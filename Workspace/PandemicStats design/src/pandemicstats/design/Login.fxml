@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.text.*?>
+<?import javafx.scene.control.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.layout.BorderPane?>
+
+<AnchorPane fx:id="AnchorPaneLogin" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="300.0" prefWidth="400.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="pandemicstats.design.MainController">
+   <children>
+      <Button fx:id="BTNPacienteLogin" alignment="CENTER" layoutX="14.0" layoutY="226.0" mnemonicParsing="false" onAction="#LoginPaciente" prefHeight="40.0" prefWidth="80.0" text="Paciente">
+         <font>
+            <Font size="15.0" />
+         </font>
+      </Button>
+      <Button fx:id="BTNEmpresaLogin" alignment="CENTER" layoutX="161.0" layoutY="227.0" mnemonicParsing="false" onAction="#LoginEmpresa" prefHeight="40.0" prefWidth="80.0" text="Empresa">
+         <font>
+            <Font size="15.0" />
+         </font>
+      </Button>
+      <Button fx:id="BTNMedicoLogin" alignment="CENTER" layoutX="306.0" layoutY="226.0" mnemonicParsing="false" onAction="#LoginMedico" prefHeight="40.0" prefWidth="80.0" text="Médico">
+         <font>
+            <Font size="15.0" />
+         </font>
+      </Button>
+      <TextField fx:id="TXTLoginLogin" layoutX="126.0" layoutY="76.0" prefHeight="25.0" prefWidth="149.0" promptText="Login" />
+      <PasswordField fx:id="PSWTXTSenhaLogin" layoutX="126.0" layoutY="125.0" promptText="Senha" />
+      <Label fx:id="LBLLogin" alignment="CENTER" layoutX="56.0" layoutY="14.0" prefHeight="54.0" prefWidth="291.0" text="Login PandemicStats">
+         <font>
+            <Font size="24.0" />
+         </font>
+      </Label>
+      <Label fx:id="LBLFixaLogin2" alignment="CENTER" layoutX="85.0" layoutY="167.0" prefHeight="40.0" prefWidth="231.0" text="Deseja fazer login como?">
+         <font>
+            <Font size="18.0" />
+         </font>
+      </Label>
+   </children>
+</AnchorPane>
