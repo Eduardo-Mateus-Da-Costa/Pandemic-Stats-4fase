@@ -104,14 +104,14 @@ public class LoginController {
 				//Para fins de teste
 				LBLLogin.setText(Login+Senha);
 				
-				main.start(new Stage(), 600, 600, "SistemaMedico.fxml", "SistemaMedico.css");
+				main.start(new Stage(), 700, 800, "SistemaMedico.fxml", "SistemaMedico.css");
 			}
 		}
 		else
 		{
 			if (TXTLoginLogin.getText().equals("Dudu") && PSWTXTSenhaLogin.getText().equals("Teste")) 
 			{
-				main.start(new Stage(), 600, 600, "SistemaMedico.fxml", "SistemaMedico.css");
+				main.start(new Stage(), 700, 800, "SistemaMedico.fxml", "SistemaMedico.css");
 			}
 			else
 			{
