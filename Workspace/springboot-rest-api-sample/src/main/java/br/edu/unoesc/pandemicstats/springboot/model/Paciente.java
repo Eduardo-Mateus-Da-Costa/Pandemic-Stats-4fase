@@ -6,18 +6,18 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.SequenceGenerator;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 
 import lombok.Data;
 
 @Entity
-@SequenceGenerator(name = "seq_paciente", sequenceName = "seq_paciente", allocationSize = 1, initialValue = 1)
 @Data
 public class Paciente implements Serializable{
 	private static final long serialVersionUID = 1L;
 	
 	@Id
-	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "seq_paciente")
+	@GeneratedValue(strategy = GenerationType.AUTO)
 	private int codpac;
 	
 	private String nompac;
@@ -29,6 +29,12 @@ public class Paciente implements Serializable{
 	private char grurispac;
 	private char sexpac;
 	private String sitpac;
+	
+	@ManyToOne
+	@JoinColumn
 	private Empresa codemp;
+	
+	@ManyToOne
+	@JoinColumn
 	private Tipo_funcionario codfun;
 }

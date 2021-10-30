@@ -6,21 +6,27 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.SequenceGenerator;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 
 import lombok.Data;
 
 @Entity
-@SequenceGenerator(name = "seq_mon_paciente", sequenceName = "seq_mon_paciente", allocationSize = 1, initialValue = 1)
 @Data
 public class Monitoramento_paciente implements Serializable{
 	private static final long serialVersionUID = 1L;
 	
 	@Id
-	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "seq_mon_paciente")
+	@GeneratedValue(strategy = GenerationType.AUTO)
 	private int codmon;
 	private String datmon;
 	private char intsin;
+	
+	@ManyToOne
+	@JoinColumn
 	private Paciente codpac;
+	
+	@ManyToOne
+	@JoinColumn
 	private Sintoma codsin;
 }
