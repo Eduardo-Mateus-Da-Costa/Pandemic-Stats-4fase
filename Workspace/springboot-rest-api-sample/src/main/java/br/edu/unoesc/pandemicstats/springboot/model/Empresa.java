@@ -16,28 +16,28 @@ public class Empresa implements Serializable{
 	private static final long serialVersionUID = 1L;
 	
 	@Id
+	@Column(columnDefinition = "NUMERIC(14, 0)")
 	private int cnpjemp;
 	
-	@Column(nullable = false)
+	@Column(columnDefinition = "VARCHAR(100)", nullable = false)
 	private String nomemp;
 	
-	@Column(nullable = true)
+	@Column(columnDefinition = "VARCHAR(100)", nullable = true)
 	private String nomfanemp;
 	
-	@Column(nullable = false)
+	@Column(columnDefinition = "VARCHAR(20)", nullable = false)
 	private String telemp1;
 	
-	@Column(nullable = true)
+	@Column(columnDefinition = "VARCHAR(20)", nullable = true)
 	private String telemp2;
 	
-	@Column(nullable = false, unique = true)
+	@Column(columnDefinition = "VARCHAR(30)", nullable = false, unique = true)
 	private String emaemp;
 	
-	@Column(nullable = false)
+	@Column(columnDefinition = "VARCHAR(60)", nullable = false)
 	private String ramo;
 	
-	
 	@ManyToOne
-	@JoinColumn(nullable = false)
-	private int cpfusu;
+	@JoinColumn(columnDefinition = "NUMERIC(11, 0)", nullable = false)
+	private Usuario cpfusu;
 }

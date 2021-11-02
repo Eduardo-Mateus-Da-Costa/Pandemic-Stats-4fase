@@ -25,7 +25,6 @@ public class GreetingsController {
 	
 	@Autowired
 	private EmpresaRepository empresaRepository;
-	@Autowired
 	
     @RequestMapping(value = "/{name}", method = RequestMethod.GET)
     @ResponseStatus(HttpStatus.OK)

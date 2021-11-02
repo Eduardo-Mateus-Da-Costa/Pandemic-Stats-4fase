@@ -2,6 +2,7 @@ package br.edu.unoesc.pandemicstats.springboot.model;
 
 import java.io.Serializable;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -19,22 +20,23 @@ public class Controle_Ligacao_Acesso implements Serializable{
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
+	@Column(columnDefinition = "NUMERIC(10, 0)")
 	private int codcon;
 	
 	@OneToOne
-	@JoinColumn(nullable = false, unique = true)
-	private int cpfusu;
+	@JoinColumn(columnDefinition = "NUMERIC(11, 0)", nullable = false, unique = true)
+	private Usuario cpfusu;
 	
 	@ManyToOne
-	@JoinColumn(nullable = true)
-	private int cnpjemp;
+	@JoinColumn(columnDefinition = "NUMERIC(14, 0)", nullable = true)
+	private Empresa cnpjemp;
 	
 	@OneToOne
-	@JoinColumn(nullable = true)
-	private String crmmed;
+	@JoinColumn(columnDefinition = "VARCHAR(30)", nullable = true)
+	private Medico crmmed;
 	
 	@OneToOne
-	@JoinColumn(nullable = true)
-	private int codpac;
+	@JoinColumn(columnDefinition = "NUMERIC(10, 0)", nullable = true)
+	private Paciente codpac;
 
 }

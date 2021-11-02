@@ -17,8 +17,9 @@ public class Pais implements Serializable{
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
+	@Column(columnDefinition = "NUMERIC(2, 0)")
 	private int codpai;
 	
-	@Column(nullable = false)
+	@Column(columnDefinition = "VARCHAR(60)", nullable = false)
 	private String nompai;
 }

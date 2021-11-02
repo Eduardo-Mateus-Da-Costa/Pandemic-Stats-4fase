@@ -20,15 +20,16 @@ public class Test_covid implements Serializable{
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
+	@Column(columnDefinition = "NUMERIC(10, 0)")
 	private int codtes;
 	
-	@Column(nullable = false)
+	@Column(columnDefinition = "DATE", nullable = false)
 	private Date dattes;
 	
-	@Column(nullable = false)
+	@Column(columnDefinition = "CHAR(1) CHECK(COVPACTES IN('P', 'N'))", nullable = false)
 	private char covpactes;
 	
 	@ManyToOne
-	@JoinColumn
-	private int codpac;
+	@JoinColumn(columnDefinition = "NUMERIC(10, 0)")
+	private Paciente codpac;
 }

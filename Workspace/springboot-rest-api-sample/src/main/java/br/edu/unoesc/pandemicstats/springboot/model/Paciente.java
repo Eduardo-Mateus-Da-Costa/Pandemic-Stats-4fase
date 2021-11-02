@@ -17,14 +17,15 @@ public class Paciente implements Serializable{
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
+	@Column(columnDefinition = "NUMERIC(10, 0)")
 	private int codpac;
 	
-	@Column(nullable = false)
+	@Column(columnDefinition = "NUMERIC(5, 2)", nullable = false)
 	private double pespac;
 	
-	@Column(nullable = false)
+	@Column(columnDefinition = "CHAR(1) CHECK(GRURISPAC IN ('S', 'N'))", nullable = false)
 	private char grurispac;
 	
-	@Column(nullable = false)
+	@Column(columnDefinition = "VARCHAR(20) CHECK(SITPAC IN ('INTERNADO', 'ISOLAMENTO', 'CURADO'))", nullable = false)
 	private String sitpac;
 }

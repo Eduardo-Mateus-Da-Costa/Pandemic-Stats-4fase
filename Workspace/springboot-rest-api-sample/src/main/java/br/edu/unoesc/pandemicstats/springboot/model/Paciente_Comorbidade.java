@@ -3,8 +3,6 @@ package br.edu.unoesc.pandemicstats.springboot.model;
 import java.io.Serializable;
 
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
@@ -16,14 +14,14 @@ import lombok.Data;
 public class Paciente_Comorbidade implements Serializable{
 	private static final long serialVersionUID = 1L;
 	
+	
 	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
-	
 	@ManyToOne
-	@JoinColumn
-	private  int codpac;
+	@JoinColumn(columnDefinition = "NUMERIC(10, 0)")
+	private  Paciente codpac;
 	
+	@Id
 	@ManyToOne
-	@JoinColumn
-	private  int codcom;
+	@JoinColumn(columnDefinition = "NUMERIC(10, 0)")
+	private  Comorbidade codcom;
 }

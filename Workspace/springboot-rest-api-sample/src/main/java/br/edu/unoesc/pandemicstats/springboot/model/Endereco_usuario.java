@@ -19,22 +19,23 @@ public class Endereco_usuario implements Serializable{
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
+	@Column(columnDefinition = "NUMERIC(10, 0)")
 	private int codendusu;
 	
-	@Column(nullable = false)
+	@Column(columnDefinition = "NUMERIC(8, 0)", nullable = false)
 	private int cepusu;
 	
-	@Column(nullable = false)
+	@Column(columnDefinition = "VARCHAR(60)", nullable = false)
 	private String ruausu;
 	
-	@Column(nullable = false)
+	@Column(columnDefinition = "VARCHAR(10)", nullable = false)
 	private String numusu;
 	
 	@OneToOne
-	@JoinColumn
-	private int cpfusu;
+	@JoinColumn(columnDefinition = "NUMERIC(11, 0)")
+	private Usuario cpfusu;
 	
 	@ManyToOne
-	@JoinColumn
-	private int codcid;
+	@JoinColumn(columnDefinition = "NUMERIC(6, 0)")
+	private Cidade codcid;
 }

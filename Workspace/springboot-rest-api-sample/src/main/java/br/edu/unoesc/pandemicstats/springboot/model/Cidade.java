@@ -2,6 +2,7 @@ package br.edu.unoesc.pandemicstats.springboot.model;
 
 import java.io.Serializable;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -18,11 +19,13 @@ public class Cidade implements Serializable{
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
+	@Column(columnDefinition = "NUMERIC(6, 0)")
 	private int codcid;
 	
+	@Column(columnDefinition = "VARCHAR(60)")
 	private String nomcid;
 	
 	@ManyToOne
-	@JoinColumn
+	@JoinColumn(columnDefinition = "NUMERIC(2, 0)")
 	private Estado codest;
 }

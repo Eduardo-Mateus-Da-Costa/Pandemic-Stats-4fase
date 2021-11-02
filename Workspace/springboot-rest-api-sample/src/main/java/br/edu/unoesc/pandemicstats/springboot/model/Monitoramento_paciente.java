@@ -20,19 +20,20 @@ public class Monitoramento_paciente implements Serializable{
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
+	@Column(columnDefinition = "NUMERIC(10, 0)")
 	private int codmon;
 	
-	@Column(nullable = false)
+	@Column(columnDefinition = "DATE", nullable = false)
 	private Date datmon;
 	
-	@Column(nullable = false)
+	@Column(columnDefinition = "CHAR(1) CHECK(INTSIN IN('P', 'M', 'C', 'S'))", nullable = false)
 	private char intsin;
 	
 	@ManyToOne
-	@JoinColumn
-	private int codpac;
+	@JoinColumn(columnDefinition = "NUMERIC(10, 0)")
+	private Paciente codpac;
 	
 	@ManyToOne
-	@JoinColumn
-	private int codsin;
+	@JoinColumn(columnDefinition = "NUMERIC(10, 0)")
+	private Sintoma codsin;
 }

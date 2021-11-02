@@ -17,11 +17,12 @@ public class Sintoma implements Serializable{
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
+	@Column(columnDefinition = "NUMERIC(10, 0)")
 	private int codsin;
 	
-	@Column(nullable = false)
+	@Column(columnDefinition = "VARCHAR(60)", nullable = false)
 	private String nomsin;
 	
-	@Column(nullable = true)
+	@Column(columnDefinition = "VARCHAR(300)", nullable = true)
 	private String dessin;
 }

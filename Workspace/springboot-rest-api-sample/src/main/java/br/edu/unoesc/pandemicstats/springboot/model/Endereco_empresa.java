@@ -20,22 +20,23 @@ public class Endereco_empresa implements Serializable{
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
+	@Column(columnDefinition = "NUMERIC(10, 0)")
 	private int codendemp;
 	
-	@Column(nullable = false)
+	@Column(columnDefinition = "NUMERIC(8, 0)", nullable = false)
 	private int cepemp;
 	
-	@Column(nullable = false)
+	@Column(columnDefinition = "VARCHAR(10)", nullable = false)
 	private String numemp;
 	
-	@Column(nullable = false)
+	@Column(columnDefinition = "VARCHAR(60)", nullable = false)
 	private String ruaemp;
 	
 	@OneToOne
-	@JoinColumn
-	private int cnpjemp;
+	@JoinColumn(columnDefinition = "NUMERIC(14, 0)")
+	private Empresa cnpjemp;
 	
 	@ManyToOne
-	@JoinColumn
-	private int codcid;
+	@JoinColumn(columnDefinition = "NUMERIC(6, 0)")
+	private Cidade codcid;
 }

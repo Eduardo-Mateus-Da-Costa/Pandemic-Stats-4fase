@@ -15,23 +15,25 @@ public class Usuario implements Serializable{
 	private static final long serialVersionUID = 1L;
 	
 	@Id
+	@Column(columnDefinition = "NUMERIC(11, 0)")
 	private int cpfusu;
 	
-	@Column(nullable = false)
+	@Column(columnDefinition = "VARCHAR(100)", nullable = false)
 	private String nomusu;
 	
-	@Column(nullable = false)
+	
+	@Column(columnDefinition = "VARCHAR(20)", nullable = false)
 	private String senusu;
 	
-	@Column(nullable = false)
+	@Column(columnDefinition = "DATE", nullable = false)
 	private Date datnasusu;
 	
-	@Column(nullable = false)
+	@Column(columnDefinition = "CHAR(1) CHECK( SEXUSU IN('M','F'))", nullable = false)
 	private char sexusu;
 	
-	@Column(nullable = false)
+	@Column(columnDefinition = "VARCHAR(20)", nullable = false)
 	private String telsusu;
 	
-	@Column(nullable = false, unique = true)
+	@Column(columnDefinition = "VARCHAR(30)", nullable = false, unique = true)
 	private String emausu;
 }

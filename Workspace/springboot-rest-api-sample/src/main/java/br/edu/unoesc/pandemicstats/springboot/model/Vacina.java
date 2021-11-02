@@ -20,22 +20,23 @@ public class Vacina implements Serializable{
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
+	@Column(columnDefinition = "NUMERIC(11, 0)")
 	private int codvac;
 	
-	@Column(nullable = false)
+	@Column(columnDefinition = "DATE", nullable = false)
 	private Date datvac;
 	
-	@Column(nullable = false)
+	@Column(columnDefinition = "CHAR(1) CHECK(DOSVAC IN('1', '2'))", nullable = false)
 	private char dosvac;
 	
-	@Column(nullable = true)
+	@Column(columnDefinition = "VARCHAR(30)", nullable = true)
 	private String fabvac;
 	
 	@ManyToOne
-	@JoinColumn
-	private int codpac;
+	@JoinColumn(columnDefinition = "NUMERIC(10, 0)")
+	private Paciente codpac;
 	
 	@ManyToOne
-	@JoinColumn
-	private String crmmed;
+	@JoinColumn(columnDefinition = "VARCHAR(30)")
+	private Medico crmmed;
 }

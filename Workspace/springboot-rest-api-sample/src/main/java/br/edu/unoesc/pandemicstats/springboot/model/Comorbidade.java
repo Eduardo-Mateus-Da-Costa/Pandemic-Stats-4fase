@@ -4,6 +4,7 @@ import br.edu.unoesc.pandemicstats.springboot.enumeracoes.ListaComo;
 
 import java.io.Serializable;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -18,7 +19,9 @@ public class Comorbidade implements Serializable{
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
+	@Column(columnDefinition = "NUMERIC(10, 0)")
 	private int codcom;
 	
+	@Column(columnDefinition = "VARCHAR(300)", nullable = false)
 	private ListaComo com;
 }
