@@ -1,9 +1,8 @@
 package br.edu.unoesc.pandemicstats.springboot.model;
 
-import br.edu.unoesc.pandemicstats.springboot.enumeracoes.ListaSint;
-
 import java.io.Serializable;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -20,7 +19,9 @@ public class Sintoma implements Serializable{
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private int codsin;
 	
-	private ListaSint nomsin;
+	@Column(nullable = false)
+	private String nomsin;
 	
+	@Column(nullable = true)
 	private String dessin;
 }

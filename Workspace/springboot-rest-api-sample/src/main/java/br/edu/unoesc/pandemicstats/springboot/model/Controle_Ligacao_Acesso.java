@@ -11,24 +11,30 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 
 import lombok.Data;
+
 @Entity
 @Data
-public class Endereco_paciente implements Serializable{
+public class Controle_Ligacao_Acesso implements Serializable{
 	private static final long serialVersionUID = 1L;
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
-	private int codendpac;
-	
-	private int ceppac;
-	private String ruapac;
-	private String numpac;
+	private int codcon;
 	
 	@OneToOne
-	@JoinColumn
-	private Paciente codpac;
+	@JoinColumn(nullable = false, unique = true)
+	private int cpfusu;
 	
 	@ManyToOne
-	@JoinColumn
-	private Cidade codcid;
+	@JoinColumn(nullable = true)
+	private int cnpjemp;
+	
+	@OneToOne
+	@JoinColumn(nullable = true)
+	private String crmmed;
+	
+	@OneToOne
+	@JoinColumn(nullable = true)
+	private int codpac;
+
 }

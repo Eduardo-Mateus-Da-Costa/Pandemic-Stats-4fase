@@ -8,10 +8,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import br.edu.unoesc.pandemicstats.springboot.enumeracoes.RamosEmp;
-import br.edu.unoesc.pandemicstats.springboot.model.Ajuda;
 import br.edu.unoesc.pandemicstats.springboot.model.Empresa;
-import br.edu.unoesc.pandemicstats.springboot.repository.AjudaRepository;
 import br.edu.unoesc.pandemicstats.springboot.repository.EmpresaRepository;
 
 /**
@@ -29,7 +26,6 @@ public class GreetingsController {
 	@Autowired
 	private EmpresaRepository empresaRepository;
 	@Autowired
-	private AjudaRepository ajudaRepository;
 	
     @RequestMapping(value = "/{name}", method = RequestMethod.GET)
     @ResponseStatus(HttpStatus.OK)
@@ -39,16 +35,13 @@ public class GreetingsController {
     
 	@RequestMapping(value = "/insert-empresa/{name}/{cnpj}/{nomfanemp}/teleemp1}/{teleemp2}/{emaemp}/{codaju}", method=RequestMethod.GET)
     @ResponseStatus(HttpStatus.OK)
-    public String insertEmpresa(@PathVariable String nome, @PathVariable int cnpj, @PathVariable String nomfanemp, @PathVariable String telemp1, @PathVariable String telemp2, @PathVariable String emaemp, @PathVariable Ajuda codaju)
+    public String insertEmpresa(@PathVariable String nome, @PathVariable int cnpj, @PathVariable String nomfanemp, @PathVariable String telemp1, @PathVariable String telemp2, @PathVariable String emaemp)
     {
     	Empresa empresa = new Empresa();
-    	RamosEmp ramo = RamosEmp.CONTABILIDADE;
     	empresa.setCnpjemp(cnpj);
-    	empresa.setCodaju(codaju);
     	empresa.setEmaemp(emaemp);
     	empresa.setNomemp(nome);
     	empresa.setNomfanemp(nomfanemp);
-    	empresa.setRamo(ramo);
     	empresa.setTelemp1(telemp1);
     	empresa.setTelemp2(telemp2);
     	try {
@@ -59,18 +52,4 @@ public class GreetingsController {
     	return "Funfou";
     }
     
-	@RequestMapping(value = "/insert-ajuda/{infaju}", method=RequestMethod.GET)
-    @ResponseStatus(HttpStatus.OK)
-    public String insertAjuda(@PathVariable String infaju)
-    {
-    	Ajuda ajuda = new Ajuda();
-    	ajuda.setInfaju(infaju);
-    
-    	try {
-			ajudaRepository.save(ajuda);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return "Funfou";
-    }
 }

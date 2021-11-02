@@ -21,9 +21,9 @@ public class Paciente_Comorbidade implements Serializable{
 	
 	@ManyToOne
 	@JoinColumn
-	private  Paciente codpac;
+	private  int codpac;
 	
 	@ManyToOne
 	@JoinColumn
-	private  Comorbidade codcom;
+	private  int codcom;
 }

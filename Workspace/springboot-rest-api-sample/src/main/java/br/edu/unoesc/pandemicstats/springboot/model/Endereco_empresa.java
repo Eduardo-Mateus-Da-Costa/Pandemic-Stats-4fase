@@ -2,6 +2,7 @@ package br.edu.unoesc.pandemicstats.springboot.model;
 
 import java.io.Serializable;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -21,15 +22,20 @@ public class Endereco_empresa implements Serializable{
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private int codendemp;
 	
+	@Column(nullable = false)
 	private int cepemp;
+	
+	@Column(nullable = false)
 	private String numemp;
+	
+	@Column(nullable = false)
 	private String ruaemp;
 	
 	@OneToOne
 	@JoinColumn
-	private Empresa codemp;
+	private int cnpjemp;
 	
 	@ManyToOne
 	@JoinColumn
-	private Cidade codcid;
+	private int codcid;
 }

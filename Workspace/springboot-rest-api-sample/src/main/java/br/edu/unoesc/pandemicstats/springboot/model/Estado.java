@@ -25,5 +25,5 @@ public class Estado implements Serializable{
 	
 	@ManyToOne
 	@JoinColumn
-	private Pais codpai;
+	private int codpai;
 }

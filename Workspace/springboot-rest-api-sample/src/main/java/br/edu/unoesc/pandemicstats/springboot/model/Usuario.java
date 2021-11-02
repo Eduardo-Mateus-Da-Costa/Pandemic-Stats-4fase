@@ -1,14 +1,11 @@
 package br.edu.unoesc.pandemicstats.springboot.model;
 
 import java.io.Serializable;
+import java.sql.Date;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToOne;
 
 import lombok.Data;
 
@@ -18,23 +15,23 @@ public class Usuario implements Serializable{
 	private static final long serialVersionUID = 1L;
 	
 	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
-	private int codusu;
+	private int cpfusu;
 	
+	@Column(nullable = false)
 	private String nomusu;
-	private String logusu;
+	
+	@Column(nullable = false)
 	private String senusu;
-	private char tipusu;
 	
-	@ManyToOne
-	@JoinColumn
-	private Empresa codemp;
+	@Column(nullable = false)
+	private Date datnasusu;
 	
-	@OneToOne
-	@JoinColumn
-	private Paciente codpac;
+	@Column(nullable = false)
+	private char sexusu;
 	
-	@OneToOne
-	@JoinColumn
-	private Medico codmed;
+	@Column(nullable = false)
+	private String telsusu;
+	
+	@Column(nullable = false, unique = true)
+	private String emausu;
 }

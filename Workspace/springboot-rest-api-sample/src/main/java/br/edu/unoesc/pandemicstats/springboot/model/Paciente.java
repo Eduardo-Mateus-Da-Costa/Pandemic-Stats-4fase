@@ -2,12 +2,11 @@ package br.edu.unoesc.pandemicstats.springboot.model;
 
 import java.io.Serializable;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 
 import lombok.Data;
 
@@ -20,21 +19,12 @@ public class Paciente implements Serializable{
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private int codpac;
 	
-	private String nompac;
-	private int cpfpac;
-	private String datnaspac;
+	@Column(nullable = false)
 	private double pespac;
-	private String telpac1;
-	private String telpac2;
+	
+	@Column(nullable = false)
 	private char grurispac;
-	private char sexpac;
+	
+	@Column(nullable = false)
 	private String sitpac;
-	
-	@ManyToOne
-	@JoinColumn
-	private Empresa codemp;
-	
-	@ManyToOne
-	@JoinColumn
-	private Tipo_funcionario codfun;
 }

@@ -2,6 +2,7 @@ package br.edu.unoesc.pandemicstats.springboot.model;
 
 import java.io.Serializable;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -18,5 +19,6 @@ public class Pais implements Serializable{
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private int codpai;
 	
+	@Column(nullable = false)
 	private String nompai;
 }

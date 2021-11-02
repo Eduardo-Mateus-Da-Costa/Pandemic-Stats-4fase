@@ -1,7 +1,9 @@
 package br.edu.unoesc.pandemicstats.springboot.model;
 
 import java.io.Serializable;
+import java.sql.Date;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -20,15 +22,20 @@ public class Vacina implements Serializable{
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private int codvac;
 	
-	private String datvac;
+	@Column(nullable = false)
+	private Date datvac;
+	
+	@Column(nullable = false)
 	private char dosvac;
+	
+	@Column(nullable = true)
 	private String fabvac;
 	
 	@ManyToOne
 	@JoinColumn
-	private Paciente codpac;
+	private int codpac;
 	
 	@ManyToOne
 	@JoinColumn
-	private Medico codmed;
+	private String crmmed;
 }

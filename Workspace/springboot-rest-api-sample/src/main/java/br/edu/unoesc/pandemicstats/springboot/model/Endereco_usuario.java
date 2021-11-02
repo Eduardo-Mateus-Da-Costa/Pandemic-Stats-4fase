@@ -1,7 +1,6 @@
 package br.edu.unoesc.pandemicstats.springboot.model;
 
 import java.io.Serializable;
-import java.sql.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -10,25 +9,32 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
 
 import lombok.Data;
-
 @Entity
 @Data
-public class Test_covid implements Serializable{
+public class Endereco_usuario implements Serializable{
 	private static final long serialVersionUID = 1L;
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
-	private int codtes;
+	private int codendusu;
 	
 	@Column(nullable = false)
-	private Date dattes;
+	private int cepusu;
 	
 	@Column(nullable = false)
-	private char covpactes;
+	private String ruausu;
+	
+	@Column(nullable = false)
+	private String numusu;
+	
+	@OneToOne
+	@JoinColumn
+	private int cpfusu;
 	
 	@ManyToOne
 	@JoinColumn
-	private int codpac;
+	private int codcid;
 }
