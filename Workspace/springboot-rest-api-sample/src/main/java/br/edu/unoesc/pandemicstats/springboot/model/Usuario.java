@@ -1,7 +1,6 @@
 package br.edu.unoesc.pandemicstats.springboot.model;
 
 import java.io.Serializable;
-import java.sql.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -21,19 +20,19 @@ public class Usuario implements Serializable{
 	@Column(columnDefinition = "VARCHAR(100)", nullable = false)
 	private String nomusu;
 	
-	
 	@Column(columnDefinition = "VARCHAR(20)", nullable = false)
 	private String senusu;
 	
-	@Column(columnDefinition = "DATE", nullable = false)
-	private Date datnasusu;
+	@Column(columnDefinition = "VARCHAR(30)", nullable = false)
+	private String datnasusu;
 	
 	@Column(columnDefinition = "CHAR(1) CHECK( SEXUSU IN('M','F'))", nullable = false)
 	private char sexusu;
 	
 	@Column(columnDefinition = "VARCHAR(20)", nullable = false)
-	private String telsusu;
+	private String telusu;
 	
 	@Column(columnDefinition = "VARCHAR(30)", nullable = false, unique = true)
 	private String emausu;
+	
 }
