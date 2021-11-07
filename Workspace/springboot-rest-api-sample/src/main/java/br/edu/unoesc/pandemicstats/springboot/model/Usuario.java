@@ -6,11 +6,16 @@ import java.sql.Date;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+
+import org.hibernate.annotations.ColumnDefault;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 import lombok.Data;
 
+@org.hibernate.annotations.Table(comment = "Tabela de usuarios", appliesTo = "usuario")
 @Entity
 @Data
 public class Usuario implements Serializable{
@@ -27,7 +32,7 @@ public class Usuario implements Serializable{
 	private String senusu;
 	
 	@Column(columnDefinition = "VARCHAR(30)", nullable = false)
-	@JsonFormat(pattern="dd/mm/yyyy")
+	@JsonFormat(pattern="yyyy-mm-dd")
 	private Date datnasusu;
 	
 	@Column(columnDefinition = "CHAR(1) CHECK( SEXUSU IN('M','F'))", nullable = false)
@@ -38,5 +43,14 @@ public class Usuario implements Serializable{
 	
 	@Column(columnDefinition = "VARCHAR(30)", nullable = false, unique = true)
 	private String emausu;
+	
+	@Column(columnDefinition = "DATE", nullable = false)
+	@ColumnDefault(value="CURRENT_TIMESTAMP")
+	@JsonFormat(pattern="yyyy-mm-dd")
+	private Date valusu;
+	
+	@ManyToOne
+	@JoinColumn(columnDefinition = "NUMERIC(14, 0)", nullable = true)
+	private Empresa cnpjemp;
 	
 }

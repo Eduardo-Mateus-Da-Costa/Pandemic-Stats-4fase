@@ -12,6 +12,7 @@ import javax.persistence.ManyToOne;
 
 import lombok.Data;
 
+@org.hibernate.annotations.Table(comment = "Tabela de cidades", appliesTo = "cidade")
 @Entity
 @Data
 public class Cidade implements Serializable{
@@ -21,6 +22,7 @@ public class Cidade implements Serializable{
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	@Column(columnDefinition = "NUMERIC(6, 0)")
 	private int codcid;
+	
 	
 	@Column(columnDefinition = "VARCHAR(60)")
 	private String nomcid;

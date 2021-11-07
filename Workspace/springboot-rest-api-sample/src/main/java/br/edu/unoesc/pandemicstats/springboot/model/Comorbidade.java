@@ -12,6 +12,7 @@ import javax.persistence.Id;
 
 import lombok.Data;
 
+@org.hibernate.annotations.Table(comment = "Tabela de comorbidades", appliesTo = "comorbidade")
 @Entity
 @Data
 public class Comorbidade implements Serializable{

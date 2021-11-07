@@ -10,6 +10,7 @@ import javax.persistence.Id;
 
 import lombok.Data;
 
+@org.hibernate.annotations.Table(comment = "Tabela de paises", appliesTo = "pais")
 @Entity
 @Data
 public class Pais implements Serializable{

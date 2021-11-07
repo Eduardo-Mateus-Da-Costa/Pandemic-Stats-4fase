@@ -10,6 +10,7 @@ import javax.persistence.ManyToOne;
 
 import lombok.Data;
 
+@org.hibernate.annotations.Table(comment = "Tabela de vinculação paciente comorbidades", appliesTo = "paciente_comorbidade")
 @Entity
 @Data
 public class Paciente_comorbidade implements Serializable{
@@ -24,6 +25,6 @@ public class Paciente_comorbidade implements Serializable{
 	private Paciente codpac;
 	
 	@ManyToOne
-	@JoinColumn(columnDefinition = "NUMERIC(10, 0)")
+	@JoinColumn(columnDefinition = "NUMERIC(10, 0)", nullable = false)
 	private Comorbidade codcom;
 }

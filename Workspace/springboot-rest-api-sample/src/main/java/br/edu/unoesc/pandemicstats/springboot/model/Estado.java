@@ -13,6 +13,8 @@ import javax.persistence.ManyToOne;
 
 import lombok.Data;
 
+
+@org.hibernate.annotations.Table(comment = "Tabela de estados", appliesTo = "estado")
 @Entity
 @Data
 public class Estado implements Serializable{

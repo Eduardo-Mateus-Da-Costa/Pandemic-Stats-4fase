@@ -20,9 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 import br.edu.unoesc.pandemicstats.springboot.model.Usuario;
 import br.edu.unoesc.pandemicstats.springboot.repository.CidadeRepository;
 import br.edu.unoesc.pandemicstats.springboot.repository.ComorbidadeRepository;
-import br.edu.unoesc.pandemicstats.springboot.repository.Controle_Ligacao_AcessoRepository;
 import br.edu.unoesc.pandemicstats.springboot.repository.EmpresaRepository;
-import br.edu.unoesc.pandemicstats.springboot.repository.Endereco_empresaRepository;
 import br.edu.unoesc.pandemicstats.springboot.repository.Endereco_usuarioRepository;
 import br.edu.unoesc.pandemicstats.springboot.repository.EstadoRepository;
 import br.edu.unoesc.pandemicstats.springboot.repository.MedicoRepository;
@@ -31,6 +29,7 @@ import br.edu.unoesc.pandemicstats.springboot.repository.PacienteRepository;
 import br.edu.unoesc.pandemicstats.springboot.repository.Paciente_comorbidadeRepository;
 import br.edu.unoesc.pandemicstats.springboot.repository.PaisRepository;
 import br.edu.unoesc.pandemicstats.springboot.repository.SintomaRepository;
+import br.edu.unoesc.pandemicstats.springboot.repository.SolicitacaoRepository;
 import br.edu.unoesc.pandemicstats.springboot.repository.Test_covidRepository;
 import br.edu.unoesc.pandemicstats.springboot.repository.UsuarioRepository;
 import br.edu.unoesc.pandemicstats.springboot.repository.VacinaRepository;
@@ -51,11 +50,7 @@ public class GreetingsController {
 	@Autowired
 	ComorbidadeRepository comRep;
 	@Autowired
-	Controle_Ligacao_AcessoRepository controlRep;
-	@Autowired
 	EmpresaRepository empRep;
-	@Autowired
-	Endereco_empresaRepository endEmpRep;
 	@Autowired
 	Endereco_usuarioRepository endUsuRep;
 	@Autowired
@@ -78,6 +73,8 @@ public class GreetingsController {
 	UsuarioRepository usuRep;
 	@Autowired
 	VacinaRepository vacRep;
+	@Autowired
+	SolicitacaoRepository solRep;
 	
 	
     @RequestMapping(value = "/hello/{name}", method = RequestMethod.GET)

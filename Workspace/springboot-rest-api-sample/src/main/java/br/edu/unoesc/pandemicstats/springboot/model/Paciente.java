@@ -4,21 +4,25 @@ import java.io.Serializable;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToOne;
 
 import lombok.Data;
 
+@org.hibernate.annotations.Table(comment = "Tabela de pacientes", appliesTo = "paciente")
 @Entity
 @Data
 public class Paciente implements Serializable{
 	private static final long serialVersionUID = 1L;
 	
 	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
 	@Column(columnDefinition = "NUMERIC(10, 0)")
 	private int codpac;
+	
+	@OneToOne
+	@JoinColumn(columnDefinition = "NUMERIC(11, 0)", nullable = false)
+	private Usuario cpfusu;
 	
 	@Column(columnDefinition = "NUMERIC(5, 2)", nullable = false)
 	private double pespac;

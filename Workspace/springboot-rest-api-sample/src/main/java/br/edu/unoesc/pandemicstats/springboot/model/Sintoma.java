@@ -10,6 +10,8 @@ import javax.persistence.Id;
 
 import lombok.Data;
 
+
+@org.hibernate.annotations.Table(comment = "Tabela de sintomas", appliesTo = "sintoma")
 @Entity
 @Data
 public class Sintoma implements Serializable{

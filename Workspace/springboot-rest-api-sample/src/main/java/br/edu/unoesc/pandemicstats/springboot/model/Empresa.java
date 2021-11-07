@@ -1,6 +1,7 @@
 package br.edu.unoesc.pandemicstats.springboot.model;
 
 import java.io.Serializable;
+import java.sql.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -8,8 +9,11 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
+import org.hibernate.annotations.ColumnDefault;
+
 import lombok.Data;
 
+@org.hibernate.annotations.Table(comment = "Tabela de empresas", appliesTo = "empresa")
 @Entity
 @Data
 public class Empresa implements Serializable{
@@ -36,6 +40,10 @@ public class Empresa implements Serializable{
 	
 	@Column(columnDefinition = "VARCHAR(60)", nullable = false)
 	private String ramo;
+	
+	@Column(columnDefinition = "DATE", nullable = false)
+	@ColumnDefault(value="CURRENT_TIMESTAMP")
+	private Date valemp;
 	
 	@ManyToOne
 	@JoinColumn(columnDefinition = "NUMERIC(11, 0)", nullable = false)
