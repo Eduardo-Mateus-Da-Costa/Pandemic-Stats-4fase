@@ -1,10 +1,13 @@
 package br.edu.unoesc.pandemicstats.springboot.model;
 
 import java.io.Serializable;
+import java.sql.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 import lombok.Data;
 
@@ -24,7 +27,8 @@ public class Usuario implements Serializable{
 	private String senusu;
 	
 	@Column(columnDefinition = "VARCHAR(30)", nullable = false)
-	private String datnasusu;
+	@JsonFormat(pattern="dd/mm/yyyy")
+	private Date datnasusu;
 	
 	@Column(columnDefinition = "CHAR(1) CHECK( SEXUSU IN('M','F'))", nullable = false)
 	private char sexusu;
