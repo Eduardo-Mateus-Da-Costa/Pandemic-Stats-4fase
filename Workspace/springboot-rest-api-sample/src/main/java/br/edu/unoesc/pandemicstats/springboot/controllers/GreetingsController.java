@@ -1,6 +1,7 @@
 package br.edu.unoesc.pandemicstats.springboot.controllers;
 
-import java.util.List;
+
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -33,6 +34,8 @@ import br.edu.unoesc.pandemicstats.springboot.repository.SolicitacaoRepository;
 import br.edu.unoesc.pandemicstats.springboot.repository.Test_covidRepository;
 import br.edu.unoesc.pandemicstats.springboot.repository.UsuarioRepository;
 import br.edu.unoesc.pandemicstats.springboot.repository.VacinaRepository;
+import br.edu.unoesc.pandemicstats.springboot.responses.ResponseGeral;
+import br.edu.unoesc.pandemicstats.springboot.schemmas.UsuarioSCH;
 /**
  *
  * A sample greetings controller to return greeting text
@@ -83,20 +86,21 @@ public class GreetingsController {
         return "Hello " + name + "!";
     }
     
-    @GetMapping(value = "getUsus")
-    @ResponseBody
-    public ResponseEntity<List<Usuario>>ListaUsuario()
-    {
-    	List<Usuario> usuarios = usuRep.findAll();
-    	return new ResponseEntity<List<Usuario>>(usuarios, HttpStatus.OK);
-    }
     
     @PostMapping(value = "postUsu")
     @ResponseBody
-    public ResponseEntity<Usuario> postUsu(@RequestBody Usuario usu)
+    public ResponseEntity<ResponseGeral> postUsu(@RequestBody Usuario usu)
     {
-    	Usuario u = usuRep.save(usu);
-    	return new ResponseEntity<Usuario>(u, HttpStatus.CREATED);
+    	try {
+    		usuRep.save(usu);
+    		ResponseGeral rg = new ResponseGeral();
+    		rg.RespValUsu(usu, 0);
+    		return new ResponseEntity<ResponseGeral>(rg, HttpStatus.CREATED);
+		} catch (Exception e) {
+			ResponseGeral rg = new ResponseGeral();
+			rg.RespValUsu(usu, 500);
+			return new ResponseEntity<ResponseGeral>(rg, HttpStatus.CONFLICT);
+		}
     }
     
     @DeleteMapping(value = "deleteUsu")
@@ -109,11 +113,14 @@ public class GreetingsController {
     
     @GetMapping(value = "getUsu")
     @ResponseBody
-    public ResponseEntity<Usuario>getUsu(@RequestParam(name ="cpfusu") int cpfusu)
+    public ResponseEntity<UsuarioSCH>getUsu(@RequestParam(name ="cpfusu") int cpfusu)
     {
-    	Usuario user = usuRep.findById(cpfusu).get();
-    	return new ResponseEntity<Usuario>(user, HttpStatus.OK);
+    	Usuario u = usuRep.findById(cpfusu).get();
+    	UsuarioSCH user = new UsuarioSCH();
+    	user.Convert(u);
+    	return new ResponseEntity<UsuarioSCH>(user, HttpStatus.OK);
     }
+    
     
     
 }
