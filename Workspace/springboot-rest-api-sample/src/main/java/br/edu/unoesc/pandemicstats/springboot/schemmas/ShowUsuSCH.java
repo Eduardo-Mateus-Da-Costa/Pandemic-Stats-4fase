@@ -6,7 +6,7 @@ import br.edu.unoesc.pandemicstats.springboot.model.Usuario;
 import lombok.Data;
 
 @Data
-public class UsuarioSCH {
+public class ShowUsuSCH {
 	private int cpfusu;
 	private String nomusu;
 	private Date datnasusu;	

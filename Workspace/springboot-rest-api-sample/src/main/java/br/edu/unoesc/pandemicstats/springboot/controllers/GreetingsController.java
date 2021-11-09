@@ -1,13 +1,12 @@
 package br.edu.unoesc.pandemicstats.springboot.controllers;
 
 
-import java.util.Optional;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -35,11 +34,14 @@ import br.edu.unoesc.pandemicstats.springboot.repository.Test_covidRepository;
 import br.edu.unoesc.pandemicstats.springboot.repository.UsuarioRepository;
 import br.edu.unoesc.pandemicstats.springboot.repository.VacinaRepository;
 import br.edu.unoesc.pandemicstats.springboot.responses.ResponseGeral;
-import br.edu.unoesc.pandemicstats.springboot.schemmas.UsuarioSCH;
+import br.edu.unoesc.pandemicstats.springboot.schemmas.ShowUsuSCH;
+import br.edu.unoesc.pandemicstats.springboot.utils.ConvertUsu;
 /**
  *
  * A sample greetings controller to return greeting text
  */
+
+
 @RestController
 public class GreetingsController {
     /**
@@ -92,16 +94,47 @@ public class GreetingsController {
     public ResponseEntity<ResponseGeral> postUsu(@RequestBody Usuario usu)
     {
     	try {
-    		usuRep.save(usu);
-    		ResponseGeral rg = new ResponseGeral();
-    		rg.RespValUsu(usu, 0);
-    		return new ResponseEntity<ResponseGeral>(rg, HttpStatus.CREATED);
+    		Usuario val_u = new Usuario();
+    		val_u = usuRep.findByCPF(usu.getCpfusu());
+    		if(val_u != null)
+    		{
+    			ResponseGeral rg = new ResponseGeral();
+    			rg.RespValUsu(null, 503);
+    			return new ResponseEntity<ResponseGeral>(rg, HttpStatus.CONFLICT);
+    		}
+    		else
+    		{
+    			usuRep.save(usu);
+    			ResponseGeral rg = new ResponseGeral();
+    			rg.RespValUsu(usu, 0);
+    			return new ResponseEntity<ResponseGeral>(rg, HttpStatus.CREATED);
+    		}
 		} catch (Exception e) {
 			ResponseGeral rg = new ResponseGeral();
-			rg.RespValUsu(usu, 500);
+			rg.RespValUsu(null, 500);
 			return new ResponseEntity<ResponseGeral>(rg, HttpStatus.CONFLICT);
 		}
     }
+    
+    @PatchMapping(value = "patchUsu")
+    @ResponseBody
+    public ResponseEntity<ResponseGeral> patchUsu(@RequestBody Usuario usu)
+    {
+    	try {
+    		Usuario u = usuRep.findByCPF(usu.getCpfusu());
+    		ConvertUsu.complete(usu, u);
+    		usuRep.save(usu);
+    		ResponseGeral rg = new ResponseGeral();
+    		rg.RespValUsu(usu, 0);
+    		return new ResponseEntity<ResponseGeral>(rg, HttpStatus.OK);
+    	}catch(Exception e)
+    	{
+    		ResponseGeral rg = new ResponseGeral();
+    		rg.RespValUsu(null, 500);
+    		return new ResponseEntity<ResponseGeral>(rg, HttpStatus.CONFLICT);
+    	}
+    }
+    
     
     @DeleteMapping(value = "deleteUsu")
     @ResponseBody
@@ -113,12 +146,12 @@ public class GreetingsController {
     
     @GetMapping(value = "getUsu")
     @ResponseBody
-    public ResponseEntity<UsuarioSCH>getUsu(@RequestParam(name ="cpfusu") int cpfusu)
+    public ResponseEntity<ShowUsuSCH>getUsu(@RequestParam(name ="cpfusu") int cpfusu)
     {
     	Usuario u = usuRep.findById(cpfusu).get();
-    	UsuarioSCH user = new UsuarioSCH();
+    	ShowUsuSCH user = new ShowUsuSCH();
     	user.Convert(u);
-    	return new ResponseEntity<UsuarioSCH>(user, HttpStatus.OK);
+    	return new ResponseEntity<ShowUsuSCH>(user, HttpStatus.OK);
     }
     
     
