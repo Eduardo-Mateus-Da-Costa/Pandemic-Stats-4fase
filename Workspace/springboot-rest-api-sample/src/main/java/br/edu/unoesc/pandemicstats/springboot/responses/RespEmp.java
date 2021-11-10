@@ -1,16 +1,16 @@
 package br.edu.unoesc.pandemicstats.springboot.responses;
 
-import br.edu.unoesc.pandemicstats.springboot.model.Usuario;
-import br.edu.unoesc.pandemicstats.springboot.schemmas.ShowUsuSCH;
+import br.edu.unoesc.pandemicstats.springboot.model.Empresa;
+import br.edu.unoesc.pandemicstats.springboot.schemmas.ShowEmpSCH;
 import lombok.Data;
 
 @Data
-public class ResponseGeral {
+public class RespEmp {
 	private int Httpstatus;
-	private ShowUsuSCH u = new ShowUsuSCH();
+	private ShowEmpSCH e = new ShowEmpSCH();
 	private String s;
 	
-	public void RespValUsu(Usuario user, int Httpstatus)
+	public void RespValEmp(Empresa emp, int Httpstatus)
 	{
 		if(Httpstatus==500)
 		{
@@ -20,12 +20,13 @@ public class ResponseGeral {
 		else if(Httpstatus==503)
 		{
 			this.Httpstatus = Httpstatus;
-			this.s = "CPFs iguais";
+			this.s = "CNPJs iguais";
 		}
 		else
 		{
 			this.Httpstatus = 200;
-			u.Convert(user);
+			e.Convert(emp);;
 		}
 	}
+
 }

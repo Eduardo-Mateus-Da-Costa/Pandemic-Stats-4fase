@@ -7,16 +7,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import br.edu.unoesc.pandemicstats.springboot.model.Empresa;
 import br.edu.unoesc.pandemicstats.springboot.model.Usuario;
 import br.edu.unoesc.pandemicstats.springboot.repository.CidadeRepository;
 import br.edu.unoesc.pandemicstats.springboot.repository.ComorbidadeRepository;
@@ -33,8 +30,12 @@ import br.edu.unoesc.pandemicstats.springboot.repository.SolicitacaoRepository;
 import br.edu.unoesc.pandemicstats.springboot.repository.Test_covidRepository;
 import br.edu.unoesc.pandemicstats.springboot.repository.UsuarioRepository;
 import br.edu.unoesc.pandemicstats.springboot.repository.VacinaRepository;
-import br.edu.unoesc.pandemicstats.springboot.responses.ResponseGeral;
+import br.edu.unoesc.pandemicstats.springboot.responses.RespEmp;
+import br.edu.unoesc.pandemicstats.springboot.responses.RespUsu;
+import br.edu.unoesc.pandemicstats.springboot.schemmas.LoginSCH;
+import br.edu.unoesc.pandemicstats.springboot.schemmas.ShowEmpSCH;
 import br.edu.unoesc.pandemicstats.springboot.schemmas.ShowUsuSCH;
+import br.edu.unoesc.pandemicstats.springboot.utils.ConvertEmp;
 import br.edu.unoesc.pandemicstats.springboot.utils.ConvertUsu;
 /**
  *
@@ -80,58 +81,51 @@ public class GreetingsController {
 	VacinaRepository vacRep;
 	@Autowired
 	SolicitacaoRepository solRep;
-	
-	
-    @RequestMapping(value = "/hello/{name}", method = RequestMethod.GET)
-    @ResponseStatus(HttpStatus.OK)
-    public String greetingText(@PathVariable String name) {
-        return "Hello " + name + "!";
-    }
     
-    
+//Endpoints de usuário
     @PostMapping(value = "postUsu")
     @ResponseBody
-    public ResponseEntity<ResponseGeral> postUsu(@RequestBody Usuario usu)
+    public ResponseEntity<RespUsu> postUsu(@RequestBody Usuario usu)
     {
     	try {
     		Usuario val_u = new Usuario();
     		val_u = usuRep.findByCPF(usu.getCpfusu());
     		if(val_u != null)
     		{
-    			ResponseGeral rg = new ResponseGeral();
+    			RespUsu rg = new RespUsu();
     			rg.RespValUsu(null, 503);
-    			return new ResponseEntity<ResponseGeral>(rg, HttpStatus.CONFLICT);
+    			return new ResponseEntity<RespUsu>(rg, HttpStatus.CONFLICT);
     		}
     		else
     		{
     			usuRep.save(usu);
-    			ResponseGeral rg = new ResponseGeral();
+    			RespUsu rg = new RespUsu();
     			rg.RespValUsu(usu, 0);
-    			return new ResponseEntity<ResponseGeral>(rg, HttpStatus.CREATED);
+    			return new ResponseEntity<RespUsu>(rg, HttpStatus.CREATED);
     		}
 		} catch (Exception e) {
-			ResponseGeral rg = new ResponseGeral();
+			RespUsu rg = new RespUsu();
 			rg.RespValUsu(null, 500);
-			return new ResponseEntity<ResponseGeral>(rg, HttpStatus.CONFLICT);
+			return new ResponseEntity<RespUsu>(rg, HttpStatus.CONFLICT);
 		}
     }
     
     @PatchMapping(value = "patchUsu")
     @ResponseBody
-    public ResponseEntity<ResponseGeral> patchUsu(@RequestBody Usuario usu)
+    public ResponseEntity<RespUsu> patchUsu(@RequestBody Usuario usu)
     {
     	try {
     		Usuario u = usuRep.findByCPF(usu.getCpfusu());
     		ConvertUsu.complete(usu, u);
     		usuRep.save(usu);
-    		ResponseGeral rg = new ResponseGeral();
+    		RespUsu rg = new RespUsu();
     		rg.RespValUsu(usu, 0);
-    		return new ResponseEntity<ResponseGeral>(rg, HttpStatus.OK);
+    		return new ResponseEntity<RespUsu>(rg, HttpStatus.OK);
     	}catch(Exception e)
     	{
-    		ResponseGeral rg = new ResponseGeral();
+    		RespUsu rg = new RespUsu();
     		rg.RespValUsu(null, 500);
-    		return new ResponseEntity<ResponseGeral>(rg, HttpStatus.CONFLICT);
+    		return new ResponseEntity<RespUsu>(rg, HttpStatus.CONFLICT);
     	}
     }
     
@@ -140,8 +134,13 @@ public class GreetingsController {
     @ResponseBody
     public ResponseEntity<String> deleteUsu(@RequestParam(name ="cpfusu") int cpfusu)
     {
-    	usuRep.deleteById(cpfusu);
-    	return new ResponseEntity<String>("Deletado com sucesso", HttpStatus.OK);
+    	try {
+    		usuRep.deleteById(cpfusu);
+    		return new ResponseEntity<String>("Deletado com sucesso", HttpStatus.OK);
+    	}catch(Exception e)
+    	{
+    		return new ResponseEntity<String>("Erro na deleção", HttpStatus.NOT_FOUND);
+    	}
     }
     
     @GetMapping(value = "getUsu")
@@ -154,6 +153,106 @@ public class GreetingsController {
     	return new ResponseEntity<ShowUsuSCH>(user, HttpStatus.OK);
     }
     
+    @GetMapping(value = "login")
+    @ResponseBody
+    public ResponseEntity<RespUsu> login(@RequestBody LoginSCH login)
+    {
+    	Usuario u = new Usuario();
+    	u = usuRep.findByEmail(login.getEmail());
+    	if(u == null)
+    	{
+    		RespUsu rg = new RespUsu();
+    		rg.RespValUsu(null, 505);
+    		return new ResponseEntity<RespUsu>(rg, HttpStatus.CONFLICT);
+    	}
+    	else
+    	{
+    		if (u.getSenusu().equals(login.getSenha()))
+    		{
+    			RespUsu rg = new RespUsu();
+        		rg.RespValUsu(u, 0);
+        		return new ResponseEntity<RespUsu>(rg, HttpStatus.ACCEPTED);
+    		}
+    		else
+    		{
+    			RespUsu rg = new RespUsu();
+        		rg.RespValUsu(null, 504);
+        		System.out.println(u.getSenusu());
+            	System.out.println(login.toString());
+        		return new ResponseEntity<RespUsu>(rg, HttpStatus.UNAUTHORIZED);
+    		}
+    	}
+    }
     
+//Endpoints de empresa
+    @PostMapping(value = "postEmp")
+    @ResponseBody
+    public ResponseEntity<RespEmp> postEmp(@RequestBody Empresa emp)
+    {
+    	try {
+    		Empresa val_e = new Empresa();
+    		val_e = empRep.findByCNPJ(emp.getCnpjemp());
+    		if(val_e != null)
+    		{
+    			RespEmp re = new RespEmp();
+    			re.RespValEmp(null, 503);
+    			return new ResponseEntity<RespEmp>(re, HttpStatus.CONFLICT);
+    		}
+    		else
+    		{
+    			empRep.save(emp);
+    			RespEmp re = new RespEmp();
+    			re.RespValEmp(emp, 0);
+    			return new ResponseEntity<RespEmp>(re, HttpStatus.CREATED);
+    		}
+		} catch (Exception e) {
+			RespEmp re = new RespEmp();
+			re.RespValEmp(null, 500);
+			return new ResponseEntity<RespEmp>(re, HttpStatus.CONFLICT);
+		}
+    }
     
+    @PatchMapping(value = "patchEmp")
+    @ResponseBody
+    public ResponseEntity<RespEmp> patchEmp(@RequestBody Empresa emp)
+    {
+    	try {
+    		Empresa e = empRep.findByCNPJ(emp.getCnpjemp());
+    		ConvertEmp.complete(emp, e);
+    		empRep.save(emp);
+    		RespEmp re = new RespEmp();
+    		re.RespValEmp(emp, 0);
+    		return new ResponseEntity<RespEmp>(re, HttpStatus.OK);
+    	}catch(Exception e)
+    	{
+    		RespEmp re = new RespEmp();
+    		re.RespValEmp(null, 500);
+    		return new ResponseEntity<RespEmp>(re, HttpStatus.CONFLICT);
+    	}
+    }
+    
+    @DeleteMapping(value = "deleteEmp")
+    @ResponseBody
+    public ResponseEntity<String> deleteEmp(@RequestParam(name ="cnpjemp") int cnpjemp)
+    {
+    	try {
+    		usuRep.setCnpjNull(cnpjemp);
+    		empRep.deleteById(cnpjemp);
+    		return new ResponseEntity<String>("Deletado com sucesso", HttpStatus.OK);
+    	}catch(Exception e)
+    	{
+    		e.printStackTrace();
+    		return new ResponseEntity<String>("Erro na deleção", HttpStatus.NOT_FOUND);
+    	}
+    }
+    
+    @GetMapping(value = "getEmp")
+    @ResponseBody
+    public ResponseEntity<ShowEmpSCH> getEmp(@RequestParam(name ="cnpjemp") int cnpjemp)
+    {
+    	Empresa e = empRep.findById(cnpjemp).get();
+    	ShowEmpSCH se = new ShowEmpSCH();
+    	se.Convert(e);
+    	return new ResponseEntity<ShowEmpSCH>(se, HttpStatus.OK);
+    }
 }

@@ -11,6 +11,8 @@ import javax.persistence.ManyToOne;
 
 import org.hibernate.annotations.ColumnDefault;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import lombok.Data;
 
 @org.hibernate.annotations.Table(comment = "Tabela de empresas", appliesTo = "empresa")
@@ -42,6 +44,7 @@ public class Empresa implements Serializable{
 	private String ramo;
 	
 	@Column(columnDefinition = "DATE", nullable = false)
+	@JsonFormat(pattern="yyyy-mm-dd")
 	@ColumnDefault(value="CURRENT_TIMESTAMP")
 	private Date valemp;
 	
