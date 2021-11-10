@@ -1,0 +1,93 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+	<changeSet id="adiciona os comentários em todas as tabelas" author="Eduardo Mateus da Costa">
+		<sql stripComments="true" splitStatements="true" endDelimiter=";">
+			COMMENT ON COLUMN cidade.codcid IS 'Código da cidade';
+			COMMENT ON COLUMN cidade.nomcid IS 'Nome da cidade.';
+			
+			COMMENT ON COLUMN comorbidade.codcom IS 'Código da comorbidade';
+			COMMENT ON COLUMN comorbidade.com IS 'Comorbidades e sua descrição se necessário.';
+			
+			COMMENT ON COLUMN empresa.nomemp IS 'Nome da empresa';
+			COMMENT ON COLUMN empresa.cnpjemp IS 'CNPJ da Empresa';
+			COMMENT ON COLUMN empresa.nomfanemp IS 'Nome fantasia da empresa';
+			COMMENT ON COLUMN empresa.telemp1 IS 'Telefone 1 da empresa';
+			COMMENT ON COLUMN empresa.telemp2 IS 'Telefone 2 da empresa';
+			COMMENT ON COLUMN empresa.emaemp IS 'Email da empresa';
+			COMMENT ON COLUMN empresa.ramemp IS 'Ramo da empresa';
+			COMMENT ON COLUMN empresa.valemp IS 'Data de validação da empresa:
+			Se a partir da data de criação ou alteração, não possuir funcionarios em até 21 dias será excluida do banco';
+			
+			COMMENT ON COLUMN endereco.codend IS 'Código do endereço';
+			COMMENT ON COLUMN endereco.cep IS 'Número do CEP.';
+			COMMENT ON COLUMN endereco.rua IS 'Nome da rua.';
+			COMMENT ON COLUMN endereco.num IS 'Número da casa/prédio';
+			
+			COMMENT ON COLUMN estado.codest IS 'Código do estado';
+			COMMENT ON COLUMN estado.nomest IS 'Nome do estado';
+			
+			COMMENT ON COLUMN medico.crmmed IS 'CRM do médico';
+			
+			COMMENT ON COLUMN monitoramento_paciente.codmon IS 'Código do monitoramento';
+			COMMENT ON COLUMN monitoramento_paciente.datmon IS 'Data do monitoramento';
+			COMMENT ON COLUMN monitoramento_paciente.intsin IS 'Intensidade dos sintomas:
+			S - Sem sintomas,
+			P - Pouco,
+			M- Moderado,
+			C - Constante.';
+			
+			COMMENT ON COLUMN paciente.pespac IS 'Peso do paciente.';
+			COMMENT ON COLUMN paciente.grurispac IS 'Paciente é do grupo de risco:
+			S- Sim,
+			N- Não.';
+			COMMENT ON COLUMN paciente.sitpac IS 'Situação do paciente:
+			Internado,
+			Isolamento,
+			Curado.';
+			
+			COMMENT ON COLUMN paciente_comorbidade.codpaccom IS 'Chave primaria da tabela, existe devido problemas de compatibilidade com o Hibernate';
+			
+			COMMENT ON COLUMN pais.nompai IS 'Nome do país.';
+			COMMENT ON COLUMN pais.codpai IS 'Chave primária código do país.';
+			
+			COMMENT ON COLUMN sintoma.codsin IS 'Código do sintoma.';
+			COMMENT ON COLUMN sintoma.nomsin IS 'Nomer do sintoma.';
+			COMMENT ON COLUMN sintoma.dessin IS 'Descrição do sintoma.';
+			
+			COMMENT ON COLUMN solicitacao.dessol IS 'Solicitação em si';
+			COMMENT ON COLUMN solicitacao.anasol IS 'Valor booleano que indica se a solicitação foi analisada pelo Administrador ou não:';
+			COMMENT ON COLUMN solicitacao.datsol IS 'Data da solicitação';
+			
+			COMMENT ON COLUMN test_covid.codtes IS 'Código do teste de covid.';
+			COMMENT ON COLUMN test_covid.dattes IS 'Data do teste.';
+			COMMENT ON COLUMN test_covid.covpactes IS 'Resultado do teste para covid do paciente:
+			P-positivo
+			N-negativo';
+			
+			COMMENT ON COLUMN usuario.nomusu IS 'Nome do usuário';
+			COMMENT ON COLUMN usuario.senusu IS 'Senha do usuário';
+			COMMENT ON COLUMN usuario.cpfusu IS 'CPF do usuario.';
+			COMMENT ON COLUMN usuario.datnasusu IS 'Data de nascimento do usuario.';
+			COMMENT ON COLUMN usuario.sexusu IS 'Sexo do usuario:
+			M- Masculino
+			F- Feminino';
+			COMMENT ON COLUMN usuario.telusu IS 'Telefone do usuario.';
+			COMMENT ON COLUMN usuario.emausu IS 'Email do usuario';
+			COMMENT ON COLUMN usuario.valusu IS 'Data de validação do usuário:
+			Se não for feita nenhuma vinculação desse usuário com empresa, paciente ou médico ele será excluido em 7 dias';
+			
+			COMMENT ON COLUMN vacina.codvac IS 'Chave primária da tabela vacina';
+			COMMENT ON COLUMN vacina.datvac IS 'Data da vacinação';
+			COMMENT ON COLUMN vacina.dosvac IS 'Dose da vacina';
+			COMMENT ON COLUMN vacina.fabvac IS 'Fabricante da vacina';
+		</sql>
+	</changeSet>
+
+	<changeSet id="tag-1.0" author="Eduardo Mateus da Costa">
+		<tagDatabase tag="1.0" />
+	</changeSet>
+
+</databaseChangeLog>
+

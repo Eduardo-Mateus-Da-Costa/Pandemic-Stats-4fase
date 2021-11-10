@@ -18,7 +18,7 @@ public class Paciente_comorbidade implements Serializable{
 	
 	@Id
 	@Column(columnDefinition = "NUMERIC(10, 0)")
-	private int paccomcod;
+	private int codpaccom;
 	
 	@ManyToOne
 	@JoinColumn(columnDefinition = "NUMERIC(10, 0)")

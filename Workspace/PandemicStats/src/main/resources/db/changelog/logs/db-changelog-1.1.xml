@@ -1,0 +1,26 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog
+	xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+	<changeSet id="adiciona as functions e triggers"
+		author="Eduardo Mateus da Costa">
+		<sql stripComments="true" splitStatements="true" endDelimiter="@"> <!--@ finaliza pois nas functions tem ; no meio -->
+			create or replace function garbage_colector()
+			returns trigger
+			as
+			$body$
+			begin
+			return 
+			end
+			$body$
+			language plpgsql;@
+		</sql>
+	</changeSet>
+
+	<changeSet id="tag-1.1" author="Eduardo Mateus da Costa">
+		<tagDatabase tag="1.1" />
+	</changeSet>
+
+</databaseChangeLog>
+

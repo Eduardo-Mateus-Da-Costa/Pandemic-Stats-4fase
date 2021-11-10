@@ -41,7 +41,7 @@ public class Empresa implements Serializable{
 	private String emaemp;
 	
 	@Column(columnDefinition = "VARCHAR(60)", nullable = false)
-	private String ramo;
+	private String ramemp;
 	
 	@Column(columnDefinition = "DATE", nullable = false)
 	@JsonFormat(pattern="yyyy-mm-dd")

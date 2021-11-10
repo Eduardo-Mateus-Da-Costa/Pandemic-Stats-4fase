@@ -28,7 +28,7 @@ public class ShowEmpSCH {
 		this.telemp1 = e.getTelemp1();
 		this.telemp2 = e.getTelemp2();
 		this.valemp = e.getValemp();
-		this.ramo = e.getRamo();
+		this.ramo = e.getRamemp();
 		Usuario u = new Usuario();
 		u = e.getCpfusu();
 		if(u != null)

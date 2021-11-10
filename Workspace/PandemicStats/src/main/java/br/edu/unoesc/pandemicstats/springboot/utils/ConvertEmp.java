@@ -26,9 +26,9 @@ public class ConvertEmp {
 		{
 			obtido.setTelemp2(inserido.getTelemp2());
 		}
-		if(obtido.getRamo() == null)
+		if(obtido.getRamemp() == null)
 		{
-			obtido.setRamo(inserido.getRamo());
+			obtido.setRamemp(inserido.getRamemp());
 		}
 		if(obtido.getValemp() == null)
 		{
