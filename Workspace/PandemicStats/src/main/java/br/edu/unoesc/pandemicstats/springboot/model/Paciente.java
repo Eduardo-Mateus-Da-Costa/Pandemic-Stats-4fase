@@ -8,6 +8,9 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
 
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+
 import lombok.Data;
 
 @org.hibernate.annotations.Table(comment = "Tabela de pacientes", appliesTo = "paciente")
@@ -21,6 +24,7 @@ public class Paciente implements Serializable{
 	private int codpac;
 	
 	@OneToOne
+	@OnDelete(action = OnDeleteAction.CASCADE)
 	@JoinColumn(columnDefinition = "NUMERIC(11, 0)", nullable = false)
 	private Usuario cpfusu;
 	

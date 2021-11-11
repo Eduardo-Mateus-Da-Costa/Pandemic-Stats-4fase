@@ -10,4 +10,7 @@ public interface EmpresaRepository extends JpaRepository<Empresa, Integer> {
 	
 	@Query(value = "select e from Empresa e where e.cnpjemp = ?1")
 	Empresa findByCNPJ(int cnpj);
+	
+	@Query(value = "select e from Empresa e where e.cpfusu.cpfusu = ?1")
+	Empresa findByCpfusu(int cpfusu);
 }

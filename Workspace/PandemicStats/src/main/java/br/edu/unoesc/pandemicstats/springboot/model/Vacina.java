@@ -45,6 +45,6 @@ public class Vacina implements Serializable{
 	private Paciente codpac;
 	
 	@ManyToOne
-	@JoinColumn(columnDefinition = "VARCHAR(30)")
+	@JoinColumn(columnDefinition = "VARCHAR(30)", nullable = true)
 	private Medico crmmed;
 }

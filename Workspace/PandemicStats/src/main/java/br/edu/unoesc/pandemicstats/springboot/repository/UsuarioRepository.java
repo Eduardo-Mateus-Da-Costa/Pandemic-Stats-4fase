@@ -26,5 +26,6 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Integer> {
 	@Transactional
 	@Modifying(clearAutomatically = true)
 	@Query(value = "update Usuario set cnpjemp = null where cnpjemp.cnpjemp = ?1")
-	void setCnpjNull(int cnpj);
+	void setCnpjempNull(int cnpj);
+	
 }
