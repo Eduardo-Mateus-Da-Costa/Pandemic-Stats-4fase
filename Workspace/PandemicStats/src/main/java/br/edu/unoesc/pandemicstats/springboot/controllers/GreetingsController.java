@@ -14,11 +14,12 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import br.edu.unoesc.pandemicstats.springboot.model.Empresa;
+import br.edu.unoesc.pandemicstats.springboot.model.Endereco;
 import br.edu.unoesc.pandemicstats.springboot.model.Usuario;
 import br.edu.unoesc.pandemicstats.springboot.repository.CidadeRepository;
 import br.edu.unoesc.pandemicstats.springboot.repository.ComorbidadeRepository;
 import br.edu.unoesc.pandemicstats.springboot.repository.EmpresaRepository;
-import br.edu.unoesc.pandemicstats.springboot.repository.Endereco_usuarioRepository;
+import br.edu.unoesc.pandemicstats.springboot.repository.EnderecoRepository;
 import br.edu.unoesc.pandemicstats.springboot.repository.EstadoRepository;
 import br.edu.unoesc.pandemicstats.springboot.repository.MedicoRepository;
 import br.edu.unoesc.pandemicstats.springboot.repository.Monitoramento_pacienteRepository;
@@ -31,11 +32,15 @@ import br.edu.unoesc.pandemicstats.springboot.repository.Test_covidRepository;
 import br.edu.unoesc.pandemicstats.springboot.repository.UsuarioRepository;
 import br.edu.unoesc.pandemicstats.springboot.repository.VacinaRepository;
 import br.edu.unoesc.pandemicstats.springboot.responses.RespEmp;
+import br.edu.unoesc.pandemicstats.springboot.responses.RespEnd;
 import br.edu.unoesc.pandemicstats.springboot.responses.RespUsu;
 import br.edu.unoesc.pandemicstats.springboot.schemmas.LoginSCH;
+import br.edu.unoesc.pandemicstats.springboot.schemmas.ReqEndSCH;
 import br.edu.unoesc.pandemicstats.springboot.schemmas.ShowEmpSCH;
+import br.edu.unoesc.pandemicstats.springboot.schemmas.ShowEndSCH;
 import br.edu.unoesc.pandemicstats.springboot.schemmas.ShowUsuSCH;
 import br.edu.unoesc.pandemicstats.springboot.utils.ConvertEmp;
+import br.edu.unoesc.pandemicstats.springboot.utils.ConvertEnd;
 import br.edu.unoesc.pandemicstats.springboot.utils.ConvertUsu;
 /**
  *
@@ -58,7 +63,7 @@ public class GreetingsController {
 	@Autowired
 	EmpresaRepository empRep;
 	@Autowired
-	Endereco_usuarioRepository endUsuRep;
+	EnderecoRepository endRep;
 	@Autowired
 	EstadoRepository estRep;
 	@Autowired
@@ -255,4 +260,59 @@ public class GreetingsController {
     	se.Convert(e);
     	return new ResponseEntity<ShowEmpSCH>(se, HttpStatus.OK);
     }
+    
+//Endpoints de endereço
+    @PostMapping(value = "postORpatchEnd")
+    @ResponseBody
+    public ResponseEntity<RespEnd> postORpatchEnd(@RequestBody Endereco end)
+    {
+		Endereco val_end = new Endereco();
+		Usuario u_tmp = end.getCpfusu();
+		Empresa e_tmp = end.getCnpjemp();
+		if((u_tmp != null)||(e_tmp != null))
+		{
+			if(u_tmp != null)
+			{
+				val_end = endRep.findEndByCPF(u_tmp.getCpfusu());
+			}
+			else
+			{
+				val_end = endRep.findEndByCNPJ(e_tmp.getCnpjemp());
+			}
+			ConvertEnd.complete(end, val_end);
+			endRep.save(val_end);
+			RespEnd re = new RespEnd();
+			re.RespValEnd(val_end, 0);
+			return new ResponseEntity<RespEnd>(re, HttpStatus.CREATED);
+		}
+		else
+		{
+			RespEnd re = new RespEnd();
+			re.RespValEnd(null, 500);
+			return new ResponseEntity<RespEnd>(re, HttpStatus.BAD_REQUEST);
+		}
+    }
+    
+    
+    @GetMapping(value = "getEnd")
+    @ResponseBody
+    public ResponseEntity<ShowEndSCH> getEnd(@RequestBody ReqEndSCH end)
+    {
+    	Endereco e = new Endereco();
+    	if(end.getCpfusu() != 0)
+    	{
+    		e = endRep.findEndByCPF(end.getCpfusu());
+    	}
+    	else
+    	{
+    		e = endRep.findEndByCNPJ(end.getCnpjemp());
+    	}
+    	ShowEndSCH se = new ShowEndSCH();
+    	se.Convert(e);
+    	return new ResponseEntity<ShowEndSCH>(se, HttpStatus.OK);
+    }
+    
+//Endpoints de médico
+    
+   
 }
