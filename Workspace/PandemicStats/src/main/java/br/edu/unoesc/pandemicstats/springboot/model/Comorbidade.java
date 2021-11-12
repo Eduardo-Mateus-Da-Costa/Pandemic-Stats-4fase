@@ -1,7 +1,5 @@
 package br.edu.unoesc.pandemicstats.springboot.model;
 
-import br.edu.unoesc.pandemicstats.springboot.enumeracoes.ListaComo;
-
 import java.io.Serializable;
 
 import javax.persistence.Column;
@@ -24,5 +22,5 @@ public class Comorbidade implements Serializable{
 	private int codcom;
 	
 	@Column(columnDefinition = "VARCHAR(300)", nullable = false)
-	private ListaComo com;
+	private String com;
 }

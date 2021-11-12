@@ -2,7 +2,7 @@ package br.edu.unoesc.pandemicstats.springboot.utils;
 
 import br.edu.unoesc.pandemicstats.springboot.model.Endereco;
 
-public class ConvertEnd {
+public class CompleteEnd {
 	public static void complete(Endereco obtido, Endereco inserido)
 	{
 		if(obtido.getCodend() == 0)

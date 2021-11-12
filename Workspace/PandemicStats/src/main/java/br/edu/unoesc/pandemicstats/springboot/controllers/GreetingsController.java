@@ -40,20 +40,20 @@ import br.edu.unoesc.pandemicstats.springboot.responses.RespEmp;
 import br.edu.unoesc.pandemicstats.springboot.responses.RespEnd;
 import br.edu.unoesc.pandemicstats.springboot.responses.RespMed;
 import br.edu.unoesc.pandemicstats.springboot.responses.RespUsu;
-import br.edu.unoesc.pandemicstats.springboot.schemmas.LoginSCH;
+import br.edu.unoesc.pandemicstats.springboot.schemmas.ReqLoginSCH;
 import br.edu.unoesc.pandemicstats.springboot.schemmas.ReqCidSCH;
-import br.edu.unoesc.pandemicstats.springboot.schemmas.ReqEmp;
+import br.edu.unoesc.pandemicstats.springboot.schemmas.ReqEmpSCH;
 import br.edu.unoesc.pandemicstats.springboot.schemmas.ReqEndSCH;
 import br.edu.unoesc.pandemicstats.springboot.schemmas.ReqMedSCH;
-import br.edu.unoesc.pandemicstats.springboot.schemmas.ReqUsu;
+import br.edu.unoesc.pandemicstats.springboot.schemmas.ReqUsuSCH;
 import br.edu.unoesc.pandemicstats.springboot.schemmas.ShowCidSCH;
 import br.edu.unoesc.pandemicstats.springboot.schemmas.ShowEmpSCH;
 import br.edu.unoesc.pandemicstats.springboot.schemmas.ShowEndSCH;
 import br.edu.unoesc.pandemicstats.springboot.schemmas.ShowMedSCH;
 import br.edu.unoesc.pandemicstats.springboot.schemmas.ShowUsuSCH;
-import br.edu.unoesc.pandemicstats.springboot.utils.ConvertEmp;
-import br.edu.unoesc.pandemicstats.springboot.utils.ConvertEnd;
-import br.edu.unoesc.pandemicstats.springboot.utils.ConvertUsu;
+import br.edu.unoesc.pandemicstats.springboot.utils.CompleteEmp;
+import br.edu.unoesc.pandemicstats.springboot.utils.CompleteEnd;
+import br.edu.unoesc.pandemicstats.springboot.utils.CompleteUsu;
 /**
  *
  * A sample greetings controller to return greeting text
@@ -133,7 +133,7 @@ public class GreetingsController {
     {
     	try {
     		Usuario u = usuRep.findByCPF(usu.getCpfusu());
-    		ConvertUsu.complete(usu, u);
+    		CompleteUsu.complete(usu, u);
     		usuRep.save(usu);
     		RespUsu rg = new RespUsu();
     		rg.RespValUsu(usu, 0);
@@ -149,7 +149,7 @@ public class GreetingsController {
     
     @DeleteMapping(value = "deleteUsu")
     @ResponseBody
-    public ResponseEntity<String> deleteUsu(@RequestBody ReqUsu usu)
+    public ResponseEntity<String> deleteUsu(@RequestBody ReqUsuSCH usu)
     {
     	try {
     		Usuario u = new Usuario();
@@ -189,7 +189,7 @@ public class GreetingsController {
     
     @GetMapping(value = "getUsu")
     @ResponseBody
-    public ResponseEntity<ShowUsuSCH>getUsu(@RequestBody ReqUsu usu)
+    public ResponseEntity<ShowUsuSCH>getUsu(@RequestBody ReqUsuSCH usu)
     {
     	Usuario u = new Usuario();
     	if (usu.getEmausu() != null)
@@ -207,7 +207,7 @@ public class GreetingsController {
     
     @GetMapping(value = "login")
     @ResponseBody
-    public ResponseEntity<RespUsu> login(@RequestBody LoginSCH login)
+    public ResponseEntity<RespUsu> login(@RequestBody ReqLoginSCH login)
     {
     	Usuario u = new Usuario();
     	u = usuRep.findByEmail(login.getEmail());
@@ -270,7 +270,7 @@ public class GreetingsController {
     {
     	try {
     		Empresa e = empRep.findByCNPJ(emp.getCnpjemp());
-    		ConvertEmp.complete(emp, e);
+    		CompleteEmp.complete(emp, e);
     		empRep.save(emp);
     		RespEmp re = new RespEmp();
     		re.RespValEmp(emp, 0);
@@ -285,7 +285,7 @@ public class GreetingsController {
     
     @DeleteMapping(value = "deleteEmp")
     @ResponseBody
-    public ResponseEntity<String> deleteEmp(@RequestBody ReqEmp emp)
+    public ResponseEntity<String> deleteEmp(@RequestBody ReqEmpSCH emp)
     {
     	try {
     		usuRep.setCnpjempNull(emp.getCnpjemp());
@@ -326,7 +326,7 @@ public class GreetingsController {
 			{
 				val_end = endRep.findByCNPJ(e_tmp.getCnpjemp());
 			}
-			ConvertEnd.complete(end, val_end);
+			CompleteEnd.complete(end, val_end);
 			endRep.save(val_end);
 			RespEnd re = new RespEnd();
 			re.RespValEnd(val_end, 0);

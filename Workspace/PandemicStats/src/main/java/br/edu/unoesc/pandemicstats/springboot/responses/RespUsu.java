@@ -2,13 +2,9 @@ package br.edu.unoesc.pandemicstats.springboot.responses;
 
 import br.edu.unoesc.pandemicstats.springboot.model.Usuario;
 import br.edu.unoesc.pandemicstats.springboot.schemmas.ShowUsuSCH;
-import lombok.Data;
 
-@Data
-public class RespUsu {
-	private int Httpstatus;
+public class RespUsu extends RespPadrao{
 	private ShowUsuSCH u = new ShowUsuSCH();
-	private String s;
 	
 	public void RespValUsu(Usuario user, int Httpstatus)
 	{

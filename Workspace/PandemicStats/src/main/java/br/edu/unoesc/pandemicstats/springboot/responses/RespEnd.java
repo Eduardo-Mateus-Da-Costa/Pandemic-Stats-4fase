@@ -2,13 +2,9 @@ package br.edu.unoesc.pandemicstats.springboot.responses;
 
 import br.edu.unoesc.pandemicstats.springboot.model.Endereco;
 import br.edu.unoesc.pandemicstats.springboot.schemmas.ShowEndSCH;
-import lombok.Data;
 
-@Data
-public class RespEnd {
-	private int Httpstatus;
+public class RespEnd extends RespPadrao{
 	private ShowEndSCH e = new ShowEndSCH();
-	private String s;
 	
 	public void RespValEnd(Endereco end, int Httpstatus)
 	{

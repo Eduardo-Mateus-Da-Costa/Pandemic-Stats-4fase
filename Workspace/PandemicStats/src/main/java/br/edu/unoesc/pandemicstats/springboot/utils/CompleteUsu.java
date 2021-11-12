@@ -2,7 +2,7 @@ package br.edu.unoesc.pandemicstats.springboot.utils;
 
 import br.edu.unoesc.pandemicstats.springboot.model.Usuario;
 
-public class ConvertUsu {
+public class CompleteUsu {
 
 	public static void complete(Usuario obtido, Usuario inserido)
 	{

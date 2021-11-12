@@ -2,7 +2,7 @@ package br.edu.unoesc.pandemicstats.springboot.utils;
 
 import br.edu.unoesc.pandemicstats.springboot.model.Empresa;
 
-public class ConvertEmp {
+public class CompleteEmp{
 
 	public static void complete(Empresa obtido, Empresa inserido)
 	{
