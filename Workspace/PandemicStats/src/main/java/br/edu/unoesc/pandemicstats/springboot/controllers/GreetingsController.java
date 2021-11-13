@@ -16,53 +16,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import br.edu.unoesc.pandemicstats.springboot.model.Cidade;
-import br.edu.unoesc.pandemicstats.springboot.model.Comorbidade;
-import br.edu.unoesc.pandemicstats.springboot.model.Empresa;
-import br.edu.unoesc.pandemicstats.springboot.model.Endereco;
-import br.edu.unoesc.pandemicstats.springboot.model.Estado;
-import br.edu.unoesc.pandemicstats.springboot.model.Medico;
-import br.edu.unoesc.pandemicstats.springboot.model.MonitoramentoPaciente;
-import br.edu.unoesc.pandemicstats.springboot.model.Usuario;
-import br.edu.unoesc.pandemicstats.springboot.repository.CidadeRepository;
-import br.edu.unoesc.pandemicstats.springboot.repository.ComorbidadeRepository;
-import br.edu.unoesc.pandemicstats.springboot.repository.EmpresaRepository;
-import br.edu.unoesc.pandemicstats.springboot.repository.EnderecoRepository;
-import br.edu.unoesc.pandemicstats.springboot.repository.EstadoRepository;
-import br.edu.unoesc.pandemicstats.springboot.repository.MedicoRepository;
-import br.edu.unoesc.pandemicstats.springboot.repository.MonitoramentoPacienteRepository;
-import br.edu.unoesc.pandemicstats.springboot.repository.PacienteRepository;
-import br.edu.unoesc.pandemicstats.springboot.repository.PacienteComorbidadeRepository;
-import br.edu.unoesc.pandemicstats.springboot.repository.PaisRepository;
-import br.edu.unoesc.pandemicstats.springboot.repository.SintomaRepository;
-import br.edu.unoesc.pandemicstats.springboot.repository.SolicitacaoRepository;
-import br.edu.unoesc.pandemicstats.springboot.repository.Test_covidRepository;
-import br.edu.unoesc.pandemicstats.springboot.repository.UsuarioRepository;
-import br.edu.unoesc.pandemicstats.springboot.repository.VacinaRepository;
-import br.edu.unoesc.pandemicstats.springboot.responses.RespEmp;
-import br.edu.unoesc.pandemicstats.springboot.responses.RespEnd;
-import br.edu.unoesc.pandemicstats.springboot.responses.RespMed;
-import br.edu.unoesc.pandemicstats.springboot.responses.RespMonPac;
-import br.edu.unoesc.pandemicstats.springboot.responses.RespUsu;
-import br.edu.unoesc.pandemicstats.springboot.schemmas.ReqLoginSCH;
-import br.edu.unoesc.pandemicstats.springboot.schemmas.ReqCidSCH;
-import br.edu.unoesc.pandemicstats.springboot.schemmas.ReqComSCH;
-import br.edu.unoesc.pandemicstats.springboot.schemmas.ReqEmpSCH;
-import br.edu.unoesc.pandemicstats.springboot.schemmas.ReqEndSCH;
-import br.edu.unoesc.pandemicstats.springboot.schemmas.ReqEstSCH;
-import br.edu.unoesc.pandemicstats.springboot.schemmas.ReqMedSCH;
-import br.edu.unoesc.pandemicstats.springboot.schemmas.ReqMonPacSCH;
-import br.edu.unoesc.pandemicstats.springboot.schemmas.ReqUsuSCH;
-import br.edu.unoesc.pandemicstats.springboot.schemmas.ShowCidSCH;
-import br.edu.unoesc.pandemicstats.springboot.schemmas.ShowEmpSCH;
-import br.edu.unoesc.pandemicstats.springboot.schemmas.ShowEndSCH;
-import br.edu.unoesc.pandemicstats.springboot.schemmas.ShowEstSCH;
-import br.edu.unoesc.pandemicstats.springboot.schemmas.ShowMedSCH;
-import br.edu.unoesc.pandemicstats.springboot.schemmas.ShowMonPacSCH;
-import br.edu.unoesc.pandemicstats.springboot.schemmas.ShowUsuSCH;
-import br.edu.unoesc.pandemicstats.springboot.utils.CompleteEmp;
-import br.edu.unoesc.pandemicstats.springboot.utils.CompleteEnd;
-import br.edu.unoesc.pandemicstats.springboot.utils.CompleteUsu;
+import br.edu.unoesc.pandemicstats.springboot.model.*;
+import br.edu.unoesc.pandemicstats.springboot.repository.*;
+import br.edu.unoesc.pandemicstats.springboot.responses.*;
+import br.edu.unoesc.pandemicstats.springboot.schemmas.*;
+import br.edu.unoesc.pandemicstats.springboot.utils.*;
+
 /**
  *
  * A sample greetings controller to return greeting text
@@ -130,6 +89,7 @@ public class GreetingsController {
     			return new ResponseEntity<RespUsu>(respusu, HttpStatus.CREATED);
     		}
 		} catch (Exception e) {
+			e.printStackTrace();
 			RespUsu respusu = new RespUsu();
 			respusu.RespValUsu(null, 500);
 			return new ResponseEntity<RespUsu>(respusu, HttpStatus.CONFLICT);
@@ -138,14 +98,14 @@ public class GreetingsController {
     
     @PatchMapping(value = "patchUsu")
     @ResponseBody
-    public ResponseEntity<RespUsu> patchUsu(@RequestBody Usuario requsu)
+    public ResponseEntity<RespUsu> patchUsu(@RequestBody Usuario usuusu)
     {
     	try {
-    		Usuario usuario = usuRep.findByCPF(requsu.getCpfusu());
-    		CompleteUsu.complete(requsu, usuario);
-    		usuRep.save(requsu);
+    		Usuario usuario = usuRep.findByCPF(usuusu.getCpfusu());
+    		CompleteUsu.complete(usuusu, usuario);
+    		usuRep.save(usuusu);
     		RespUsu respusu = new RespUsu();
-    		respusu.RespValUsu(requsu, 0);
+    		respusu.RespValUsu(usuusu, 0);
     		return new ResponseEntity<RespUsu>(respusu, HttpStatus.OK);
     	}catch(Exception e)
     	{
@@ -311,11 +271,11 @@ public class GreetingsController {
 //Endpoints de endereço
     @PostMapping(value = "postORpatchEnd")
     @ResponseBody
-    public ResponseEntity<RespEnd> postORpatchEnd(@RequestBody Endereco reqend)
+    public ResponseEntity<RespEnd> postORpatchEnd(@RequestBody Endereco endend)
     {
 		Endereco endereco = new Endereco();
-		Usuario utmp = reqend.getCpfusu();
-		Empresa etmp = reqend.getCnpjemp();
+		Usuario utmp = endend.getCpfusu();
+		Empresa etmp = endend.getCnpjemp();
 		if((utmp != null)||(etmp != null))
 		{
 			if(utmp != null)
@@ -326,7 +286,7 @@ public class GreetingsController {
 			{
 				endereco = endRep.findByCNPJ(etmp.getCnpjemp());
 			}
-			CompleteEnd.complete(reqend, endereco);
+			CompleteEnd.complete(endend, endereco);
 			endRep.save(endereco);
 			RespEnd respend = new RespEnd();
 			respend.RespValEnd(endereco, 0);
@@ -362,10 +322,10 @@ public class GreetingsController {
 //Endpoints de medico
     @PostMapping(value = "postMed")
     @ResponseBody
-    public ResponseEntity<RespMed> postMed(@RequestBody Medico reqmed)
+    public ResponseEntity<RespMed> postMed(@RequestBody Medico medmed)
     {
 		Medico medico = new Medico();
-		medico = medRep.findByCRM(reqmed.getCrmmed());
+		medico = medRep.findByCRM(medmed.getCrmmed());
 		if(medico != null)
 		{       
 			RespMed respmed = new RespMed();
@@ -537,7 +497,92 @@ public class GreetingsController {
   	}
   	
 //Endpoints de paciente
-  	
+  	 @PostMapping(value = "postORpatchPac")
+     @ResponseBody
+     public ResponseEntity<RespPac> postPac(@RequestBody Paciente pacpac)
+     {
+     	try {
+ 			if((pacpac.getGrurispac() == 'S')||(pacpac.getGrurispac() == 'N'))
+ 			{
+ 				if((pacpac.getSitpac().equals("INTERNADO") )||(pacpac.getSitpac().equals("ISOLAMENTO"))||(pacpac.getSitpac().equals("BEM")))
+ 				{
+ 					if((pacpac.getPespac() < 0)||(pacpac.getPespac() > 500))
+ 					{
+ 						RespPac resppac = new RespPac();
+             			resppac.RespValPac(null, 503);
+             			return new ResponseEntity<RespPac>(resppac, HttpStatus.CONFLICT);
+ 					}
+ 					else
+ 					{
+ 						Paciente paciente = new Paciente();
+ 			     		Usuario usuario = pacpac.getCpfusu();
+ 			     		paciente = pacRep.findByCPF(usuario.getCpfusu());
+ 						if(paciente == null)
+ 						{
+ 							pacRep.save(pacpac);
+ 							RespPac resppac = new RespPac();
+ 	             			resppac.RespValPac(pacpac, 0);
+ 	             			return new ResponseEntity<RespPac>(resppac, HttpStatus.OK);
+ 						}
+ 						else
+ 						{
+ 							CompletePac.complete(pacpac, paciente);
+ 	 						pacRep.save(pacpac);
+ 	             			RespPac resppac = new RespPac();
+ 	             			resppac.RespValPac(pacpac, 0);
+ 	             			return new ResponseEntity<RespPac>(resppac, HttpStatus.OK);
+ 						}
+ 					}
+ 				}
+ 				else
+ 				{
+ 					RespPac resppac = new RespPac();
+         			resppac.RespValPac(null, 502);
+         			return new ResponseEntity<RespPac>(resppac, HttpStatus.CONFLICT);
+ 				}
+ 			}
+ 			else
+ 			{
+ 				RespPac resppac = new RespPac();
+     			resppac.RespValPac(null, 501);
+     			return new ResponseEntity<RespPac>(resppac, HttpStatus.CONFLICT);
+ 			}
+ 		} catch (Exception e) {
+ 			RespPac resppac = new RespPac();
+ 			resppac.RespValPac(null, 500);
+ 			return new ResponseEntity<RespPac>(resppac, HttpStatus.INTERNAL_SERVER_ERROR);
+ 		}
+     }
+ 
+     
+     @GetMapping(value = "getPac")
+     @ResponseBody
+     public ResponseEntity<ShowPacSCH>getPac(@RequestBody ReqPacSCH reqpac)
+     {
+     	Paciente paciente = pacRep.findByCPF(reqpac.getCpfusu());
+     	ShowPacSCH showpac = new ShowPacSCH();
+     	showpac.Convert(paciente);
+     	return new ResponseEntity<ShowPacSCH>(showpac, HttpStatus.OK);
+     }
+     
+//Endpoint de paciente comorbidade
+     @PostMapping(value = "postPacCom")
+     @ResponseBody
+     public ResponseEntity<String>postPacCom(@RequestBody PacienteComorbidade paccompaccom)
+     {
+    	Paciente paciente = paccompaccom.getCodpac();
+    	Comorbidade comorbidade = paccompaccom.getCodcom();
+ 		PacienteComorbidade paccom  = pacComRep.findByCodpacANDCodcom(paciente.getCodpac(), comorbidade.getCodcom());
+ 		if(paccom != null)
+ 		{       
+ 			return new ResponseEntity<String>("Ja estava cadastrado", HttpStatus.OK);
+ 		}
+ 		else
+ 		{
+ 			pacComRep.save(paccompaccom);
+ 			return new ResponseEntity<String>("Salvo", HttpStatus.CREATED);
+ 		}
+     }
 }
 
 

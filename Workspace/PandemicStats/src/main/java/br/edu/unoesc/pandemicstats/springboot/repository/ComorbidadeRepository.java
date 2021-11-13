@@ -14,6 +14,6 @@ public interface ComorbidadeRepository extends JpaRepository<Comorbidade, Long> 
 	@Query(value ="select c from Comorbidade c where c.codcom = ?1")
 	Comorbidade findByCodcom(long codcom);
 	
-	@Query(value ="select c from Comorbidade")
+	@Query(value ="select c from Comorbidade c")
 	List<Comorbidade> findAllComs();
 }

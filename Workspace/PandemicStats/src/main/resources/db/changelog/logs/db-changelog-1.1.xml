@@ -257,7 +257,7 @@
 			language plpgsql;@
 			
 			<!--Procedure grant usuario-->
-			create or replace procedure grant_administrador(email varchar(30))
+			create or replace procedure grant_usuario(email varchar(30))
 			as
 			$body$
 			begin

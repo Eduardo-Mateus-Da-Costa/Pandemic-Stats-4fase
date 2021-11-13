@@ -34,6 +34,6 @@ public class Paciente implements Serializable{
 	@Column(columnDefinition = "CHAR(1) CHECK(GRURISPAC IN ('S', 'N'))", nullable = false)
 	private char grurispac;
 	
-	@Column(columnDefinition = "VARCHAR(20) CHECK(SITPAC IN ('INTERNADO', 'ISOLAMENTO', 'CURADO'))", nullable = false)
+	@Column(columnDefinition = "VARCHAR(20) CHECK(SITPAC IN ('INTERNADO', 'ISOLAMENTO', 'BEM'))", nullable = false)
 	private String sitpac;
 }
