@@ -23,7 +23,7 @@ import lombok.Data;
 @org.hibernate.annotations.Table(comment = "Tabela de vinculação monitoramento pacientes", appliesTo = "monitoramento_paciente")
 @Entity
 @Data
-public class Monitoramento_paciente implements Serializable{
+public class MonitoramentoPaciente implements Serializable{
 	private static final long serialVersionUID = 1L;
 	
 	@Id

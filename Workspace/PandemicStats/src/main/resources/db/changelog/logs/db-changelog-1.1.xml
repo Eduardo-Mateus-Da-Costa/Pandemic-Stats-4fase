@@ -6,6 +6,8 @@
 	<changeSet id="adiciona as functions, trigger, views e grupos"
 		author="Eduardo Mateus da Costa">
 		<sql stripComments="true" splitStatements="true" endDelimiter="@"> <!--@ finaliza pois nas functions tem ; no meio -->
+		
+		<!--Tipo de  resposta cidade-covid -->
 			create type tp_cid_covid as 
 			(
 				nomusu varchar(100),
@@ -15,6 +17,7 @@
 				covpactes char(1)
 			);@
 			
+			<!--Funcao cidade-covid -->
 			create or replace function cidade_covid(codigo numeric(6,0))
 			returns setof tp_cid_covid
 			as
@@ -31,6 +34,8 @@
 			$body$
 			language plpgsql;@
 			
+			
+			<!--Tipo de resposta empresa-covid -->
 			create type tp_emp_covid as 
 			(
 				nomusu varchar(100),
@@ -40,6 +45,8 @@
 				covpactes char(1)
 			);@
 			
+			
+			<!--Funcao empresa-covid -->
 			create or replace function empresa_covid(cnpj numeric(14,0))
 			returns setof tp_emp_covid
 			as
@@ -56,7 +63,7 @@
 			$body$
 			language plpgsql;@
 			
-			
+			<!--Funcao primeria-dose-cidade -->
 			create or replace function p_dose_cidade(codigo numeric(6,0))
 			returns numeric
 			as
@@ -75,7 +82,7 @@
 			$body$
 			language plpgsql;@
 			
-			
+			<!--Funcao segunda-dose-cidade -->
 			create or replace function s_dose_cidade(codigo numeric(6,0))
 			returns numeric
 			as
@@ -94,7 +101,7 @@
 			$body$
 			language plpgsql;@
 			
-			
+			<!--Funcao trigger-dose-vacina -->
 			create or replace function controla_dosvac()
 			returns trigger
 			as
@@ -108,13 +115,14 @@
 			$body$
 			language plpgsql;@
 			
+			<!--Trigger-dose-vacina -->
 			create trigger vacina_dosvac_before_tg
 			before insert or update
 			on vacina
 			for each row
 			execute procedure controla_dosvac();@
 			
-			
+			<!--Funcao trigger-data-vacina -->
 			create or replace function controla_datvac()
 			returns trigger
 			as
@@ -128,25 +136,30 @@
 			$body$
 			language plpgsql;@
 			
+			<!--Trigger-data-vacina -->
 			create trigger vacina_datvac_before_tg
 			before insert
 			on vacina
 			for each row
 			execute procedure controla_datvac();@
 			
-			
+			<!--View conta-medicos -->
 			create view vw_conta_medicos as
 			select count(*) from medico;@
 			
+			<!--View conta-empresas -->
 			create view vw_conta_empresas as
 			select count(*) from empresa;@
 			
+			<!--View conta-pacientes -->
 			create view vw_conta_pacientes as
 			select count(*) from paciente;@
 			
+			<!--View conta-usuarios-->
 			create view vw_conta_usuarios as
 			select count(*) from usuario;@
 			
+			<!--Procedure cria usuario-->
 			create or replace procedure create_user(email varchar(30), senha varchar(20))
 			as
 			$body$
@@ -156,13 +169,18 @@
 			$body$
 			language plpgsql;@
 			
-			
+			<!--Grupo empresa-->
 			create group g_empresa;@
+			<!--Grupo paciente-->
 			create group g_paciente;@
+			<!--Grupo medico-->
 			create group g_medico;@
+			<!--Grupo administrador-->
 			create group g_administrador;@
+			<!--Grupo usuario-->
 			create group g_usuario;@
 			
+			<!--Grant usuarios-->
 			grant select, insert, update, delete
 			on usuario, endereco
 			to g_usuario;@
@@ -175,6 +193,7 @@
 			on solicitacao, paciente, paciente_comorbidade, medico, empresa
 			to g_usuario;@
 			
+			<!--Grant empresas-->
 			grant select, insert, update, delete
 			on empresa
 			to g_empresa;@
@@ -183,6 +202,7 @@
 			on paciente, vacina, test_covid
 			to g_empresa;@
 			
+			<!--Grant pacientes-->
 			grant select, insert, update
 			on test_covid, monitoramento_paciente, vacina
 			to g_paciente;@
@@ -191,11 +211,12 @@
 			on paciente, paciente_comorbidade
 			to g_paciente;@
 			
+			<!--Grant administrador-->
 			grant select, insert, update, delete
 			on all tables in schema public
 			to g_administrador;@
 			
-			
+			<!--Procedure grant empresa-->
 			create or replace procedure grant_empresa(email varchar(30))
 			as
 			$body$
@@ -205,6 +226,7 @@
 			$body$
 			language plpgsql;@
 			
+			<!--Procedure grant paciente-->
 			create or replace procedure grant_paciente(email varchar(30))
 			as
 			$body$
@@ -214,6 +236,7 @@
 			$body$
 			language plpgsql;@
 			
+			<!--Procedure grant medico-->
 			create or replace procedure grant_medico(email varchar(30))
 			as
 			$body$
@@ -223,6 +246,7 @@
 			$body$
 			language plpgsql;@
 			
+			<!--Procedure grant administrador-->
 			create or replace procedure grant_administrador(email varchar(30))
 			as
 			$body$
@@ -232,6 +256,15 @@
 			$body$
 			language plpgsql;@
 			
+			<!--Procedure grant usuario-->
+			create or replace procedure grant_administrador(email varchar(30))
+			as
+			$body$
+			begin
+				execute format('grant g_usuario to %I', email);
+			end
+			$body$
+			language plpgsql;@
 			
 		</sql>
 	</changeSet>

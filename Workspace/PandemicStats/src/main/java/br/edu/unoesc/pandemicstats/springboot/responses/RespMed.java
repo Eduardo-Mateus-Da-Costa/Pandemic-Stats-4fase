@@ -6,21 +6,21 @@ import lombok.Data;
 
 @Data
 public class RespMed{
-	private ShowMedSCH m = new ShowMedSCH();
-	private String s;
-	private int Httpstatus;
+	private ShowMedSCH showmed = new ShowMedSCH();
+	private String erro;
+	private int codstatus;
 	
-	public void RespValMed(Medico med, int Httpstatus)
+	public void RespValMed(Medico med, int codstatus)
 	{
-		if(Httpstatus==501)
+		if(codstatus==501)
 		{
-			this.Httpstatus = Httpstatus;
-			this.s = "CRM já em uso";
+			this.codstatus = codstatus;
+			this.erro = "CRM já em uso";
 		}
 		else
 		{
-			this.Httpstatus = Httpstatus;
-			m.Convert(med);
+			this.codstatus = codstatus;
+			showmed.Convert(med);
 		}
 	}
 }

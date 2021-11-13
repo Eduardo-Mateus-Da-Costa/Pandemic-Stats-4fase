@@ -4,6 +4,6 @@ import lombok.Data;
 
 @Data
 public class ReqUsuSCH {
-	private int cpfusu;
+	private long cpfusu;
 	private String emausu;
 }

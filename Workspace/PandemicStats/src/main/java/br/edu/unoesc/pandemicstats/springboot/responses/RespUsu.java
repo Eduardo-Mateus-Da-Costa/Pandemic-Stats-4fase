@@ -6,36 +6,36 @@ import lombok.Data;
 
 @Data
 public class RespUsu{
-	private ShowUsuSCH u = new ShowUsuSCH();
-	private String s;
-	private int Httpstatus;
+	private ShowUsuSCH showusu = new ShowUsuSCH();
+	private String erro;
+	private int codstatus;
 	
-	public void RespValUsu(Usuario user, int Httpstatus)
+	public void RespValUsu(Usuario usuario, int codstatus)
 	{
-		if(Httpstatus==500)
+		if(codstatus==500)
 		{
-			this.Httpstatus = Httpstatus;
-			this.s = "Emails iguais.";
+			this.codstatus = codstatus;
+			this.erro = "Emails iguais.";
 		}
-		else if(Httpstatus==503)
+		else if(codstatus==503)
 		{
-			this.Httpstatus = Httpstatus;
-			this.s = "CPFs iguais";
+			this.codstatus = codstatus;
+			this.erro = "CPFs iguais";
 		}
-		else if(Httpstatus==504)
+		else if(codstatus==504)
 		{
-			this.Httpstatus = Httpstatus;
-			this.s = "Senha incorreta";
+			this.codstatus = codstatus;
+			this.erro = "Senha incorreta";
 		}
-		else if(Httpstatus==505)
+		else if(codstatus==505)
 		{
-			this.Httpstatus = Httpstatus;
-			this.s = "Email não encontrado";
+			this.codstatus = codstatus;
+			this.erro = "Email não encontrado";
 		}
 		else
 		{
-			this.Httpstatus = 200;
-			u.Convert(user);
+			this.codstatus = 200;
+			showusu.Convert(usuario);
 		}
 	}
 }

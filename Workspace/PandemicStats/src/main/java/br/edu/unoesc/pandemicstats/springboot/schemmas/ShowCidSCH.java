@@ -1,18 +1,16 @@
 package br.edu.unoesc.pandemicstats.springboot.schemmas;
 
 import br.edu.unoesc.pandemicstats.springboot.model.Cidade;
-import br.edu.unoesc.pandemicstats.springboot.model.Estado;
 import lombok.Data;
 
 @Data
 public class ShowCidSCH {
 	private String nomcid;
-	private long codest;
+	private long codcid;
 	
-	public void Convert(Cidade c)
+	public void Convert(Cidade cidade)
 	{
-		this.nomcid = c.getNomcid();
-		Estado e = c.getCodest();
-		this.codest = e.getCodest();
+		this.nomcid = cidade.getNomcid();
+		this.codcid = cidade.getCodcid();
 	}
 }

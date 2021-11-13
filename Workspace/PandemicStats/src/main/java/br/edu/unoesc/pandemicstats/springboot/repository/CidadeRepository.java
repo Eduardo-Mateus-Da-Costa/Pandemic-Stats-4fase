@@ -11,8 +11,8 @@ import br.edu.unoesc.pandemicstats.springboot.model.Cidade;
 public interface CidadeRepository extends JpaRepository<Cidade, Long> {
 
 	@Query(value = "select c from Cidade c where c.codcid = ?1")
-	Cidade findByCodcid(int codcid);
+	Cidade findByCodcid(long codcid);
 	
 	@Query(value = "select c from Cidade c where c.codest.codest = ?1")
-	List<Cidade> findByCodest(int codest);
+	List<Cidade> findByCodest(long codest);
 }

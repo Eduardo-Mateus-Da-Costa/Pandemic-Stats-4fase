@@ -19,21 +19,21 @@ public class ShowEmpSCH {
 	private Date valemp;
 	private long cpfusu;
 	
-	public void Convert(Empresa e)
+	public void Convert(Empresa empresa)
 	{
-		this.cnpjemp = e.getCnpjemp();
-		this.nomfanemp = e.getNomfanemp();
-		this.nomemp = e.getNomemp();
-		this.emaemp = e.getEmaemp();
-		this.telemp1 = e.getTelemp1();
-		this.telemp2 = e.getTelemp2();
-		this.valemp = e.getValemp();
-		this.ramemp = e.getRamemp();
-		Usuario u = new Usuario();
-		u = e.getCpfusu();
-		if(u != null)
+		this.cnpjemp = empresa.getCnpjemp();
+		this.nomfanemp = empresa.getNomfanemp();
+		this.nomemp = empresa.getNomemp();
+		this.emaemp = empresa.getEmaemp();
+		this.telemp1 = empresa.getTelemp1();
+		this.telemp2 = empresa.getTelemp2();
+		this.valemp = empresa.getValemp();
+		this.ramemp = empresa.getRamemp();
+		Usuario usuario = new Usuario();
+		usuario = empresa.getCpfusu();
+		if(usuario != null)
 		{
-			this.cpfusu = u.getCpfusu();
+			this.cpfusu = usuario.getCpfusu();
 		}
 	}
 }

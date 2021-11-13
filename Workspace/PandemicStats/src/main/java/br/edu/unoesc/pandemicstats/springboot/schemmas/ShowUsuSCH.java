@@ -16,19 +16,19 @@ public class ShowUsuSCH {
 	private String telusu;
 	private long cnpjemp;
 	
-	public void Convert(Usuario u)
+	public void Convert(Usuario usuario)
 	{
-		this.cpfusu = u.getCpfusu();
-		this.nomusu = u.getNomusu();
-		this.datnasusu = u.getDatnasusu();
-		this.emausu = u.getEmausu();
-		this.sexusu = u.getSexusu();
-		this.telusu = u.getTelusu();
-		Empresa e = new Empresa();
-		e = u.getCnpjemp();
-		if(e != null)
+		this.cpfusu = usuario.getCpfusu();
+		this.nomusu = usuario.getNomusu();
+		this.datnasusu = usuario.getDatnasusu();
+		this.emausu = usuario.getEmausu();
+		this.sexusu = usuario.getSexusu();
+		this.telusu = usuario.getTelusu();
+		Empresa empresa = new Empresa();
+		empresa = usuario.getCnpjemp();
+		if(empresa != null)
 		{
-			this.cnpjemp = e.getCnpjemp();
+			this.cnpjemp = empresa.getCnpjemp();
 		}
 	}
 }

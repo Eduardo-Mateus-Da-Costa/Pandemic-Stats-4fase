@@ -6,26 +6,26 @@ import lombok.Data;
 
 @Data
 public class RespEmp{
-	private ShowEmpSCH e = new ShowEmpSCH();
-	private String s;
-	private int Httpstatus;
+	private ShowEmpSCH showemp = new ShowEmpSCH();
+	private String erro;
+	private int codstatus;
 	
-	public void RespValEmp(Empresa emp, int Httpstatus)
+	public void RespValEmp(Empresa empresa, int codstatus)
 	{
-		if(Httpstatus==500)
+		if(codstatus==500)
 		{
-			this.Httpstatus = Httpstatus;
-			this.s = "Emails iguais.";
+			this.codstatus = codstatus;
+			this.erro = "Emails iguais.";
 		}
-		else if(Httpstatus==503)
+		else if(codstatus==503)
 		{
-			this.Httpstatus = Httpstatus;
-			this.s = "CNPJs iguais";
+			this.codstatus = codstatus;
+			this.erro = "CNPJs iguais";
 		}
 		else
 		{
-			this.Httpstatus = 200;
-			e.Convert(emp);;
+			this.codstatus = 200;
+			showemp.Convert(empresa);;
 		}
 	}
 

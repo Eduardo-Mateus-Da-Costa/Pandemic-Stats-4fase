@@ -4,7 +4,7 @@ import lombok.Data;
 
 @Data
 public class ReqEndSCH {
-	private int codend;
-	private int cpfusu;
-	private int cnpjemp;
+	private long codend;
+	private long cpfusu;
+	private long cnpjemp;
 }

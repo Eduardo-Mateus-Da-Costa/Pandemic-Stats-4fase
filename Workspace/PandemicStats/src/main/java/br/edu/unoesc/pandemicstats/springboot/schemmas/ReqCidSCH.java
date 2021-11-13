@@ -4,6 +4,6 @@ import lombok.Data;
 
 @Data
 public class ReqCidSCH {
-	private int codcid;
-	private int codest;
+	private long codcid;
+	private long codest;
 }

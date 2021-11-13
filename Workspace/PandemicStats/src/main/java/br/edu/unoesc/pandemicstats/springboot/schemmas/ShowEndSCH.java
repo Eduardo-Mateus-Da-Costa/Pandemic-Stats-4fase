@@ -12,16 +12,16 @@ public class ShowEndSCH {
 	private String num;
 	private long codcid;
 	
-	public void Convert(Endereco e)
+	public void Convert(Endereco endereco)
 	{
-		this.codend = e.getCodend();
-		this.cep = e.getCep();
-		this.rua = e.getRua();
-		this.num = e.getNum();
-		Cidade c = e.getCodcid();
-		if(c != null)
+		this.codend = endereco.getCodend();
+		this.cep = endereco.getCep();
+		this.rua = endereco.getRua();
+		this.num = endereco.getNum();
+		Cidade cidade = endereco.getCodcid();
+		if(cidade != null)
 		{
-			this.codcid	= c.getCodcid();
+			this.codcid	= cidade.getCodcid();
 		}
 	}
 }

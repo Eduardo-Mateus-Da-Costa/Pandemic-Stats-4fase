@@ -6,21 +6,21 @@ import lombok.Data;
 
 @Data
 public class RespEnd{
-	private ShowEndSCH e = new ShowEndSCH();
-	private String s;
-	private int Httpstatus;
+	private ShowEndSCH showend = new ShowEndSCH();
+	private String erro;
+	private int codstatus;
 	
-	public void RespValEnd(Endereco end, int Httpstatus)
+	public void RespValEnd(Endereco endereco, int codstatus)
 	{
-		if(Httpstatus==500)
+		if(codstatus==500)
 		{
-			this.Httpstatus = Httpstatus;
-			this.s = "Não há CNPJ nem CPF";
+			this.codstatus = codstatus;
+			this.erro = "Não há CNPJ nem CPF";
 		}
 		else
 		{
-			this.Httpstatus = Httpstatus;
-			e.Convert(end);
+			this.codstatus = codstatus;
+			showend.Convert(endereco);
 		}
 	}
 }

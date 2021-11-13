@@ -11,15 +11,15 @@ public class ShowMedSCH {
 	private long cpfusu;
 	private String nomusu;
 	
-	public void Convert(Medico m)
+	public void Convert(Medico medico)
 	{
-		this.crmmed = m.getCrmmed();
-		Usuario u = new Usuario();
-		u = m.getCpfusu();
-		if(u != null)
+		this.crmmed = medico.getCrmmed();
+		Usuario usuario = new Usuario();
+		usuario = medico.getCpfusu();
+		if(usuario != null)
 		{
-			this.cpfusu = u.getCpfusu();
-			this.nomusu = u.getNomusu();
+			this.cpfusu = usuario.getCpfusu();
+			this.nomusu = usuario.getNomusu();
 		}
 	}
 }

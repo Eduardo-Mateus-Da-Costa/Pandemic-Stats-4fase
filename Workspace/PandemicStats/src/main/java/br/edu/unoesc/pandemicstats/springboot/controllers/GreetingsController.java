@@ -13,14 +13,16 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import br.edu.unoesc.pandemicstats.springboot.model.Cidade;
+import br.edu.unoesc.pandemicstats.springboot.model.Comorbidade;
 import br.edu.unoesc.pandemicstats.springboot.model.Empresa;
 import br.edu.unoesc.pandemicstats.springboot.model.Endereco;
+import br.edu.unoesc.pandemicstats.springboot.model.Estado;
 import br.edu.unoesc.pandemicstats.springboot.model.Medico;
+import br.edu.unoesc.pandemicstats.springboot.model.MonitoramentoPaciente;
 import br.edu.unoesc.pandemicstats.springboot.model.Usuario;
 import br.edu.unoesc.pandemicstats.springboot.repository.CidadeRepository;
 import br.edu.unoesc.pandemicstats.springboot.repository.ComorbidadeRepository;
@@ -28,9 +30,9 @@ import br.edu.unoesc.pandemicstats.springboot.repository.EmpresaRepository;
 import br.edu.unoesc.pandemicstats.springboot.repository.EnderecoRepository;
 import br.edu.unoesc.pandemicstats.springboot.repository.EstadoRepository;
 import br.edu.unoesc.pandemicstats.springboot.repository.MedicoRepository;
-import br.edu.unoesc.pandemicstats.springboot.repository.Monitoramento_pacienteRepository;
+import br.edu.unoesc.pandemicstats.springboot.repository.MonitoramentoPacienteRepository;
 import br.edu.unoesc.pandemicstats.springboot.repository.PacienteRepository;
-import br.edu.unoesc.pandemicstats.springboot.repository.Paciente_comorbidadeRepository;
+import br.edu.unoesc.pandemicstats.springboot.repository.PacienteComorbidadeRepository;
 import br.edu.unoesc.pandemicstats.springboot.repository.PaisRepository;
 import br.edu.unoesc.pandemicstats.springboot.repository.SintomaRepository;
 import br.edu.unoesc.pandemicstats.springboot.repository.SolicitacaoRepository;
@@ -40,17 +42,23 @@ import br.edu.unoesc.pandemicstats.springboot.repository.VacinaRepository;
 import br.edu.unoesc.pandemicstats.springboot.responses.RespEmp;
 import br.edu.unoesc.pandemicstats.springboot.responses.RespEnd;
 import br.edu.unoesc.pandemicstats.springboot.responses.RespMed;
+import br.edu.unoesc.pandemicstats.springboot.responses.RespMonPac;
 import br.edu.unoesc.pandemicstats.springboot.responses.RespUsu;
 import br.edu.unoesc.pandemicstats.springboot.schemmas.ReqLoginSCH;
 import br.edu.unoesc.pandemicstats.springboot.schemmas.ReqCidSCH;
+import br.edu.unoesc.pandemicstats.springboot.schemmas.ReqComSCH;
 import br.edu.unoesc.pandemicstats.springboot.schemmas.ReqEmpSCH;
 import br.edu.unoesc.pandemicstats.springboot.schemmas.ReqEndSCH;
+import br.edu.unoesc.pandemicstats.springboot.schemmas.ReqEstSCH;
 import br.edu.unoesc.pandemicstats.springboot.schemmas.ReqMedSCH;
+import br.edu.unoesc.pandemicstats.springboot.schemmas.ReqMonPacSCH;
 import br.edu.unoesc.pandemicstats.springboot.schemmas.ReqUsuSCH;
 import br.edu.unoesc.pandemicstats.springboot.schemmas.ShowCidSCH;
 import br.edu.unoesc.pandemicstats.springboot.schemmas.ShowEmpSCH;
 import br.edu.unoesc.pandemicstats.springboot.schemmas.ShowEndSCH;
+import br.edu.unoesc.pandemicstats.springboot.schemmas.ShowEstSCH;
 import br.edu.unoesc.pandemicstats.springboot.schemmas.ShowMedSCH;
+import br.edu.unoesc.pandemicstats.springboot.schemmas.ShowMonPacSCH;
 import br.edu.unoesc.pandemicstats.springboot.schemmas.ShowUsuSCH;
 import br.edu.unoesc.pandemicstats.springboot.utils.CompleteEmp;
 import br.edu.unoesc.pandemicstats.springboot.utils.CompleteEnd;
@@ -82,9 +90,9 @@ public class GreetingsController {
 	@Autowired
 	MedicoRepository medRep;
 	@Autowired
-	Monitoramento_pacienteRepository monPacRep;
+	MonitoramentoPacienteRepository monPacRep;
 	@Autowired
-	Paciente_comorbidadeRepository pacComRep;
+	PacienteComorbidadeRepository pacComRep;
 	@Autowired
 	PacienteRepository pacRep;
 	@Autowired
@@ -103,84 +111,76 @@ public class GreetingsController {
 //Endpoints de usuário
     @PostMapping(value = "postUsu")
     @ResponseBody
-    public ResponseEntity<RespUsu> postUsu(@RequestBody Usuario usu)
+    public ResponseEntity<RespUsu> postUsu(@RequestBody Usuario usuusu)
     {
     	try {
-    		Usuario val_u = new Usuario();
-    		val_u = usuRep.findByCPF(usu.getCpfusu());
-    		if(val_u != null)
+    		Usuario usuario = new Usuario();
+    		usuario = usuRep.findByCPF(usuusu.getCpfusu());
+    		if(usuario != null)
     		{
-    			RespUsu rg = new RespUsu();
-    			rg.RespValUsu(null, 503);
-    			return new ResponseEntity<RespUsu>(rg, HttpStatus.CONFLICT);
+    			RespUsu respusu = new RespUsu();
+    			respusu.RespValUsu(null, 503);
+    			return new ResponseEntity<RespUsu>(respusu, HttpStatus.CONFLICT);
     		}
     		else
     		{
-    			usuRep.save(usu);
-    			RespUsu rg = new RespUsu();
-    			rg.RespValUsu(usu, 0);
-    			return new ResponseEntity<RespUsu>(rg, HttpStatus.CREATED);
+    			usuRep.save(usuusu);
+    			RespUsu respusu = new RespUsu();
+    			respusu.RespValUsu(usuusu, 0);
+    			return new ResponseEntity<RespUsu>(respusu, HttpStatus.CREATED);
     		}
 		} catch (Exception e) {
-			RespUsu rg = new RespUsu();
-			rg.RespValUsu(null, 500);
-			return new ResponseEntity<RespUsu>(rg, HttpStatus.CONFLICT);
+			RespUsu respusu = new RespUsu();
+			respusu.RespValUsu(null, 500);
+			return new ResponseEntity<RespUsu>(respusu, HttpStatus.CONFLICT);
 		}
     }
     
     @PatchMapping(value = "patchUsu")
     @ResponseBody
-    public ResponseEntity<RespUsu> patchUsu(@RequestBody Usuario usu)
+    public ResponseEntity<RespUsu> patchUsu(@RequestBody Usuario requsu)
     {
     	try {
-    		Usuario u = usuRep.findByCPF(usu.getCpfusu());
-    		CompleteUsu.complete(usu, u);
-    		usuRep.save(usu);
-    		RespUsu rg = new RespUsu();
-    		rg.RespValUsu(usu, 0);
-    		return new ResponseEntity<RespUsu>(rg, HttpStatus.OK);
+    		Usuario usuario = usuRep.findByCPF(requsu.getCpfusu());
+    		CompleteUsu.complete(requsu, usuario);
+    		usuRep.save(requsu);
+    		RespUsu respusu = new RespUsu();
+    		respusu.RespValUsu(requsu, 0);
+    		return new ResponseEntity<RespUsu>(respusu, HttpStatus.OK);
     	}catch(Exception e)
     	{
-    		RespUsu rg = new RespUsu();
-    		rg.RespValUsu(null, 500);
-    		return new ResponseEntity<RespUsu>(rg, HttpStatus.CONFLICT);
+    		RespUsu respusu = new RespUsu();
+    		respusu.RespValUsu(null, 500);
+    		return new ResponseEntity<RespUsu>(respusu, HttpStatus.CONFLICT);
     	}
     }
     
     
     @DeleteMapping(value = "deleteUsu")
     @ResponseBody
-    public ResponseEntity<String> deleteUsu(@RequestBody ReqUsuSCH usu)
+    public ResponseEntity<String> deleteUsu(@RequestBody ReqUsuSCH requsu)
     {
     	try {
-    		Usuario u = new Usuario();
-    		if(usu.getEmausu() != null)
+    		Usuario usuario = new Usuario();
+    		if(requsu.getEmausu() != null)
     		{
-    			u = usuRep.findByEmail(usu.getEmausu());
+    			usuario = usuRep.findByEmail(requsu.getEmausu());
     		}
     		else
     		{
-    			u = usuRep.findByCPF(usu.getCpfusu());
+    			usuario = usuRep.findByCPF(requsu.getCpfusu());
     		}
     		
-    		Empresa e = empRep.findByCpfusu(u.getCpfusu());
-    		if(e !=null)
+    		Empresa empresa = empRep.findByCpfusu(usuario.getCpfusu());
+    		if(empresa !=null)
     		{
-    			usuRep.setCnpjempNull(e.getCnpjemp());
+    			usuRep.setCnpjempNull(empresa.getCnpjemp());
     		}
     		
-    		Endereco end = endRep.findByCPF(u.getCpfusu());
-    		Empresa e_end = end.getCnpjemp();
-    		if((end.getCnpjemp() != null)&&(e_end.getCnpjemp() != e.getCnpjemp()))
-    		{ 
-    			endRep.setCpfusuNull(end.getCodend());
-    		}
-    		else
-    		{
-    			endRep.deleteById(end.getCodend());
-    		}
+    		Endereco endereco = endRep.findByCPF(usuario.getCpfusu());
+    		endRep.deleteById(endereco.getCodend());
     		
-    		usuRep.deleteById(u.getCpfusu());
+    		usuRep.deleteById(usuario.getCpfusu());
     		return new ResponseEntity<String>("Deletado com sucesso", HttpStatus.OK);
     	}catch(Exception e)
     	{
@@ -190,49 +190,49 @@ public class GreetingsController {
     
     @GetMapping(value = "getUsu")
     @ResponseBody
-    public ResponseEntity<ShowUsuSCH>getUsu(@RequestBody ReqUsuSCH usu)
+    public ResponseEntity<ShowUsuSCH>getUsu(@RequestBody ReqUsuSCH requsu)
     {
-    	Usuario u = new Usuario();
-    	if (usu.getEmausu() != null)
+    	Usuario usuario = new Usuario();
+    	if (requsu.getEmausu() != null)
     	{
-    		u = usuRep.findByEmail(usu.getEmausu());
+    		usuario = usuRep.findByEmail(requsu.getEmausu());
     	}
     	else
     	{
-    		u = usuRep.findByCPF(usu.getCpfusu());
+    		usuario = usuRep.findByCPF(requsu.getCpfusu());
     	}
-    	ShowUsuSCH user = new ShowUsuSCH();
-    	user.Convert(u);
-    	return new ResponseEntity<ShowUsuSCH>(user, HttpStatus.OK);
+    	ShowUsuSCH showusu = new ShowUsuSCH();
+    	showusu.Convert(usuario);
+    	return new ResponseEntity<ShowUsuSCH>(showusu, HttpStatus.OK);
     }
     
     @GetMapping(value = "login")
     @ResponseBody
-    public ResponseEntity<RespUsu> login(@RequestBody ReqLoginSCH login)
+    public ResponseEntity<RespUsu> login(@RequestBody ReqLoginSCH reqlogin)
     {
-    	Usuario u = new Usuario();
-    	u = usuRep.findByEmail(login.getEmail());
-    	if(u == null)
+    	Usuario usuario = new Usuario();
+    	usuario = usuRep.findByEmail(reqlogin.getEmail());
+    	if(usuario == null)
     	{
-    		RespUsu rg = new RespUsu();
-    		rg.RespValUsu(null, 505);
-    		return new ResponseEntity<RespUsu>(rg, HttpStatus.CONFLICT);
+    		RespUsu respusu = new RespUsu();
+    		respusu.RespValUsu(null, 505);
+    		return new ResponseEntity<RespUsu>(respusu, HttpStatus.CONFLICT);
     	}
     	else
     	{
-    		if (u.getSenusu().equals(login.getSenha()))
+    		if (usuario.getSenusu().equals(reqlogin.getSenha()))
     		{
-    			RespUsu rg = new RespUsu();
-        		rg.RespValUsu(u, 0);
-        		return new ResponseEntity<RespUsu>(rg, HttpStatus.ACCEPTED);
+    			RespUsu respusu = new RespUsu();
+        		respusu.RespValUsu(usuario, 0);
+        		return new ResponseEntity<RespUsu>(respusu, HttpStatus.ACCEPTED);
     		}
     		else
     		{
-    			RespUsu rg = new RespUsu();
-        		rg.RespValUsu(null, 504);
-        		System.out.println(u.getSenusu());
-            	System.out.println(login.toString());
-        		return new ResponseEntity<RespUsu>(rg, HttpStatus.UNAUTHORIZED);
+    			RespUsu respusu = new RespUsu();
+        		respusu.RespValUsu(null, 504);
+        		System.out.println(usuario.getSenusu());
+            	System.out.println(reqlogin.toString());
+        		return new ResponseEntity<RespUsu>(respusu, HttpStatus.UNAUTHORIZED);
     		}
     	}
     }
@@ -240,164 +240,163 @@ public class GreetingsController {
 //Endpoints de empresa
     @PostMapping(value = "postEmp")
     @ResponseBody
-    public ResponseEntity<RespEmp> postEmp(@RequestBody Empresa emp)
+    public ResponseEntity<RespEmp> postEmp(@RequestBody Empresa empemp)
     {
     	try {
-    		Empresa val_e = new Empresa();
-    		val_e = empRep.findByCNPJ(emp.getCnpjemp());
-    		if(val_e != null)
+    		Empresa empresa = new Empresa();
+    		empresa = empRep.findByCNPJ(empemp.getCnpjemp());
+    		if(empresa != null)
     		{
-    			RespEmp re = new RespEmp();
-    			re.RespValEmp(null, 503);
-    			return new ResponseEntity<RespEmp>(re, HttpStatus.CONFLICT);
+    			RespEmp respemp = new RespEmp();
+    			respemp.RespValEmp(null, 503);
+    			return new ResponseEntity<RespEmp>(respemp, HttpStatus.CONFLICT);
     		}
     		else
     		{
-    			empRep.save(emp);
-    			RespEmp re = new RespEmp();
-    			re.RespValEmp(emp, 0);
-    			return new ResponseEntity<RespEmp>(re, HttpStatus.CREATED);
+    			empRep.save(empemp);
+    			RespEmp respemp = new RespEmp();
+    			respemp.RespValEmp(empemp, 0);
+    			return new ResponseEntity<RespEmp>(respemp, HttpStatus.CREATED);
     		}
 		} catch (Exception e) {
-			RespEmp re = new RespEmp();
-			re.RespValEmp(null, 500);
-			return new ResponseEntity<RespEmp>(re, HttpStatus.CONFLICT);
+			RespEmp respemp = new RespEmp();
+			respemp.RespValEmp(null, 500);
+			return new ResponseEntity<RespEmp>(respemp, HttpStatus.CONFLICT);
 		}
     }
     
     @PatchMapping(value = "patchEmp")
     @ResponseBody
-    public ResponseEntity<RespEmp> patchEmp(@RequestBody Empresa emp)
+    public ResponseEntity<RespEmp> patchEmp(@RequestBody Empresa empemp)
     {
     	try {
-    		Empresa e = empRep.findByCNPJ(emp.getCnpjemp());
-    		CompleteEmp.complete(emp, e);
-    		empRep.save(emp);
-    		RespEmp re = new RespEmp();
-    		re.RespValEmp(emp, 0);
-    		return new ResponseEntity<RespEmp>(re, HttpStatus.OK);
+    		Empresa empresa = empRep.findByCNPJ(empemp.getCnpjemp());
+    		CompleteEmp.complete(empemp, empresa);
+    		empRep.save(empemp);
+    		RespEmp respemp = new RespEmp();
+    		respemp.RespValEmp(empemp, 0);
+    		return new ResponseEntity<RespEmp>(respemp, HttpStatus.OK);
     	}catch(Exception e)
     	{
-    		RespEmp re = new RespEmp();
-    		re.RespValEmp(null, 500);
-    		return new ResponseEntity<RespEmp>(re, HttpStatus.CONFLICT);
+    		RespEmp respemp = new RespEmp();
+    		respemp.RespValEmp(null, 500);
+    		return new ResponseEntity<RespEmp>(respemp, HttpStatus.CONFLICT);
     	}
     }
     
     @DeleteMapping(value = "deleteEmp")
     @ResponseBody
-    public ResponseEntity<String> deleteEmp(@RequestBody ReqEmpSCH emp)
+    public ResponseEntity<String> deleteEmp(@RequestBody ReqEmpSCH reqemp)
     {
     	try {
-    		usuRep.setCnpjempNull(emp.getCnpjemp());
-    		empRep.deleteById(emp.getCnpjemp());
+    		usuRep.setCnpjempNull(reqemp.getCnpjemp());
+    		empRep.deleteById(reqemp.getCnpjemp());
     		return new ResponseEntity<String>("Deletado com sucesso", HttpStatus.OK);
     	}catch(Exception e)
     	{
-    		e.printStackTrace();
     		return new ResponseEntity<String>("Erro na deleção", HttpStatus.NOT_FOUND);
     	}
     }
     
     @GetMapping(value = "getEmp")
     @ResponseBody
-    public ResponseEntity<ShowEmpSCH> getEmp(@RequestParam(name ="cnpjemp") long cnpjemp)
+    public ResponseEntity<ShowEmpSCH> getEmp(@RequestBody ReqEmpSCH reqemp)
     {
-    	Empresa e = empRep.findById(cnpjemp).get();
-    	ShowEmpSCH se = new ShowEmpSCH();
-    	se.Convert(e);
-    	return new ResponseEntity<ShowEmpSCH>(se, HttpStatus.OK);
+    	Empresa empresa = empRep.findByCNPJ(reqemp.getCnpjemp());
+    	ShowEmpSCH showemp = new ShowEmpSCH();
+    	showemp.Convert(empresa);
+    	return new ResponseEntity<ShowEmpSCH>(showemp, HttpStatus.OK);
     }
     
 //Endpoints de endereço
     @PostMapping(value = "postORpatchEnd")
     @ResponseBody
-    public ResponseEntity<RespEnd> postORpatchEnd(@RequestBody Endereco end)
+    public ResponseEntity<RespEnd> postORpatchEnd(@RequestBody Endereco reqend)
     {
-		Endereco val_end = new Endereco();
-		Usuario u_tmp = end.getCpfusu();
-		Empresa e_tmp = end.getCnpjemp();
-		if((u_tmp != null)||(e_tmp != null))
+		Endereco endereco = new Endereco();
+		Usuario utmp = reqend.getCpfusu();
+		Empresa etmp = reqend.getCnpjemp();
+		if((utmp != null)||(etmp != null))
 		{
-			if(u_tmp != null)
+			if(utmp != null)
 			{
-				val_end = endRep.findByCPF(u_tmp.getCpfusu());
+				endereco = endRep.findByCPF(utmp.getCpfusu());
 			}
 			else
 			{
-				val_end = endRep.findByCNPJ(e_tmp.getCnpjemp());
+				endereco = endRep.findByCNPJ(etmp.getCnpjemp());
 			}
-			CompleteEnd.complete(end, val_end);
-			endRep.save(val_end);
-			RespEnd re = new RespEnd();
-			re.RespValEnd(val_end, 0);
-			return new ResponseEntity<RespEnd>(re, HttpStatus.CREATED);
+			CompleteEnd.complete(reqend, endereco);
+			endRep.save(endereco);
+			RespEnd respend = new RespEnd();
+			respend.RespValEnd(endereco, 0);
+			return new ResponseEntity<RespEnd>(respend, HttpStatus.CREATED);
 		}
 		else
 		{
-			RespEnd re = new RespEnd();
-			re.RespValEnd(null, 500);
-			return new ResponseEntity<RespEnd>(re, HttpStatus.BAD_REQUEST);
+			RespEnd respend = new RespEnd();
+			respend.RespValEnd(null, 500);
+			return new ResponseEntity<RespEnd>(respend, HttpStatus.BAD_REQUEST);
 		}
     }
     
     
     @GetMapping(value = "getEnd")
     @ResponseBody
-    public ResponseEntity<ShowEndSCH> getEnd(@RequestBody ReqEndSCH end)
+    public ResponseEntity<ShowEndSCH> getEnd(@RequestBody ReqEndSCH reqend)
     {
-    	Endereco e = new Endereco();
-    	if(end.getCpfusu() != 0)
+    	Endereco endereco = new Endereco();
+    	if(reqend.getCpfusu() != 0)
     	{
-    		e = endRep.findByCPF(end.getCpfusu());
+    		endereco = endRep.findByCPF(reqend.getCpfusu());
     	}
     	else
     	{
-    		e = endRep.findByCNPJ(end.getCnpjemp());
+    		endereco = endRep.findByCNPJ(reqend.getCnpjemp());
     	}
-    	ShowEndSCH se = new ShowEndSCH();
-    	se.Convert(e);
-    	return new ResponseEntity<ShowEndSCH>(se, HttpStatus.OK);
+    	ShowEndSCH showend = new ShowEndSCH();
+    	showend.Convert(endereco);
+    	return new ResponseEntity<ShowEndSCH>(showend, HttpStatus.OK);
     }
     
 //Endpoints de medico
     @PostMapping(value = "postMed")
     @ResponseBody
-    public ResponseEntity<RespMed> postMed(@RequestBody Medico med)
+    public ResponseEntity<RespMed> postMed(@RequestBody Medico reqmed)
     {
-		Medico val_m = new Medico();
-		val_m = medRep.findByCRM(med.getCrmmed());
-		if(val_m != null)
+		Medico medico = new Medico();
+		medico = medRep.findByCRM(reqmed.getCrmmed());
+		if(medico != null)
 		{       
-			RespMed rm = new RespMed();
-			rm.RespValMed(null, 501);
-			return new ResponseEntity<RespMed>(rm, HttpStatus.CONFLICT);
+			RespMed respmed = new RespMed();
+			respmed.RespValMed(null, 501);
+			return new ResponseEntity<RespMed>(respmed, HttpStatus.CONFLICT);
 		}
 		else
 		{
-			medRep.save(med);
-			RespMed rm =new RespMed();
-			rm.RespValMed(med, 0);
-			return new ResponseEntity<RespMed>(rm, HttpStatus.CREATED);
+			medRep.save(medico);
+			RespMed respmed =new RespMed();
+			respmed.RespValMed(medico, 0);
+			return new ResponseEntity<RespMed>(respmed, HttpStatus.CREATED);
 		}
     }
     
     @DeleteMapping(value = "deleteMed")
     @ResponseBody
-    public ResponseEntity<String> deleteMed(@RequestBody ReqMedSCH med)
+    public ResponseEntity<String> deleteMed(@RequestBody ReqMedSCH reqmed)
     {
     	try {
-    		Medico m = new Medico();
-    		if(med.getCrmmed() == null)
+    		Medico medico = new Medico();
+    		if(reqmed.getCrmmed() == null)
     		{
-    			m = medRep.findByCPF(med.getCpfusu());
+    			medico = medRep.findByCPF(reqmed.getCpfusu());
     		}
     		else
     		{
-    			m = medRep.findByCRM(med.getCrmmed());
+    			medico = medRep.findByCRM(reqmed.getCrmmed());
     		}
-    		vacRep.setCrmNull(m.getCrmmed());
-    		medRep.deleteById(m.getCrmmed());
+    		vacRep.setCrmNull(medico.getCrmmed());
+    		medRep.deleteById(medico.getCrmmed());
     		return new ResponseEntity<String>("Deletado com sucesso", HttpStatus.OK);
     	}catch(Exception e)
     	{
@@ -408,46 +407,138 @@ public class GreetingsController {
     
     @GetMapping(value = "getMed")
     @ResponseBody
-    public ResponseEntity<ShowMedSCH> getMed(@RequestBody ReqMedSCH med)
+    public ResponseEntity<ShowMedSCH> getMed(@RequestBody ReqMedSCH reqmed)
     {
-    	Medico m = new Medico();
-		if(med.getCrmmed() == null)
+    	Medico medico = new Medico();
+		if(reqmed.getCrmmed() == null)
 		{
-			m = medRep.findByCPF(med.getCpfusu());
+			medico = medRep.findByCPF(reqmed.getCpfusu());
 		}
 		else
 		{
-			m = medRep.findByCRM(med.getCrmmed());
+			medico = medRep.findByCRM(reqmed.getCrmmed());
 		}
-    	ShowMedSCH sm = new ShowMedSCH();
-    	sm.Convert(m);
-    	return new ResponseEntity<ShowMedSCH>(sm, HttpStatus.OK);
+    	ShowMedSCH showmed = new ShowMedSCH();
+    	showmed.Convert(medico);
+    	return new ResponseEntity<ShowMedSCH>(showmed, HttpStatus.OK);
     }
     
 //Endpoint de cidade
     @GetMapping(value = "getCid")
     @ResponseBody
-    public ResponseEntity<ShowCidSCH> getCid(@RequestBody ReqCidSCH cid)
+    public ResponseEntity<ShowCidSCH> getCid(@RequestBody ReqCidSCH reqcid)
     {
-    	Cidade c = cidRep.findByCodcid(cid.getCodcid());
-    	ShowCidSCH sc = new ShowCidSCH();
-    	sc.Convert(c);
-    	return new ResponseEntity<ShowCidSCH>(sc, HttpStatus.OK);
+    	Cidade cidade = cidRep.findByCodcid(reqcid.getCodcid());
+    	ShowCidSCH showcid = new ShowCidSCH();
+    	showcid.Convert(cidade);
+    	return new ResponseEntity<ShowCidSCH>(showcid, HttpStatus.OK);
     }
     
     @GetMapping(value = "getEstCids")
     @ResponseBody
-    public ResponseEntity<List<ShowCidSCH>> getCids(@RequestBody ReqCidSCH cid)
+    public ResponseEntity<List<ShowCidSCH>> getCids(@RequestBody ReqCidSCH reqcid)
     {
-    	List<Cidade> c = cidRep.findByCodest(cid.getCodest());
-    	List<ShowCidSCH> sc = new ArrayList<ShowCidSCH>();
-    	for(Cidade c_tmp : c)
+    	List<Cidade> cidades = cidRep.findByCodest(reqcid.getCodest());
+    	List<ShowCidSCH> listshowcid = new ArrayList<ShowCidSCH>();
+    	for(Cidade ctmp : cidades)
     	{
-    		ShowCidSCH sc_tmp = new ShowCidSCH();
-    		sc_tmp.Convert(c_tmp);
-    		sc.add(sc_tmp);
+    		ShowCidSCH sctmp = new ShowCidSCH();
+    		sctmp.Convert(ctmp);
+    		listshowcid.add(sctmp);
     	}
-    	return new ResponseEntity<List<ShowCidSCH>>(sc, HttpStatus.OK);
+    	return new ResponseEntity<List<ShowCidSCH>>(listshowcid, HttpStatus.OK);
     }
+    
+    
+//Endpoint de comorbidade
+  	@GetMapping(value = "getCom")
+  	@ResponseBody
+  	public ResponseEntity<Comorbidade> getCom(@RequestBody ReqComSCH reqcom)
+  	{
+  		Comorbidade comorbidade = comRep.findByCodcom(reqcom.getCodcom());
+  		return new ResponseEntity<Comorbidade>(comorbidade, HttpStatus.OK);
+  	}
+  	
+  	@GetMapping(value = "getComs")
+  	@ResponseBody
+  	public ResponseEntity<List<Comorbidade>> getComs()
+  	{
+  		List<Comorbidade> comorbidades = comRep.findAllComs();
+  		return new ResponseEntity<List<Comorbidade>>(comorbidades, HttpStatus.OK);
+  	}
+  	
+//Endpoint de estado
+  	@GetMapping(value = "getEst")
+  	@ResponseBody
+  	public ResponseEntity<ShowEstSCH> getEst(@RequestBody ReqEstSCH reqest)
+  	{
+  		Estado estado = estRep.findByCodest(reqest.getCodest());
+  		ShowEstSCH showest = new ShowEstSCH();
+  		showest.Convert(estado);
+  		return new ResponseEntity<ShowEstSCH>(showest, HttpStatus.OK);
+  	}
+  	
+  	@GetMapping(value = "getEsts")
+  	@ResponseBody
+  	public ResponseEntity<List<ShowEstSCH>> getEsts(@RequestBody ReqEstSCH reqest)
+  	{
+  		List<Estado> estados = estRep.findByCodpai(reqest.getCodpai());
+  		List<ShowEstSCH> listshowest = new ArrayList<ShowEstSCH>();
+    	for(Estado etmp : estados)
+    	{
+    		ShowEstSCH setmp = new ShowEstSCH();
+    		setmp.Convert(etmp);
+    		listshowest.add(setmp);
+    	}
+  		return new ResponseEntity<List<ShowEstSCH>>(listshowest, HttpStatus.OK);
+  	}
+  	
+//Endpoint de monitoramento paciente
+  	@PostMapping(value = "postMonPac")
+  	@ResponseBody
+  	public ResponseEntity<RespMonPac> postMomPac(@RequestBody MonitoramentoPaciente monpac)
+  	{
+		try {
+			char intsin = monpac.getIntsin();
+			if((intsin == 'P')||(intsin == 'M')||(intsin == 'C') || (intsin=='S'))
+			{
+				monPacRep.save(monpac);
+				RespMonPac respmonpac = new RespMonPac();
+				respmonpac.RespValMomPac(monpac, 0);
+				return new ResponseEntity<RespMonPac>(respmonpac, HttpStatus.OK);
+			}
+			else
+			{
+				RespMonPac respmonpac = new RespMonPac();
+				respmonpac.RespValMomPac(monpac, 501);
+				return new ResponseEntity<RespMonPac>(respmonpac, HttpStatus.NOT_ACCEPTABLE);
+			}
+		}catch(Exception e)
+		{
+			RespMonPac respmonpac = new RespMonPac();
+			respmonpac.RespValMomPac(monpac, 500);
+			return new ResponseEntity<RespMonPac>(respmonpac, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+  	}
+  	
+  	@GetMapping(value = "getMonsPac")
+  	@ResponseBody
+  	public ResponseEntity<List<ShowMonPacSCH>> getMonsPac(@RequestBody ReqMonPacSCH reqmompac)
+  	{
+  		List<MonitoramentoPaciente> monitoramentos = monPacRep.findByCodpac(reqmompac.getCodpac());
+  		List<ShowMonPacSCH> showmonspac = new ArrayList<ShowMonPacSCH>();
+  		for (MonitoramentoPaciente mptmp: monitoramentos)
+  		{
+  			ShowMonPacSCH smptmp = new ShowMonPacSCH();
+  			smptmp.Convert(mptmp);
+  			showmonspac.add(smptmp);
+  		}
+  		return new ResponseEntity<List<ShowMonPacSCH>>(showmonspac, HttpStatus.OK);
+  	}
+  	
+//Endpoints de paciente
+  	
 }
+
+
 
