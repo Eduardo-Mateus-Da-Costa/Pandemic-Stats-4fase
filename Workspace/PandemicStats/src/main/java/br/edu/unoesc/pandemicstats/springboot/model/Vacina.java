@@ -27,15 +27,15 @@ public class Vacina implements Serializable{
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	@Column(columnDefinition = "NUMERIC(11, 0)")
-	private int codvac;
+	private long codvac;
 	
 	@Column(columnDefinition = "DATE", nullable = false)
-	@ColumnDefault(value="CURRENT_TIMESTAMP")
+	@ColumnDefault(value="CURRENT_DATE")
 	@JsonFormat(pattern="yyyy-mm-dd")
 	private Date datvac;
 	
-	@Column(columnDefinition = "CHAR(1) CHECK(DOSVAC IN('1', '2'))", nullable = false)
-	private char dosvac;
+	@Column(columnDefinition = "INT4", nullable = false)
+	private int dosvac;
 	
 	@Column(columnDefinition = "VARCHAR(30)", nullable = true)
 	private String fabvac;

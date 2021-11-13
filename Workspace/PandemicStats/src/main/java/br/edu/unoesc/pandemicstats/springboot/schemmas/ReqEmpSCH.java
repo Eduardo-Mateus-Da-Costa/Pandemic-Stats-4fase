@@ -4,5 +4,5 @@ import lombok.Data;
 
 @Data
 public class ReqEmpSCH {
-	private int cnpjemp;
+	private long cnpjemp;
 }

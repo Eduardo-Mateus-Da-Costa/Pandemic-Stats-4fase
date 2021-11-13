@@ -9,7 +9,7 @@ import lombok.Data;
 @Data
 public class ShowEmpSCH {
 
-	private int cnpjemp;
+	private long cnpjemp;
 	private String nomemp;
 	private String nomfanemp;
 	private String telemp1;
@@ -17,7 +17,7 @@ public class ShowEmpSCH {
 	private String emaemp;
 	private String ramemp;
 	private Date valemp;
-	private int cpfusu;
+	private long cpfusu;
 	
 	public void Convert(Empresa e)
 	{

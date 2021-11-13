@@ -4,6 +4,7 @@ package br.edu.unoesc.pandemicstats.springboot.controllers;
 import java.util.ArrayList;
 import java.util.List;
 
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -300,7 +301,7 @@ public class GreetingsController {
     
     @GetMapping(value = "getEmp")
     @ResponseBody
-    public ResponseEntity<ShowEmpSCH> getEmp(@RequestParam(name ="cnpjemp") int cnpjemp)
+    public ResponseEntity<ShowEmpSCH> getEmp(@RequestParam(name ="cnpjemp") long cnpjemp)
     {
     	Empresa e = empRep.findById(cnpjemp).get();
     	ShowEmpSCH se = new ShowEmpSCH();

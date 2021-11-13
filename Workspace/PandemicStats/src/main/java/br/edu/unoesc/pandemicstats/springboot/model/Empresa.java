@@ -23,7 +23,7 @@ public class Empresa implements Serializable{
 	
 	@Id
 	@Column(columnDefinition = "NUMERIC(14, 0)")
-	private int cnpjemp;
+	private long cnpjemp;
 	
 	@Column(columnDefinition = "VARCHAR(100)", nullable = false)
 	private String nomemp;
@@ -45,7 +45,7 @@ public class Empresa implements Serializable{
 	
 	@Column(columnDefinition = "DATE", nullable = false)
 	@JsonFormat(pattern="yyyy-mm-dd")
-	@ColumnDefault(value="CURRENT_TIMESTAMP")
+	@ColumnDefault(value="CURRENT_DATE")
 	private Date valemp;
 	
 	@ManyToOne

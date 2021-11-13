@@ -7,7 +7,7 @@ import lombok.Data;
 @Data
 public class ShowCidSCH {
 	private String nomcid;
-	private int codest;
+	private long codest;
 	
 	public void Convert(Cidade c)
 	{

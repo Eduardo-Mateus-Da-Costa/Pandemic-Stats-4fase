@@ -10,17 +10,17 @@ import org.springframework.stereotype.Repository;
 import br.edu.unoesc.pandemicstats.springboot.model.Endereco;
 
 @Repository
-public interface EnderecoRepository extends JpaRepository<Endereco, Integer> {
+public interface EnderecoRepository extends JpaRepository<Endereco, Long> {
 	
 	@Query(value = "select e from Endereco e where e.cpfusu = ?1")
-	Endereco findByCPF(int cpf);
+	Endereco findByCPF(long cpf);
 	
 	@Query(value = "select e from Endereco e where e.cnpjemp = ?1")
-	Endereco findByCNPJ(int cnpj);
+	Endereco findByCNPJ(long cnpj);
 	
 	@Transactional
 	@Modifying(clearAutomatically = true)
 	@Query(value = "update Endereco set cpfusu = null where codend = ?1")
-	void setCpfusuNull(int codend);
+	void setCpfusuNull(long codend);
 
 }

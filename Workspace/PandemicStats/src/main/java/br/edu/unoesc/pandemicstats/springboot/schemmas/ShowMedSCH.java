@@ -8,7 +8,7 @@ import lombok.Data;
 @Data
 public class ShowMedSCH {
 	private String crmmed;
-	private int cpfusu;
+	private long cpfusu;
 	private String nomusu;
 	
 	public void Convert(Medico m)

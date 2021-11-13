@@ -6,6 +6,6 @@ import org.springframework.stereotype.Repository;
 import br.edu.unoesc.pandemicstats.springboot.model.Monitoramento_paciente;
 
 @Repository
-public interface Monitoramento_pacienteRepository extends JpaRepository<Monitoramento_paciente, Integer> {
+public interface Monitoramento_pacienteRepository extends JpaRepository<Monitoramento_paciente, Long> {
 
 }

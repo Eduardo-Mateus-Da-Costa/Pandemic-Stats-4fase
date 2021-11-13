@@ -28,11 +28,11 @@ public class Test_covid implements Serializable{
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	@Column(columnDefinition = "NUMERIC(10, 0)")
-	private int codtes;
+	private long codtes;
 	
 	@Column(columnDefinition = "DATE", nullable = false)
 	@JsonFormat(pattern="yyyy-mm-dd")
-	@ColumnDefault(value="CURRENT_TIMESTAMP")
+	@ColumnDefault(value="CURRENT_DATE")
 	private Date dattes;
 	
 	@Column(columnDefinition = "CHAR(1) CHECK(COVPACTES IN('P', 'N'))", nullable = false)

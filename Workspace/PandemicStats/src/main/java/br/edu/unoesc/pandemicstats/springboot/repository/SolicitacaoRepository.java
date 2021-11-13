@@ -6,6 +6,6 @@ import org.springframework.stereotype.Repository;
 import br.edu.unoesc.pandemicstats.springboot.model.Solicitacao;
 
 @Repository
-public interface SolicitacaoRepository extends JpaRepository<Solicitacao, Integer> {
+public interface SolicitacaoRepository extends JpaRepository<Solicitacao, Long> {
 
 }

@@ -13,5 +13,5 @@ public interface MedicoRepository extends JpaRepository<Medico, String> {
 	Medico findByCRM(String crm);
 	
 	@Query(value = "select m from Medico m where m.cpfusu.cpfusu = ?1")
-	Medico findByCPF(int cpfusu);
+	Medico findByCPF(long cpfusu);
 }

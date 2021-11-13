@@ -11,7 +11,7 @@ import org.springframework.stereotype.Repository;
 import br.edu.unoesc.pandemicstats.springboot.model.Vacina;
 
 @Repository
-public interface VacinaRepository extends JpaRepository<Vacina, Integer> {
+public interface VacinaRepository extends JpaRepository<Vacina, Long> {
 	
 	@Transactional
 	@Modifying(clearAutomatically = true)

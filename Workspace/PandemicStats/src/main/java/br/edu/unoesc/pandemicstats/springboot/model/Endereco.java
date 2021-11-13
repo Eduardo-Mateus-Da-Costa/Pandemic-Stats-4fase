@@ -22,10 +22,10 @@ public class Endereco implements Serializable{
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	@Column(columnDefinition = "NUMERIC(10, 0)")
-	private int codend;
+	private long codend;
 	
 	@Column(columnDefinition = "NUMERIC(8, 0)", nullable = false)
-	private int cep;
+	private long cep;
 	
 	@Column(columnDefinition = "VARCHAR(60)", nullable = false)
 	private String rua;

@@ -23,7 +23,7 @@ public class Estado implements Serializable{
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	@Column(columnDefinition = "NUMERIC(2, 0)")
-	private int codest;
+	private long codest;
 	
 	@Column(columnDefinition = "VARCHAR(60)", nullable = false)
 	private String nomest;

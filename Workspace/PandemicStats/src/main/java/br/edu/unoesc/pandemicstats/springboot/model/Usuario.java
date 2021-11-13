@@ -22,7 +22,7 @@ public class Usuario implements Serializable{
 	
 	@Id
 	@Column(columnDefinition = "NUMERIC(11, 0)")
-	private int cpfusu;
+	private long cpfusu;
 	
 	@Column(columnDefinition = "VARCHAR(100)", nullable = false)
 	private String nomusu;
@@ -43,8 +43,8 @@ public class Usuario implements Serializable{
 	@Column(columnDefinition = "VARCHAR(30)", nullable = false, unique = true)
 	private String emausu;
 	
-	@Column(columnDefinition = "DATE", nullable = true)
-	@ColumnDefault(value="CURRENT_TIMESTAMP")
+	@Column(columnDefinition = "DATE", nullable = false)
+	@ColumnDefault(value="CURRENT_DATE")
 	@JsonFormat(pattern="yyyy-mm-dd")
 	private Date valusu;
 	

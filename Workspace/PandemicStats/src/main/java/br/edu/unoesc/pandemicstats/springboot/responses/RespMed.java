@@ -2,10 +2,13 @@ package br.edu.unoesc.pandemicstats.springboot.responses;
 
 import br.edu.unoesc.pandemicstats.springboot.model.Medico;
 import br.edu.unoesc.pandemicstats.springboot.schemmas.ShowMedSCH;
+import lombok.Data;
 
-
-public class RespMed extends RespPadrao{
+@Data
+public class RespMed{
 	private ShowMedSCH m = new ShowMedSCH();
+	private String s;
+	private int Httpstatus;
 	
 	public void RespValMed(Medico med, int Httpstatus)
 	{

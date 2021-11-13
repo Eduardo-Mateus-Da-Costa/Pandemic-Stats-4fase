@@ -21,7 +21,7 @@ public class Cidade implements Serializable{
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	@Column(columnDefinition = "NUMERIC(6, 0)")
-	private int codcid;
+	private long codcid;
 	
 	
 	@Column(columnDefinition = "VARCHAR(60)")

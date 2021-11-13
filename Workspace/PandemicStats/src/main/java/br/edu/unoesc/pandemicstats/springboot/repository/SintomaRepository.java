@@ -6,6 +6,6 @@ import org.springframework.stereotype.Repository;
 import br.edu.unoesc.pandemicstats.springboot.model.Sintoma;
 
 @Repository
-public interface SintomaRepository extends JpaRepository<Sintoma, Integer> {
+public interface SintomaRepository extends JpaRepository<Sintoma, Long> {
 
 }

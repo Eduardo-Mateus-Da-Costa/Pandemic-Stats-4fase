@@ -6,6 +6,6 @@ import org.springframework.stereotype.Repository;
 import br.edu.unoesc.pandemicstats.springboot.model.Test_covid;
 
 @Repository
-public interface Test_covidRepository extends JpaRepository<Test_covid, Integer> {
+public interface Test_covidRepository extends JpaRepository<Test_covid, Long> {
 
 }

@@ -21,7 +21,7 @@ public class Paciente_comorbidade implements Serializable{
 	
 	@Id
 	@Column(columnDefinition = "NUMERIC(10, 0)")
-	private int codpaccom;
+	private long codpaccom;
 	
 	@ManyToOne
 	@OnDelete(action = OnDeleteAction.CASCADE)

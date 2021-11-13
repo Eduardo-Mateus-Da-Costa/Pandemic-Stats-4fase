@@ -21,7 +21,7 @@ public class Solicitacao implements Serializable{
 	
 	@Id
 	@Column(columnDefinition = "NUMERIC(10, 0)")
-	private int codsol;
+	private long codsol;
 	
 	@Column(columnDefinition = "VARCHAR(300)", nullable = false)
 	private String dessol;

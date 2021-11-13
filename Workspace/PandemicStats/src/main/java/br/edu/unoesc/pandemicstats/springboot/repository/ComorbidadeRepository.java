@@ -6,6 +6,6 @@ import org.springframework.stereotype.Repository;
 import br.edu.unoesc.pandemicstats.springboot.model.Cidade;
 
 @Repository
-public interface ComorbidadeRepository extends JpaRepository<Cidade, Integer> {
+public interface ComorbidadeRepository extends JpaRepository<Cidade, Long> {
 
 }

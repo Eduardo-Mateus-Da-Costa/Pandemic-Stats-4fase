@@ -8,13 +8,13 @@ import lombok.Data;
 
 @Data
 public class ShowUsuSCH {
-	private int cpfusu;
+	private long cpfusu;
 	private String nomusu;
 	private Date datnasusu;	
 	private String emausu;
 	private char sexusu;
 	private String telusu;
-	private int cnpjemp;
+	private long cnpjemp;
 	
 	public void Convert(Usuario u)
 	{

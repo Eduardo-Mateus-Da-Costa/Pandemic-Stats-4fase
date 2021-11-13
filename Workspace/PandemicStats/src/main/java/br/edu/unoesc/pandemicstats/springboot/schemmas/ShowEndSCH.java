@@ -6,11 +6,11 @@ import lombok.Data;
 
 @Data
 public class ShowEndSCH {
-	private int codend;
-	private int cep;
+	private long codend;
+	private long cep;
 	private String rua;
 	private String num;
-	private int codcid;
+	private long codcid;
 	
 	public void Convert(Endereco e)
 	{

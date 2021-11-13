@@ -29,7 +29,7 @@ public class Monitoramento_paciente implements Serializable{
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	@Column(columnDefinition = "NUMERIC(10, 0)")
-	private int codmon;
+	private long codmon;
 	
 	@Column(columnDefinition = "DATE", nullable = false)
 	@ColumnDefault(value="CURRENT_TIMESTAMP")

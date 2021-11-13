@@ -2,9 +2,13 @@ package br.edu.unoesc.pandemicstats.springboot.responses;
 
 import br.edu.unoesc.pandemicstats.springboot.model.Empresa;
 import br.edu.unoesc.pandemicstats.springboot.schemmas.ShowEmpSCH;
+import lombok.Data;
 
-public class RespEmp extends RespPadrao{
+@Data
+public class RespEmp{
 	private ShowEmpSCH e = new ShowEmpSCH();
+	private String s;
+	private int Httpstatus;
 	
 	public void RespValEmp(Empresa emp, int Httpstatus)
 	{

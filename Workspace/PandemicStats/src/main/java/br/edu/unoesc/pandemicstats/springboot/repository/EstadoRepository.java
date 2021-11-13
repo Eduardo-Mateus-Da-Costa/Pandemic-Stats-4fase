@@ -6,6 +6,6 @@ import org.springframework.stereotype.Repository;
 import br.edu.unoesc.pandemicstats.springboot.model.Estado;
 
 @Repository
-public interface EstadoRepository extends JpaRepository<Estado, Integer> {
+public interface EstadoRepository extends JpaRepository<Estado, Long> {
 
 }

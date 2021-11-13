@@ -3,18 +3,236 @@
 	xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
-	<changeSet id="adiciona as functions e triggers"
+	<changeSet id="adiciona as functions, trigger, views e grupos"
 		author="Eduardo Mateus da Costa">
 		<sql stripComments="true" splitStatements="true" endDelimiter="@"> <!--@ finaliza pois nas functions tem ; no meio -->
-			create or replace function garbage_colector()
+			create type tp_cid_covid as 
+			(
+				nomusu varchar(100),
+				sexusu char(1),
+				nomemp varchar(100),
+				dattes date,
+				covpactes char(1)
+			);@
+			
+			create or replace function cidade_covid(codigo numeric(6,0))
+			returns setof tp_cid_covid
+			as
+			$body$
+			begin
+				return query select u.nomusu, u.sexusu, e.nomemp, tc.dattes, tc.covpactes from usuario u 
+						inner join empresa e on u.cnpjemp = e.cnpjemp
+						inner join endereco en on en.cpfusu = u.cpfusu
+						inner join cidade c on en.codcid = c.codcid
+						inner join paciente p on p.cpfusu = u.cpfusu
+						inner join test_covid tc on tc.codpac = p.codpac
+						where ((tc.dattes &gt;= (current_date - 30)) and (c.codcid = codigo));
+			end
+			$body$
+			language plpgsql;@
+			
+			create type tp_emp_covid as 
+			(
+				nomusu varchar(100),
+				sexusu char(1),
+				nomcid varchar(60),
+				dattes date,
+				covpactes char(1)
+			);@
+			
+			create or replace function empresa_covid(cnpj numeric(14,0))
+			returns setof tp_emp_covid
+			as
+			$body$
+			begin
+				return query select u.nomusu, u.sexusu, c.nomcid, tc.dattes, tc.covpactes from usuario u 
+						inner join empresa e on u.cnpjemp = e.cnpjemp
+						inner join endereco en on en.cpfusu = u.cpfusu
+						inner join cidade c on en.codcid = c.codcid
+						inner join paciente p on p.cpfusu = u.cpfusu
+						inner join test_covid tc on tc.codpac = p.codpac
+						where ((tc.dattes &gt;= (current_date - 30)) and (e.cnpjemp = cnpj));
+			end
+			$body$
+			language plpgsql;@
+			
+			
+			create or replace function p_dose_cidade(codigo numeric(6,0))
+			returns numeric
+			as
+			$body$
+			declare
+				conta NUMERIC := 0;
+			begin
+				select count(*) into conta from vacina v
+				inner join paciente p on p.codpac = v.codpac
+				inner join usuario u on u.cpfusu = p.cpfusu
+				inner join endereco en on en.cpfusu = u.cpfusu
+				inner join cidade c on c.codcid = en.codcid
+				where ((c.codcid = codigo) and (v.dosvac = '1'));
+			return conta; 
+			end
+			$body$
+			language plpgsql;@
+			
+			
+			create or replace function s_dose_cidade(codigo numeric(6,0))
+			returns numeric
+			as
+			$body$
+			declare
+				conta NUMERIC := 0;
+			begin
+				select count(*) into conta from vacina v
+				inner join paciente p on p.codpac = v.codpac
+				inner join usuario u on u.cpfusu = p.cpfusu
+				inner join endereco en on en.cpfusu = u.cpfusu
+				inner join cidade c on c.codcid = en.codcid
+				where ((c.codcid = codigo) and (v.dosvac = '2'));
+			return conta; 
+			end
+			$body$
+			language plpgsql;@
+			
+			
+			create or replace function controla_dosvac()
 			returns trigger
 			as
 			$body$
 			begin
-			return 
+				if (new.dosvac &gt; 2) or (new.dosvac &lt; 1) then
+					raise exception 'Dose invalida';
+				end if;
+				return new;		
 			end
 			$body$
 			language plpgsql;@
+			
+			create trigger vacina_dosvac_before_tg
+			before insert or update
+			on vacina
+			for each row
+			execute procedure controla_dosvac();@
+			
+			
+			create or replace function controla_datvac()
+			returns trigger
+			as
+			$body$
+			begin
+				if (new.datvac &gt; (current_date)) then
+					raise exception 'Data invalida';
+				end if;
+				return new;		
+			end
+			$body$
+			language plpgsql;@
+			
+			create trigger vacina_datvac_before_tg
+			before insert
+			on vacina
+			for each row
+			execute procedure controla_datvac();@
+			
+			
+			create view vw_conta_medicos as
+			select count(*) from medico;@
+			
+			create view vw_conta_empresas as
+			select count(*) from empresa;@
+			
+			create view vw_conta_pacientes as
+			select count(*) from paciente;@
+			
+			create view vw_conta_usuarios as
+			select count(*) from usuario;@
+			
+			create or replace procedure create_user(email varchar(30), senha varchar(20))
+			as
+			$body$
+			begin
+				execute format('create user %I with password %I', email, senha);
+			end
+			$body$
+			language plpgsql;@
+			
+			
+			create group g_empresa;@
+			create group g_paciente;@
+			create group g_medico;@
+			create group g_administrador;@
+			create group g_usuario;@
+			
+			grant select, insert, update, delete
+			on usuario, endereco
+			to g_usuario;@
+			
+			grant select
+			on pais, estado, cidade, comorbidade
+			to g_usuario;
+			
+			grant insert
+			on solicitacao, paciente, paciente_comorbidade, medico, empresa
+			to g_usuario;@
+			
+			grant select, insert, update, delete
+			on empresa
+			to g_empresa;@
+			
+			grant select
+			on paciente, vacina, test_covid
+			to g_empresa;@
+			
+			grant select, insert, update
+			on test_covid, monitoramento_paciente, vacina
+			to g_paciente;@
+			
+			grant delete
+			on paciente, paciente_comorbidade
+			to g_paciente;@
+			
+			grant select, insert, update, delete
+			on all tables in schema public
+			to g_administrador;@
+			
+			
+			create or replace procedure grant_empresa(email varchar(30))
+			as
+			$body$
+			begin
+				execute format('grant g_empresa to %I', email);
+			end
+			$body$
+			language plpgsql;@
+			
+			create or replace procedure grant_paciente(email varchar(30))
+			as
+			$body$
+			begin
+				execute format('grant g_paciente to %I', email);
+			end
+			$body$
+			language plpgsql;@
+			
+			create or replace procedure grant_medico(email varchar(30))
+			as
+			$body$
+			begin
+				execute format('grant g_medico to %I', email);
+			end
+			$body$
+			language plpgsql;@
+			
+			create or replace procedure grant_administrador(email varchar(30))
+			as
+			$body$
+			begin
+				execute format('grant g_administrador to %I', email);
+			end
+			$body$
+			language plpgsql;@
+			
+			
 		</sql>
 	</changeSet>
 

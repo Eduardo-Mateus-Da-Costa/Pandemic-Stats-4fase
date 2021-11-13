@@ -8,7 +8,7 @@ import org.springframework.stereotype.Repository;
 import br.edu.unoesc.pandemicstats.springboot.model.Cidade;
 
 @Repository
-public interface CidadeRepository extends JpaRepository<Cidade, Integer> {
+public interface CidadeRepository extends JpaRepository<Cidade, Long> {
 
 	@Query(value = "select c from Cidade c where c.codcid = ?1")
 	Cidade findByCodcid(int codcid);
