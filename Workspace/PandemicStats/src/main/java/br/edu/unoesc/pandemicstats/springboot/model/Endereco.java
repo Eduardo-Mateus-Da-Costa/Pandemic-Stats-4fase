@@ -21,7 +21,7 @@ public class Endereco implements Serializable{
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
-	@Column(columnDefinition = "NUMERIC(10, 0)")
+	@Column(columnDefinition = "NUMERIC(10, 0)", insertable = false)
 	private long codend;
 	
 	@Column(columnDefinition = "NUMERIC(8, 0)", nullable = false)

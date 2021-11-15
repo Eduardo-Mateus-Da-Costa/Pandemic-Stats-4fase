@@ -19,15 +19,15 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 
 import lombok.Data;
 
-@org.hibernate.annotations.Table(comment = "Tabela de testes de covid", appliesTo = "test_covid")
+@org.hibernate.annotations.Table(comment = "Tabela de testes de covid", appliesTo = "teste_covid")
 @Entity
 @Data
-public class Test_covid implements Serializable{
+public class TesteCovid implements Serializable{
 	private static final long serialVersionUID = 1L;
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
-	@Column(columnDefinition = "NUMERIC(10, 0)")
+	@Column(columnDefinition = "NUMERIC(10, 0)", insertable=false)
 	private long codtes;
 	
 	@Column(columnDefinition = "DATE", nullable = false)

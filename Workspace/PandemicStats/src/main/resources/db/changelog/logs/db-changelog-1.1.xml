@@ -28,7 +28,7 @@
 						inner join endereco en on en.cpfusu = u.cpfusu
 						inner join cidade c on en.codcid = c.codcid
 						inner join paciente p on p.cpfusu = u.cpfusu
-						inner join test_covid tc on tc.codpac = p.codpac
+						inner join teste_covid tc on tc.codpac = p.codpac
 						where ((tc.dattes &gt;= (current_date - 30)) and (c.codcid = codigo));
 			end
 			$body$
@@ -57,7 +57,7 @@
 						inner join endereco en on en.cpfusu = u.cpfusu
 						inner join cidade c on en.codcid = c.codcid
 						inner join paciente p on p.cpfusu = u.cpfusu
-						inner join test_covid tc on tc.codpac = p.codpac
+						inner join teste_covid tc on tc.codpac = p.codpac
 						where ((tc.dattes &gt;= (current_date - 30)) and (e.cnpjemp = cnpj));
 			end
 			$body$
@@ -164,7 +164,7 @@
 			as
 			$body$
 			begin
-				execute format('create user %I with password %I', email, senha);
+				execute format('create user %I with password ''%s''', email, senha);
 			end
 			$body$
 			language plpgsql;@
@@ -199,12 +199,12 @@
 			to g_empresa;@
 			
 			grant select
-			on paciente, vacina, test_covid
+			on paciente, vacina, teste_covid
 			to g_empresa;@
 			
 			<!--Grant pacientes-->
 			grant select, insert, update
-			on test_covid, monitoramento_paciente, vacina
+			on teste_covid, monitoramento_paciente, vacina
 			to g_paciente;@
 			
 			grant delete
@@ -262,6 +262,46 @@
 			$body$
 			begin
 				execute format('grant g_usuario to %I', email);
+			end
+			$body$
+			language plpgsql;@
+			
+			<!--Procedure drop usuario-->
+			create or replace procedure drop_user(email varchar(30))
+			as
+			$body$
+			begin
+				execute format('drop role %I', email);
+			end
+			$body$
+			language plpgsql;@
+			
+			<!--Procedure troca senha-->
+			create or replace procedure alter_password(email varchar(30), senha varchar(30))
+			as
+			$body$
+			begin
+				execute format('alter role %I with password ''%s''', email, senha);
+			end
+			$body$
+			language plpgsql;@
+			
+			<!--Procedure troca email-->
+			create or replace procedure alter_email(email varchar(30), newemail varchar(30))
+			as
+			$body$
+			begin
+				execute format('alter role %I rename to %L', email, newemail);
+			end
+			$body$
+			language plpgsql;@
+			
+			<!--Procedure revoke group-->
+			create or replace procedure revoke_group(email varchar(30), group varchar(20))
+			as
+			$body$
+			begin
+				execute format('revoke %I FROM %L', email, group);
 			end
 			$body$
 			language plpgsql;@

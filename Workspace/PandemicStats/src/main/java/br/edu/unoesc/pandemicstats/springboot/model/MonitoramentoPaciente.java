@@ -28,11 +28,11 @@ public class MonitoramentoPaciente implements Serializable{
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
-	@Column(columnDefinition = "NUMERIC(10, 0)")
+	@Column(columnDefinition = "NUMERIC(10, 0)", insertable = false)
 	private long codmon;
 	
 	@Column(columnDefinition = "DATE", nullable = false)
-	@ColumnDefault(value="CURRENT_TIMESTAMP")
+	@ColumnDefault(value="CURRENT_DATE")
 	@JsonFormat(pattern="yyyy-mm-dd")
 	private Date datmon;
 	

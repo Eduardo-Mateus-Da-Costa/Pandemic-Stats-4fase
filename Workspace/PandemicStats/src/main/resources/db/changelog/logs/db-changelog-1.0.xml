@@ -60,9 +60,9 @@
 			COMMENT ON COLUMN solicitacao.anasol IS 'Valor booleano que indica se a solicitação foi analisada pelo Administrador ou não:';
 			COMMENT ON COLUMN solicitacao.datsol IS 'Data da solicitação';
 			
-			COMMENT ON COLUMN test_covid.codtes IS 'Código do teste de covid.';
-			COMMENT ON COLUMN test_covid.dattes IS 'Data do teste.';
-			COMMENT ON COLUMN test_covid.covpactes IS 'Resultado do teste para covid do paciente:
+			COMMENT ON COLUMN teste_covid.codtes IS 'Código do teste de covid.';
+			COMMENT ON COLUMN teste_covid.dattes IS 'Data do teste.';
+			COMMENT ON COLUMN teste_covid.covpactes IS 'Resultado do teste para covid do paciente:
 			P-positivo
 			N-negativo';
 			

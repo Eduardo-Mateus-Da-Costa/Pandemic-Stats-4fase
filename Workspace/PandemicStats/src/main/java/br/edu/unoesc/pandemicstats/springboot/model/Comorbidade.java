@@ -18,7 +18,7 @@ public class Comorbidade implements Serializable{
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
-	@Column(columnDefinition = "NUMERIC(10, 0)")
+	@Column(columnDefinition = "NUMERIC(10, 0)", insertable = false)
 	private long codcom;
 	
 	@Column(columnDefinition = "VARCHAR(300)", nullable = false)

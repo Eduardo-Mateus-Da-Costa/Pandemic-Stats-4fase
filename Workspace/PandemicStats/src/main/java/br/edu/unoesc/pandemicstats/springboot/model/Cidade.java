@@ -20,7 +20,7 @@ public class Cidade implements Serializable{
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
-	@Column(columnDefinition = "NUMERIC(6, 0)")
+	@Column(columnDefinition = "NUMERIC(6, 0)", insertable = false)
 	private long codcid;
 	
 	

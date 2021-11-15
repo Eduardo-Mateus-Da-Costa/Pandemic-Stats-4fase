@@ -12,10 +12,10 @@ import br.edu.unoesc.pandemicstats.springboot.model.Endereco;
 @Repository
 public interface EnderecoRepository extends JpaRepository<Endereco, Long> {
 	
-	@Query(value = "select e from Endereco e where e.cpfusu = ?1")
+	@Query(value = "select e from Endereco e where e.cpfusu.cpfusu = ?1")
 	Endereco findByCPF(long cpf);
 	
-	@Query(value = "select e from Endereco e where e.cnpjemp = ?1")
+	@Query(value = "select e from Endereco e where e.cnpjemp.cnpjemp = ?1")
 	Endereco findByCNPJ(long cnpj);
 	
 	@Transactional

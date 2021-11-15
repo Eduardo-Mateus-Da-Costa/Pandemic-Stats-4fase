@@ -19,7 +19,7 @@ public class Sintoma implements Serializable{
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
-	@Column(columnDefinition = "NUMERIC(10, 0)")
+	@Column(columnDefinition = "NUMERIC(10, 0)", insertable=false)
 	private long codsin;
 	
 	@Column(columnDefinition = "VARCHAR(60)", nullable = false)
