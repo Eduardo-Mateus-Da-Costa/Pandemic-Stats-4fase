@@ -14,7 +14,7 @@ import br.edu.unoesc.pandemicstats.springboot.model.Paciente;
 public interface PacienteRepository extends JpaRepository<Paciente, Long> {
 	
 	@Query(value = "select p from Paciente p where p.cpfusu.cpfusu = ?1")
-	Paciente findByCPF(long cpfusu);
+	Paciente findByCpfusu(long cpfusu);
 	
 	@Transactional
 	@Modifying(clearAutomatically = true)

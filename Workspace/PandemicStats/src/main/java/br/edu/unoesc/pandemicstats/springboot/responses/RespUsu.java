@@ -1,16 +1,18 @@
 package br.edu.unoesc.pandemicstats.springboot.responses;
 
 import br.edu.unoesc.pandemicstats.springboot.model.Usuario;
+import br.edu.unoesc.pandemicstats.springboot.schemmas.PermisSCH;
 import br.edu.unoesc.pandemicstats.springboot.schemmas.ShowUsuSCH;
 import lombok.Data;
 
 @Data
 public class RespUsu{
 	private ShowUsuSCH showusu = new ShowUsuSCH();
+	private PermisSCH permissoes;
 	private String erro;
 	private int codstatus;
 	
-	public void RespValUsu(Usuario usuario, int codstatus)
+	public void RespValUsu(Usuario usuario, int codstatus, PermisSCH permissoes)
 	{
 		if(codstatus==500)
 		{
@@ -36,6 +38,7 @@ public class RespUsu{
 		{
 			this.codstatus = 200;
 			showusu.Convert(usuario);
+			this.permissoes = permissoes;
 		}
 	}
 }

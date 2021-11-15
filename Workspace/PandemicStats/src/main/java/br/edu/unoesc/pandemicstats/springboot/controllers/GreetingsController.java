@@ -73,20 +73,22 @@ public class GreetingsController {
 			usuario = usuRep.findByCPF(usuusu.getCpfusu());
 			if (usuario != null) {
 				RespUsu respusu = new RespUsu();
-				respusu.RespValUsu(null, 503);
+				respusu.RespValUsu(null, 503, null);
 				return new ResponseEntity<RespUsu>(respusu, HttpStatus.CONFLICT);
 			} else {
 				usuRep.save(usuusu);
 				usuRep.createDBUser(usuusu.getEmausu(), usuusu.getSenusu());
 				usuRep.grantDBUser(usuusu.getEmausu());
+				
+				PermisSCH permissoes = getPermis(usuusu.getCpfusu());
 				RespUsu respusu = new RespUsu();
-				respusu.RespValUsu(usuusu, 0);
+				respusu.RespValUsu(usuusu, 0, permissoes);
 				return new ResponseEntity<RespUsu>(respusu, HttpStatus.CREATED);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
 			RespUsu respusu = new RespUsu();
-			respusu.RespValUsu(null, 500);
+			respusu.RespValUsu(null, 500, null);
 			return new ResponseEntity<RespUsu>(respusu, HttpStatus.CONFLICT);
 		}
 	}
@@ -106,12 +108,14 @@ public class GreetingsController {
 			}
 			CompleteUsu.complete(usuusu, usuario);
 			usuRep.save(usuusu);
+			
+			PermisSCH permissoes = getPermis(usuusu.getCpfusu());
 			RespUsu respusu = new RespUsu();
-			respusu.RespValUsu(usuusu, 0);
+			respusu.RespValUsu(usuusu, 0, permissoes);
 			return new ResponseEntity<RespUsu>(respusu, HttpStatus.OK);
 		} catch (Exception e) {
 			RespUsu respusu = new RespUsu();
-			respusu.RespValUsu(null, 500);
+			respusu.RespValUsu(null, 500, null);
 			return new ResponseEntity<RespUsu>(respusu, HttpStatus.CONFLICT);
 		}
 	}
@@ -142,16 +146,12 @@ public class GreetingsController {
 
 	@GetMapping(value = "getUsu")
 	@ResponseBody
-	public ResponseEntity<ShowUsuSCH> getUsu(@RequestBody ReqUsuSCH requsu) {
-		Usuario usuario = new Usuario();
-		if (requsu.getEmausu() != null) {
-			usuario = usuRep.findByEmail(requsu.getEmausu());
-		} else {
-			usuario = usuRep.findByCPF(requsu.getCpfusu());
-		}
-		ShowUsuSCH showusu = new ShowUsuSCH();
-		showusu.Convert(usuario);
-		return new ResponseEntity<ShowUsuSCH>(showusu, HttpStatus.OK);
+	public ResponseEntity<RespUsu> getUsu(@RequestBody ReqUsuSCH requsu) {
+		Usuario usuario = usuRep.findByCPF(requsu.getCpfusu());
+		PermisSCH permissoes = getPermis(usuario.getCpfusu());
+		RespUsu respusu = new RespUsu();
+		respusu.RespValUsu(usuario, 0, permissoes);
+		return new ResponseEntity<RespUsu>(respusu, HttpStatus.OK);
 	}
 
 	@GetMapping(value = "login")
@@ -161,16 +161,17 @@ public class GreetingsController {
 		usuario = usuRep.findByEmail(reqlogin.getEmail());
 		if (usuario == null) {
 			RespUsu respusu = new RespUsu();
-			respusu.RespValUsu(null, 505);
+			respusu.RespValUsu(null, 505, null);
 			return new ResponseEntity<RespUsu>(respusu, HttpStatus.CONFLICT);
 		} else {
 			if (usuario.getSenusu().equals(reqlogin.getSenha())) {
+				PermisSCH permissoes = getPermis(usuario.getCpfusu());
 				RespUsu respusu = new RespUsu();
-				respusu.RespValUsu(usuario, 0);
+				respusu.RespValUsu(usuario, 0, permissoes);
 				return new ResponseEntity<RespUsu>(respusu, HttpStatus.ACCEPTED);
 			} else {
 				RespUsu respusu = new RespUsu();
-				respusu.RespValUsu(null, 504);
+				respusu.RespValUsu(null, 504, null);
 				System.out.println(usuario.getSenusu());
 				System.out.println(reqlogin.toString());
 				return new ResponseEntity<RespUsu>(respusu, HttpStatus.UNAUTHORIZED);
@@ -184,7 +185,7 @@ public class GreetingsController {
 	public ResponseEntity<RespEmp> postEmp(@RequestBody Empresa empemp) {
 		try {
 			Empresa empresa = new Empresa();
-			empresa = empRep.findByCNPJ(empemp.getCnpjemp());
+			empresa = empRep.findByCnpjemp(empemp.getCnpjemp());
 			if (empresa != null) {
 				RespEmp respemp = new RespEmp();
 				respemp.RespValEmp(null, 503);
@@ -209,7 +210,7 @@ public class GreetingsController {
 	@ResponseBody
 	public ResponseEntity<RespEmp> patchEmp(@RequestBody Empresa empemp) {
 		try {
-			Empresa empresa = empRep.findByCNPJ(empemp.getCnpjemp());
+			Empresa empresa = empRep.findByCnpjemp(empemp.getCnpjemp());
 			Usuario usuario1 = empresa.getCpfusu();
 			Usuario usuario2 = empemp.getCpfusu();
 			if(usuario1.getCpfusu() != usuario2.getCpfusu())
@@ -254,7 +255,7 @@ public class GreetingsController {
 	@GetMapping(value = "getEmp")
 	@ResponseBody
 	public ResponseEntity<ShowEmpSCH> getEmp(@RequestBody ReqEmpSCH reqemp) {
-		Empresa empresa = empRep.findByCNPJ(reqemp.getCnpjemp());
+		Empresa empresa = empRep.findByCnpjemp(reqemp.getCnpjemp());
 		ShowEmpSCH showemp = new ShowEmpSCH();
 		showemp.Convert(empresa);
 		return new ResponseEntity<ShowEmpSCH>(showemp, HttpStatus.OK);
@@ -457,7 +458,7 @@ public class GreetingsController {
 					} else {
 						Paciente paciente = new Paciente();
 						Usuario usuario = pacpac.getCpfusu();
-						paciente = pacRep.findByCPF(usuario.getCpfusu());
+						paciente = pacRep.findByCpfusu(usuario.getCpfusu());
 						if (paciente == null) {
 							pacRep.save(pacpac);
 							pacRep.grantDBPaciente(usuario.getEmausu());
@@ -492,7 +493,7 @@ public class GreetingsController {
 	@GetMapping(value = "getPac")
 	@ResponseBody
 	public ResponseEntity<ShowPacSCH> getPac(@RequestBody ReqPacSCH reqpac) {
-		Paciente paciente = pacRep.findByCPF(reqpac.getCpfusu());
+		Paciente paciente = pacRep.findByCpfusu(reqpac.getCpfusu());
 		ShowPacSCH showpac = new ShowPacSCH();
 		showpac.Convert(paciente);
 		return new ResponseEntity<ShowPacSCH>(showpac, HttpStatus.OK);
@@ -646,4 +647,80 @@ public class GreetingsController {
 		
 		return new ResponseEntity<List<Sintoma>>(sintomas, HttpStatus.OK);
 	}
+
+//Endpoints de functions
+	@GetMapping(value = "medgetCidCov")
+	@ResponseBody
+	public ResponseEntity<List<CidadeCovidSCH>> medgetCidCov(@RequestBody long reqfunc)
+	{
+		List<CidadeCovidSCH> lista = medRep.cidadeCovid(reqfunc);
+		return new ResponseEntity<List<CidadeCovidSCH>>(lista, HttpStatus.OK);
+	}
+	
+	@GetMapping(value = "medgetEmpCov")
+	@ResponseBody
+	public ResponseEntity<List<EmpresaCovidSCH>> medgetEmpCov(@RequestBody long reqfunc)
+	{
+		List<EmpresaCovidSCH> lista = medRep.empresaCovid(reqfunc);
+		return new ResponseEntity<List<EmpresaCovidSCH>>(lista, HttpStatus.OK);
+	}
+	
+	@GetMapping(value = "medGetPdose")
+	@ResponseBody
+	public ResponseEntity<Long> medGetPdose(@RequestBody long reqfunc)
+	{
+		long casos = medRep.PDoseCidade(reqfunc);
+		return new ResponseEntity<Long>(casos, HttpStatus.OK);
+	}
+	
+	@GetMapping(value = "medGetSdose")
+	@ResponseBody
+	public ResponseEntity<Long> medGetSdose(@RequestBody long reqfunc)
+	{
+		long casos = medRep.SDoseCidade(reqfunc);
+		return new ResponseEntity<Long>(casos, HttpStatus.OK);
+	}
+	
+	@GetMapping(value = "empgetEmpCov")
+	@ResponseBody
+	public ResponseEntity<List<EmpresaCovidSCH>> empgetEmpCov(@RequestBody long reqfunc)
+	{
+		List<EmpresaCovidSCH> lista = empRep.empresaCovid(reqfunc);
+		return new ResponseEntity<List<EmpresaCovidSCH>>(lista, HttpStatus.OK);
+	}
+	
+	public PermisSCH getPermis(long cpfusu)
+	{
+		Paciente paciente = pacRep.findByCpfusu(cpfusu);
+		Empresa empresa = empRep.findByCpfusu(cpfusu);
+		Medico medico = medRep.findByCPF(cpfusu);
+		PermisSCH permissao = new PermisSCH();
+		if(paciente != null)
+		{
+			permissao.setPaciente(true);
+		}
+		else
+		{
+			permissao.setPaciente(false);
+		}
+		if(empresa != null)
+		{
+			permissao.setEmpresa(true);
+		}
+		else
+		{
+			permissao.setEmpresa(false);
+		}
+		if(medico != null)
+		{
+			permissao.setMedico(true);
+		}
+		else
+		{
+			permissao.setMedico(false);
+		}
+		
+		return permissao;
+	}
+
 }

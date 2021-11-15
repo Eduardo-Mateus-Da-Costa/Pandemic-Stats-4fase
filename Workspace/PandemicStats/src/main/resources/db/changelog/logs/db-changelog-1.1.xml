@@ -143,6 +143,29 @@
 			for each row
 			execute procedure controla_datvac();@
 			
+			<!--Funcao trigger-sitpac-paciente-covpactes-testecovid -->
+			create or replace function controla_sitpac()
+			returns trigger
+			as
+			$body$
+			begin
+				if (new.covpactes = 'P') then
+					update paciente set sitpac = 'ISOLAMENTO' where paciente.codpac = new.codpac;
+				end if;
+				return new;		
+			end
+			$body$
+			language plpgsql;@
+			
+			
+			<!--Trigger-sitpac-paciente-covpactes-testecovid -->
+			create trigger testecovid_after_tg
+			after insert or update
+			on teste_covid
+			for each row
+			execute procedure controla_sitpac();@
+			
+			
 			<!--View conta-medicos -->
 			create view vw_conta_medicos as
 			select count(*) from medico;@
@@ -297,11 +320,11 @@
 			language plpgsql;@
 			
 			<!--Procedure revoke group-->
-			create or replace procedure revoke_group(email varchar(30), group varchar(20))
+			create or replace procedure revoke_group(email varchar(30), grupo varchar(20))
 			as
 			$body$
 			begin
-				execute format('revoke %I FROM %L', email, group);
+				execute format('revoke %I FROM %L', email, grupo);
 			end
 			$body$
 			language plpgsql;@
