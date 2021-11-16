@@ -150,7 +150,7 @@
 			$body$
 			begin
 				if (new.covpactes = 'P') then
-					update paciente set sitpac = 'ISOLAMENTO' where paciente.codpac = new.codpac;
+					update paciente set sitpac = 'ISOLAMENTO' where paciente.codpac = new.codpac_codpac;
 				end if;
 				return new;		
 			end
@@ -164,7 +164,6 @@
 			on teste_covid
 			for each row
 			execute procedure controla_sitpac();@
-			
 			
 			<!--View conta-medicos -->
 			create view vw_conta_medicos as

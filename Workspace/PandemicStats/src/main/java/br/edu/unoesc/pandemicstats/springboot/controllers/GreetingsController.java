@@ -79,10 +79,10 @@ public class GreetingsController {
 				usuRep.save(usuusu);
 				usuRep.createDBUser(usuusu.getEmausu(), usuusu.getSenusu());
 				usuRep.grantDBUser(usuusu.getEmausu());
-				
-				PermisSCH permissoes = getPermis(usuusu.getCpfusu());
+				usuario = usuRep.findByCPF(usuusu.getCpfusu());
+				PermisSCH permissoes = getPermis(usuario.getCpfusu());
 				RespUsu respusu = new RespUsu();
-				respusu.RespValUsu(usuusu, 0, permissoes);
+				respusu.RespValUsu(usuario, 0, permissoes);
 				return new ResponseEntity<RespUsu>(respusu, HttpStatus.CREATED);
 			}
 		} catch (Exception e) {
@@ -196,7 +196,8 @@ public class GreetingsController {
 				usuario = usuRep.findByCPF(usuario.getCpfusu());
 				empRep.grantDBEmpresa(usuario.getEmausu());
 				RespEmp respemp = new RespEmp();
-				respemp.RespValEmp(empemp, 0);
+				empresa = empRep.findByCnpjemp(empemp.getCnpjemp());
+				respemp.RespValEmp(empresa, 0);
 				return new ResponseEntity<RespEmp>(respemp, HttpStatus.CREATED);
 			}
 		} catch (Exception e) {
@@ -305,18 +306,19 @@ public class GreetingsController {
 	@ResponseBody
 	public ResponseEntity<RespMed> postMed(@RequestBody Medico medmed) {
 		Medico medico = new Medico();
+		System.out.println(medmed);
 		medico = medRep.findByCRM(medmed.getCrmmed());
 		if (medico != null) {
 			RespMed respmed = new RespMed();
 			respmed.RespValMed(null, 501);
 			return new ResponseEntity<RespMed>(respmed, HttpStatus.CONFLICT);
 		} else {
-			medRep.save(medico);
+			medRep.save(medmed);
 			Usuario usuario = medmed.getCpfusu();
 			usuario = usuRep.findByCPF(usuario.getCpfusu());
 			medRep.grantDBMedico(usuario.getEmausu());
 			RespMed respmed = new RespMed();
-			respmed.RespValMed(medico, 0);
+			respmed.RespValMed(medmed, 0);
 			return new ResponseEntity<RespMed>(respmed, HttpStatus.CREATED);
 		}
 	}
@@ -638,7 +640,7 @@ public class GreetingsController {
 		return new ResponseEntity<List<Pais>>(paises, HttpStatus.OK);
 	}
 	
-//Endpoint de pais
+//Endpoint de sintomas
 	@GetMapping(value = "getSints")
 	@ResponseBody
 	public ResponseEntity<List<Sintoma>> getSints()
