@@ -63,7 +63,8 @@ public class GreetingsController {
 	VacinaRepository vacRep;
 	@Autowired
 	SolicitacaoRepository solRep;
-
+	
+	
 //Endpoints de usuario
 	@PostMapping(value="postUsu")
 	@ResponseBody

@@ -129,6 +129,7 @@
     	   alert("Usuario não encontrado!" + xhr.responseText);
        })
       } 
+      
 
       function cadastrar(){
 	    var nome = $("#nome_cad").val(); 
@@ -140,7 +141,7 @@
         var sexo = $("#sex_cad").val();
         $.ajax({
      	   type : "POST",
-     	   url: "./postUsu",
+     	   url: "postUsu",
      	   data: JSON.stringify({
      		   emausu: email, 
      		   senusu: senha, 
@@ -150,10 +151,11 @@
      		   datnasusu: datnas, 
      		   sexusu: sexo
      		   }),
-     	   contentType: "application/json;",
-     	   success: function(response){
+     	   contentType: "application/json; charset=utf-8",
+     	   success: 
+     		   function(response){
      		   cpfusu = response.showusu.cpfusu;
-     		   alert("Cadastro feito" + response.showusu.cpfusu + response.showusu.emausu)
+     		   alert("Cadastro feito" + response.showusu.cpfusu + response.showusu.emausu);
      	   }
         }).fail(function (xhr, status, errorThrown){
      	   alert("Falha no cadastro" + xhr.responseText);
