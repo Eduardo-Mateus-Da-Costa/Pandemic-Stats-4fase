@@ -65,7 +65,7 @@ public class GreetingsController {
 	SolicitacaoRepository solRep;
 
 //Endpoints de usuario
-	@PostMapping(value = "postUsu")
+	@PostMapping(value="postUsu")
 	@ResponseBody
 	public ResponseEntity<RespUsu> postUsu(@RequestBody Usuario usuusu) {
 		try {
@@ -157,6 +157,7 @@ public class GreetingsController {
 	@GetMapping(value = "login")
 	@ResponseBody
 	public ResponseEntity<RespUsu> login(@RequestBody ReqLoginSCH reqlogin) {
+		System.out.println(reqlogin.toString());
 		Usuario usuario = new Usuario();
 		usuario = usuRep.findByEmail(reqlogin.getEmail());
 		if (usuario == null) {

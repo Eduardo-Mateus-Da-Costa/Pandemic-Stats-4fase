@@ -8,6 +8,9 @@ import org.springframework.boot.autoconfigure.domain.EntityScan;
 /**
  *
  * Spring Boot application starter class
+ * 
+ * 
+ * 
  */
 @EntityScan(basePackages = "br.edu.unoesc.pandemicstats.springboot.model")
 @SpringBootApplication

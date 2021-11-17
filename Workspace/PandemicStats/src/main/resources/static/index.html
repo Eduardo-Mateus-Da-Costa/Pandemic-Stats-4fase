@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>PandemicStats-Login</title>
+<link rel="stylesheet" href="login.css">
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"
+	integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4="
+	crossorigin="anonymous"></script>
+	
+	<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+<meta charset="utf-8">
+</head>
+
+<body>
+
+	<div class="container">
+		<a class="links" id="paracadastro"></a> <a class="links"
+			id="paralogin"></a>
+
+		<div class="content">
+			<!--FORMULÁRIO DE LOGIN-->
+			<div id="login">
+				<form method="post">
+					<h1>Login</h1>
+					<p>
+						<label for="email_login">Seu e-mail</label> <input
+							id="email_login" name="email_login" required="required"
+							type="text" placeholder="contato@email.com" />
+					</p>
+
+					<p>
+						<label for="senha_login">Sua senha</label> <input id="senha_login"
+							name="senha_login" required="required" type="password"
+							placeholder="1234" />
+					</p>
+
+					<p>
+						<input type="submit" value="Logar" onclick="login()" />
+					</p>
+
+					<p class="link">
+						Ainda não tem conta? <a href="#paracadastro">Cadastre-se</a>
+					</p>
+				</form>
+			</div>
+
+			<!--FORMULÁRIO DE CADASTRO-->
+			<div id="cadastro">
+				<form method="post">
+					<h1>PandemicStats</h1>
+
+					<p>
+						<label for="nome_cad">Seu nome</label> <input id="nome_cad"
+							name="nome_cad" required="required" type="text"
+							placeholder="Nome Sobrenome" />
+					</p>
+
+					<p>
+						<label for="email_cad">Seu e-mail</label> <input id="email_cad"
+							name="email_cad" required="required" type="email"
+							placeholder="contato@email.com" />
+					</p>
+
+					<p>
+						<label for="cpf_cad">Seu CPF</label> <input id="cpf_cad"
+							name="cpf_cad" required="required" type="text"
+							placeholder="000.000.000-00" />
+					</p>
+
+					<p>
+						<label for="nasdata_cad">Sua data de nascimento</label> <input
+							id="datnas_cad" name="datnas_cad" required="required" type="date"
+							placeholder="DD/MM/AAAA" />
+					</p>
+
+					<p>
+						<label for="tel_cad">Seu telefone</label> <input id="tel_cad"
+							name="tel_cad" required="required" type="tel"
+							placeholder="+00 (00) 00000-0000" />
+					</p>
+
+					<p>
+						<label for="senha_cad">Sua senha</label> <input id="senha_cad"
+							name="senha_cad" required="required" type="password"
+							pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}"
+							placeholder="A-z-0-9@!#$%¨&*" />
+					</p>
+
+					<p>
+						<label for="sex_cad">Seu sexo</label> <select id="sex_cad">
+							<option value="M">Masculino</option>
+							<option value="F">Feminino</option>
+						</select>
+					</p>
+
+					<p>
+						<input type="submit" value="Cadastrar" onclick="cadastrar()" />
+					</p>
+
+					<p class="link">
+						Já tem conta? <a href="#paralogin"> Ir para Login </a>
+					</p>
+				</form>
+			</div>
+		</div>
+	</div>
+</body>
+
+<script type "text/javascript">
+		var cpfusu;
+
+
+      function loginuiip(){
+        var email = $("#email_login").val(); 
+        var senha = $("#senha_login").val(); 
+       $.ajax({
+    	   type : "GET",
+    	   url: "./login",
+    	   data: JSON.stringfy({
+    		   email: email, 
+    		   senha: senha
+    		   }),
+    	   contentType: "application/json;",
+    	   success: function(response){
+    		   cpfusu = response.showusu.cpfusu;
+    		   alert("Login feito" + response.showusu.cpfusu + response.showusu.emausu)
+    	   }
+       }).fail(function (xhr, status, errorThrown){
+    	   alert("Usuario não encontrado!" + xhr.responseText);
+       })
+      } 
+
+      function cadastrar(){
+	    var nome = $("#nome_cad").val(); 
+	    var email = $("#email_cad").val(); 
+        var senha = $("#senha_cad").val(); 
+        var cpf = $("#cpf_cad").val(); 
+        var telefone = $("#tel_cad").val();
+        var datnas = $("#datnas_cad").val();
+        var sexo = $("#sex_cad").val();
+        $.ajax({
+     	   type : "POST",
+     	   url: "./postUsu",
+     	   data: JSON.stringify({
+     		   emausu: email, 
+     		   senusu: senha, 
+     		   nomusu: nome, 
+     		   cpfusu: cpf, 
+     		   telusu: telefone, 
+     		   datnasusu: datnas, 
+     		   sexusu: sexo
+     		   }),
+     	   contentType: "application/json;",
+     	   success: function(response){
+     		   cpfusu = response.showusu.cpfusu;
+     		   alert("Cadastro feito" + response.showusu.cpfusu + response.showusu.emausu)
+     	   }
+        }).fail(function (xhr, status, errorThrown){
+     	   alert("Falha no cadastro" + xhr.responseText);
+        });
+       }
+      
+      //Tentando com axios
+      function login()
+      {
+    	  var email = $("#email_login").val(); 
+          var senha = $("#senha_login").val(); 
+          
+          axios({
+        	  method: 'get',
+        	  url: './login',
+        	  data: {
+        		    email: email,
+        		    senha: senha
+        		  }
+        	})
+        	  .then(function (response) {
+        	    alert("Foi " + response);
+        	  });
+      }
+    </script>
+</html>
