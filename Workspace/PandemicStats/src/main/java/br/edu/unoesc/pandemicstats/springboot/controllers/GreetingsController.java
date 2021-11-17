@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -66,7 +67,7 @@ public class GreetingsController {
 	
 	
 //Endpoints de usuario
-	@PostMapping(value="postUsu")
+	@RequestMapping(value="/postusu")
 	@ResponseBody
 	public ResponseEntity<RespUsu> postUsu(@RequestBody Usuario usuusu) {
 		try {
@@ -155,7 +156,7 @@ public class GreetingsController {
 		return new ResponseEntity<RespUsu>(respusu, HttpStatus.OK);
 	}
 
-	@GetMapping(value = "login")
+	@PostMapping(value = "/login")
 	@ResponseBody
 	public ResponseEntity<RespUsu> login(@RequestBody ReqLoginSCH reqlogin) {
 		System.out.println(reqlogin.toString());

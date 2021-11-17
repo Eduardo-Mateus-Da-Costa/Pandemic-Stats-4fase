@@ -20,7 +20,7 @@
 		<div class="content">
 			<!--FORMULÁRIO DE LOGIN-->
 			<div id="login">
-				<form method="post">
+				<form>
 					<h1>Login</h1>
 					<p>
 						<label for="email_login">Seu e-mail</label> <input
@@ -46,7 +46,7 @@
 
 			<!--FORMULÁRIO DE CADASTRO-->
 			<div id="cadastro">
-				<form method="post">
+				<form>
 					<h1>PandemicStats</h1>
 
 					<p>
@@ -110,23 +110,22 @@
 		var cpfusu;
 
 
-      function loginuiip(){
+      function login(){
         var email = $("#email_login").val(); 
         var senha = $("#senha_login").val(); 
        $.ajax({
-    	   type : "GET",
-    	   url: "./login",
-    	   data: JSON.stringfy({
+    	   type : "post",
+    	   url: "/login",
+    	   data: JSON.stringify({
     		   email: email, 
     		   senha: senha
     		   }),
     	   contentType: "application/json;",
     	   success: function(response){
-    		   cpfusu = response.showusu.cpfusu;
-    		   alert("Login feito" + response.showusu.cpfusu + response.showusu.emausu)
+    		   alert("Login feito");
     	   }
        }).fail(function (xhr, status, errorThrown){
-    	   alert("Usuario não encontrado!" + xhr.responseText);
+    	   alert("Usuario não encontrado!");
        })
       } 
       
@@ -141,7 +140,7 @@
         var sexo = $("#sex_cad").val();
         $.ajax({
      	   type : "POST",
-     	   url: "postUsu",
+     	   url: "/postusu",
      	   data: JSON.stringify({
      		   emausu: email, 
      		   senusu: senha, 
@@ -163,7 +162,7 @@
        }
       
       //Tentando com axios
-      function login()
+      function loginrth()
       {
     	  var email = $("#email_login").val(); 
           var senha = $("#senha_login").val(); 
