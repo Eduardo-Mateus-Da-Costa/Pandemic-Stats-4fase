@@ -10,6 +10,13 @@ import javax.persistence.Id;
 
 import lombok.Data;
 
+/**
+ * 
+ * @author Eduardo Mateus Da Costa
+ * @since 30/10/2021
+ * @version 1.2
+ * 
+ */
 
 @org.hibernate.annotations.Table(comment = "Tabela de sintomas", appliesTo = "sintoma")
 @Entity

@@ -5,6 +5,13 @@ import org.springframework.stereotype.Repository;
 
 import br.edu.unoesc.pandemicstats.springboot.model.Sintoma;
 
+/**
+ * @author Eduardo Mateus Da Costa
+ * @since 06/11/2021
+ * @version 1.0
+ * @see JpaRepository
+ * @see Sintoma
+ */
 @Repository
 public interface SintomaRepository extends JpaRepository<Sintoma, Long> {
 

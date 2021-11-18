@@ -5,6 +5,14 @@ import br.edu.unoesc.pandemicstats.springboot.schemmas.PermisSCH;
 import br.edu.unoesc.pandemicstats.springboot.schemmas.ShowUsuSCH;
 import lombok.Data;
 
+/**
+ * @author Eduardo Mateus Da Costa
+ * @since 08/11/2021
+ * @version 1.8
+ * @see ShowUsuSCH
+ * @see PermisSCH
+ * @see Usuario
+ */
 @Data
 public class RespUsu{
 	private ShowUsuSCH showusu = new ShowUsuSCH();
@@ -12,6 +20,11 @@ public class RespUsu{
 	private String erro;
 	private int codstatus;
 	
+	/**
+	 * @param Usuario usuario
+	 * @param int codstatus
+	 * @param PermisSCH permissoes
+	 */
 	public void RespValUsu(Usuario usuario, int codstatus, PermisSCH permissoes)
 	{
 		if(codstatus==500)

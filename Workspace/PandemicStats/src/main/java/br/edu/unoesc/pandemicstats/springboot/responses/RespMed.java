@@ -4,12 +4,23 @@ import br.edu.unoesc.pandemicstats.springboot.model.Medico;
 import br.edu.unoesc.pandemicstats.springboot.schemmas.ShowMedSCH;
 import lombok.Data;
 
+/**
+ * @author Eduardo Mateus Da Costa
+ * @since 10/11/2021
+ * @version 1.2
+ * @see ShowMedSCH
+ * @see Medico
+ */
 @Data
 public class RespMed{
 	private ShowMedSCH showmed = new ShowMedSCH();
 	private String erro;
 	private int codstatus;
 	
+	/**
+	 * @param Medico med
+	 * @param int codstatus
+	 */
 	public void RespValMed(Medico med, int codstatus)
 	{
 		if(codstatus==501)

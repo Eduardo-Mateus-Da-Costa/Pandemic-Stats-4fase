@@ -4,12 +4,23 @@ import br.edu.unoesc.pandemicstats.springboot.model.MonitoramentoPaciente;
 import br.edu.unoesc.pandemicstats.springboot.schemmas.ShowMonPacSCH;
 import lombok.Data;
 
+/**
+ * @author Eduardo Mateus Da Costa
+ * @since 10/11/2021
+ * @version 1.3
+ * @see ShowMomPacSCH
+ * @see MonitoramentoPaciente
+ */
 @Data
 public class RespMonPac {
 	private ShowMonPacSCH showmompac = new ShowMonPacSCH();
 	private String erro;
 	private int codstatus;
 	
+	/**
+	 * @param MonitoramentoPaciente mompac
+	 * @param int codstatus
+	 */
 	public void RespValMomPac(MonitoramentoPaciente mompac, int codstatus)
 	{
 		if (codstatus == 500)

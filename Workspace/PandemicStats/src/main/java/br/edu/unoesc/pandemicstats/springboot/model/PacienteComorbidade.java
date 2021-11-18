@@ -15,6 +15,14 @@ import org.hibernate.annotations.OnDeleteAction;
 
 import lombok.Data;
 
+/**
+ * 
+ * @author Eduardo Mateus Da Costa
+ * @since 30/10/2021
+ * @version 1.2
+ * 
+ */
+
 @org.hibernate.annotations.Table(comment = "Tabela de vinculação paciente comorbidades", appliesTo = "paciente_comorbidade")
 @Entity
 @Data

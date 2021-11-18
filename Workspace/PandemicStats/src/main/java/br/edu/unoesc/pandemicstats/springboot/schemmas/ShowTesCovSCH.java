@@ -6,6 +6,12 @@ import br.edu.unoesc.pandemicstats.springboot.model.Paciente;
 import br.edu.unoesc.pandemicstats.springboot.model.TesteCovid;
 import lombok.Data;
 
+/**
+ * @author Eduardo Mateus Da Costa
+ * @since 11/11/2021
+ * @version 1.0
+ * @see TesteCovid
+ */
 @Data
 public class ShowTesCovSCH {
 	private long codtes;
@@ -13,6 +19,10 @@ public class ShowTesCovSCH {
 	private char covpactes;
 	private long codpac;
 	
+	/**
+	 * @param teste
+	 * @see Paciente
+	 */
 	public void Convert(TesteCovid teste)
 	{
 		this.codtes = teste.getCodtes();

@@ -15,6 +15,14 @@ import org.hibernate.annotations.ColumnDefault;
 
 import lombok.Data;
 
+/**
+ * 
+ * @author Eduardo Mateus Da Costa
+ * @since 07/11/2021
+ * @version 1.3
+ * 
+ */
+
 @org.hibernate.annotations.Table(comment = "Tabela de solicitações", appliesTo = "solicitacao")
 @Entity
 @Data

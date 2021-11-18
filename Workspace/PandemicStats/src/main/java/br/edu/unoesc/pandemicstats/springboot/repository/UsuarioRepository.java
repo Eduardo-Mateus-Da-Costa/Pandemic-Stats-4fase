@@ -12,48 +12,92 @@ import org.springframework.stereotype.Repository;
 
 import br.edu.unoesc.pandemicstats.springboot.model.Usuario;
 
+/**
+ * @author Eduardo Mateus Da Costa
+ * @since 06/11/2021
+ * @version 2.6
+ * @see JpaRepository
+ * @see Usuario
+ * @see java.util.List
+ */
 @Repository
 public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
 
+	/**
+	 * @param long cpf
+	 * @return Usuario
+	 */
 	@Query(value = "select u from Usuario u where u.cpfusu = ?1")
 	Usuario findByCPF(long cpf);
 
+	/**
+	 * @param String email
+	 * @return Usuario
+	 */
 	@Query(value = "select u from Usuario u where u.emausu = ?1")
 	Usuario findByEmail(String email);
 	
+	/**
+	 * @param long cnpj
+	 * @return List<Usuario>
+	 */
 	@Query(value = "select u from Usuario u where cnpjemp.cnpjemp = ?1")
 	List<Usuario> findByCnpjEmp(long cnpj);
 	
+	/**
+	 * @param long cnpj
+	 */
 	@Transactional
 	@Modifying(clearAutomatically = true)
 	@Query(value = "update Usuario set cnpjemp = null where cnpjemp.cnpjemp = ?1")
 	void setCnpjempNull(long cnpj);
 	
+	/**
+	 * @param long cpfusu
+	 */
 	@Transactional
 	@Modifying(clearAutomatically = true)
 	@Query(value = "delete from Usuario u where u.cpfusu = ?1")
 	void deleteByCPF(long cpfusu);
 	
+	/**
+	 * @param String usuario
+	 * @param String senha
+	 */
 	@Transactional
 	@Modifying(clearAutomatically = true)
 	@Query(nativeQuery = true, value ="call create_user(:usuario, :senha)")
 	void createDBUser(@Param("usuario") String usuario, @Param("senha") String senha);
 	
+	/**
+	 * @param String usuario
+	 */
 	@Transactional
 	@Modifying(clearAutomatically = true)
 	@Query(nativeQuery = true, value ="call grant_usuario(:usuario)")
 	void grantDBUser(@Param("usuario") String usuario);
 	
+	/**
+	 * @param String usuario
+	 * @param Sring newemail
+	 */
 	@Transactional
 	@Modifying(clearAutomatically = true)
 	@Query(nativeQuery = true, value ="call alter_email(:usuario, :newemail)")
 	void alterUserEmail(@Param("usuario") String usuario, @Param("newemail") String newemail);
 	
+	/**
+	 * @param String usuario
+	 * @param String newpassword
+	 */
 	@Transactional
 	@Modifying(clearAutomatically = true)
 	@Query(nativeQuery = true, value ="call alter_password(:usuario, :newpassword)")
 	void alterUserPassword(@Param("usuario") String usuario, @Param("newpassword") String newpassword);
 	
+	/**
+	 * @param String usuario
+	 */
 	@Transactional
 	@Modifying(clearAutomatically = true)
 	@Query(nativeQuery = true, value ="call drop_user(:usuario)")

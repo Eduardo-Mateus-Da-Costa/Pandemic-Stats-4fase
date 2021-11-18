@@ -2,7 +2,18 @@ package br.edu.unoesc.pandemicstats.springboot.utils;
 
 import br.edu.unoesc.pandemicstats.springboot.model.Endereco;
 
+/**
+ * @author Eduardo Mateus Da Costa
+ * @since 12/11/2021
+ * @version 1.2
+ * @see Endereco
+ */
 public class CompleteEnd {
+	
+	/**
+	 * @param Endereco obtido
+	 * @param Endereco inserido
+	 */
 	public static void complete(Endereco obtido, Endereco inserido)
 	{
 		if(obtido.getCodend() == 0)

@@ -2,8 +2,18 @@ package br.edu.unoesc.pandemicstats.springboot.utils;
 
 import br.edu.unoesc.pandemicstats.springboot.model.Usuario;
 
+/**
+ * @author Eduardo Mateus Da Costa
+ * @since 12/11/2021
+ * @version 1.1
+ * @see Usuario
+ */
 public class CompleteUsu {
 
+	/**
+	 * @param Usuario obtido
+	 * @param Usuario inserido
+	 */
 	public static void complete(Usuario obtido, Usuario inserido)
 	{
 		if(obtido.getCnpjemp() == null)

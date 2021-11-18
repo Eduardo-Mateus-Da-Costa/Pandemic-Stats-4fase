@@ -6,6 +6,12 @@ import br.edu.unoesc.pandemicstats.springboot.model.Empresa;
 import br.edu.unoesc.pandemicstats.springboot.model.Usuario;
 import lombok.Data;
 
+/**
+ * @author Eduardo Mateus Da Costa
+ * @since 09/11/2021
+ * @version 1.2
+ * @see Usuario
+ */
 @Data
 public class ShowUsuSCH {
 	private long cpfusu;
@@ -16,6 +22,10 @@ public class ShowUsuSCH {
 	private String telusu;
 	private long cnpjemp;
 	
+	/**
+	 * @param Usuario usuario
+	 * @see Empresa
+	 */
 	public void Convert(Usuario usuario)
 	{
 		this.cpfusu = usuario.getCpfusu();

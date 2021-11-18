@@ -7,6 +7,12 @@ import br.edu.unoesc.pandemicstats.springboot.model.Paciente;
 import br.edu.unoesc.pandemicstats.springboot.model.Vacina;
 import lombok.Data;
 
+/**
+ * @author Eduardo Mateus Da Costa
+ * @since 11/12/2021
+ * @version 1.0
+ * @see Vacina
+ */ 
 @Data
 public class ShowVacSCH {
 	private long codvac;
@@ -16,6 +22,11 @@ public class ShowVacSCH {
 	private long codpac;
 	private String crmmed;
 	
+	/**
+	 * @param Vacina vacina
+	 * @see Medico
+	 * @see Paciente
+	 */
 	public void Convert(Vacina vacina)
 	{
 		this.codvac = vacina.getCodvac();

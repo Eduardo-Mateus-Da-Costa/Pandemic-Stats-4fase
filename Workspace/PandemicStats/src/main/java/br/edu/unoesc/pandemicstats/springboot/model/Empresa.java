@@ -15,6 +15,14 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 
 import lombok.Data;
 
+/**
+ * 
+ * @author Eduardo Mateus Da Costa
+ * @since 30/10/2021
+ * @version 2.0
+ * 
+ */
+
 @org.hibernate.annotations.Table(comment = "Tabela de empresas", appliesTo = "empresa")
 @Entity
 @Data

@@ -10,12 +10,26 @@ import org.springframework.stereotype.Repository;
 
 import br.edu.unoesc.pandemicstats.springboot.model.Paciente;
 
+/**
+ * @author Eduardo Mateus Da Costa
+ * @since 06/11/2021
+ * @version 1.3
+ * @see JpaRepository
+ * @see Paciente
+ */
 @Repository
 public interface PacienteRepository extends JpaRepository<Paciente, Long> {
 	
+	/**
+	 * @param long cpfusu
+	 * @return Paciente
+	 */
 	@Query(value = "select p from Paciente p where p.cpfusu.cpfusu = ?1")
 	Paciente findByCpfusu(long cpfusu);
 	
+	/**
+	 * @param String usuario
+	 */
 	@Transactional
 	@Modifying(clearAutomatically = true)
 	@Query(nativeQuery = true, value ="call grant_paciente(:usuario)")

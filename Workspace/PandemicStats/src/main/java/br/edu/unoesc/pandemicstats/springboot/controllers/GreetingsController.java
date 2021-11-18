@@ -22,17 +22,17 @@ import br.edu.unoesc.pandemicstats.springboot.schemmas.*;
 import br.edu.unoesc.pandemicstats.springboot.utils.*;
 
 /**
- *
- * A sample greetings controller to return greeting text
+ * @author Eduardo Mateus Da Costa
+ * @since 30/10/2021
+ * @version 7.8
+ * @see br.edu.unoesc.pandemicstats.springboot.model
+ * @see br.edu.unoesc.pandemicstats.springboot.repository
+ * @see br.edu.unoesc.pandemicstats.springboot.responses
+ * @see br.edu.unoesc.pandemicstats.springboot.schemmas
+ * @see br.edu.unoesc.pandemicstats.springboot.utils
  */
-
 @RestController
 public class GreetingsController {
-	/**
-	 *
-	 * @param name the name to greet
-	 * @return greeting text
-	 */
 
 	@Autowired
 	CidadeRepository cidRep;
@@ -66,7 +66,14 @@ public class GreetingsController {
 	SolicitacaoRepository solRep;
 	
 	
-//Endpoints de usuario
+	/**
+	 * @param Usuario usuusu
+	 * @return RespUsu
+	 * @see Usuario
+	 * @see RespUsu
+	 * @see PermisSCH
+	 * @see UsuarioRepository
+	 */
 	@RequestMapping(value="/postusu")
 	@ResponseBody
 	public ResponseEntity<RespUsu> postUsu(@RequestBody Usuario usuusu) {
@@ -95,6 +102,14 @@ public class GreetingsController {
 		}
 	}
 
+	/**
+	 * @param Usuario usuusu
+	 * @return RespUsu
+	 * @see CompleteUsu
+	 * @see RespUsu
+	 * @see Usuario
+	 * @see UsuarioRepository
+	 */
 	@PatchMapping(value = "patchUsu")
 	@ResponseBody
 	public ResponseEntity<RespUsu> patchUsu(@RequestBody Usuario usuusu) {
@@ -121,7 +136,18 @@ public class GreetingsController {
 			return new ResponseEntity<RespUsu>(respusu, HttpStatus.CONFLICT);
 		}
 	}
-
+	
+	
+	/**
+	 * @param ReqUsuSCH requsu
+	 * @return String
+	 * @see Empresa
+	 * @see ReqUsuSCH
+	 * @see Usuario
+	 * @see UsuarioRepository
+	 * @see EmpresaRepository
+	 * @see EnderecoRepository
+	 */
 	@DeleteMapping(value = "deleteUsu")
 	@ResponseBody
 	public ResponseEntity<String> deleteUsu(@RequestBody ReqUsuSCH requsu) {
@@ -146,7 +172,15 @@ public class GreetingsController {
 		}
 	}
 
-	@GetMapping(value = "getUsu")
+	/**
+	 * @param ReqUsuSCH requsu
+	 * @return RespUsu
+	 * @see Usuario
+	 * @see PermisSCH
+	 * @see RespUsu
+	 * @see UsuarioRepository
+	 */
+	@PostMapping(value = "getUsu")
 	@ResponseBody
 	public ResponseEntity<RespUsu> getUsu(@RequestBody ReqUsuSCH requsu) {
 		Usuario usuario = usuRep.findByCPF(requsu.getCpfusu());
@@ -156,10 +190,18 @@ public class GreetingsController {
 		return new ResponseEntity<RespUsu>(respusu, HttpStatus.OK);
 	}
 
+	/**
+	 * @param ReqLoginSCH reqlogin
+	 * @return RespUsu
+	 * @see PermisSCH
+	 * @see Usuario
+	 * @see ReqLoginSCH
+	 * @see RespUsu
+	 * @see UsuarioRepository
+	 */
 	@PostMapping(value = "/login")
 	@ResponseBody
 	public ResponseEntity<RespUsu> login(@RequestBody ReqLoginSCH reqlogin) {
-		System.out.println(reqlogin.toString());
 		Usuario usuario = new Usuario();
 		usuario = usuRep.findByEmail(reqlogin.getEmail());
 		if (usuario == null) {
@@ -175,14 +217,20 @@ public class GreetingsController {
 			} else {
 				RespUsu respusu = new RespUsu();
 				respusu.RespValUsu(null, 504, null);
-				System.out.println(usuario.getSenusu());
-				System.out.println(reqlogin.toString());
 				return new ResponseEntity<RespUsu>(respusu, HttpStatus.UNAUTHORIZED);
 			}
 		}
 	}
 
-//Endpoints de empresa
+	/**
+	 * @param Empresa empemp
+	 * @return RespEmp
+	 * @see Empresa
+	 * @see RespEmp
+	 * @see Usuario
+	 * @see EmpresaRepository
+	 * @see UsuarioRepository
+	 */
 	@PostMapping(value = "postEmp")
 	@ResponseBody
 	public ResponseEntity<RespEmp> postEmp(@RequestBody Empresa empemp) {
@@ -210,6 +258,15 @@ public class GreetingsController {
 		}
 	}
 
+	/**
+	 * @param Empresa empemp
+	 * @return RespEmp
+	 * @see Empresa
+	 * @see RespEmp
+	 * @see Usuario
+	 * @see CompleteEmp
+	 * @see EmpresaRepository
+	 */
 	@PatchMapping(value = "patchEmp")
 	@ResponseBody
 	public ResponseEntity<RespEmp> patchEmp(@RequestBody Empresa empemp) {
@@ -238,6 +295,15 @@ public class GreetingsController {
 		}
 	}
 
+	/**
+	 * @param ReqEmpSCH reqemp
+	 * @return String
+	 * @see ReqEmpSCH
+	 * @see Empresa
+	 * @see EmpresaRepository
+	 * @see Usuario
+	 * @see UsuarioRepository
+	 */
 	@DeleteMapping(value = "deleteEmp")
 	@ResponseBody
 	public ResponseEntity<String> deleteEmp(@RequestBody ReqEmpSCH reqemp) {
@@ -256,6 +322,14 @@ public class GreetingsController {
 		}
 	}
 
+	/**
+	 * @param ReqEmpSCH reqemp
+	 * @return ShowEmpSCH
+	 * @see ShowEmpSCH
+	 * @see ReqEmpSCH
+	 * @see Empresa
+	 * @see EmpresaRepository
+	 */
 	@GetMapping(value = "getEmp")
 	@ResponseBody
 	public ResponseEntity<ShowEmpSCH> getEmp(@RequestBody ReqEmpSCH reqemp) {
@@ -265,7 +339,16 @@ public class GreetingsController {
 		return new ResponseEntity<ShowEmpSCH>(showemp, HttpStatus.OK);
 	}
 
-//Endpoints de endereço
+	/**
+	 * @param Endereco endend
+	 * @return RespEnd
+	 * @see RespEnd
+	 * @see Endereco
+	 * @see EnderecoRepository
+	 * @see Empresa
+	 * @see CompleteEnd
+	 * @see Usuario
+	 */
 	@PostMapping(value = "postORpatchEnd")
 	@ResponseBody
 	public ResponseEntity<RespEnd> postORpatchEnd(@RequestBody Endereco endend) {
@@ -290,7 +373,15 @@ public class GreetingsController {
 		}
 	}
 
-	@GetMapping(value = "getEnd")
+	/**
+	 * @param ReqEndSCH reqend
+	 * @return ShowEndSCH
+	 * @see ReqEndSCH
+	 * @see ShowEndSCH
+	 * @see Endereco
+	 * @see EnderecoRepository
+	 */
+	@PostMapping(value = "getEnd")
 	@ResponseBody
 	public ResponseEntity<ShowEndSCH> getEnd(@RequestBody ReqEndSCH reqend) {
 		Endereco endereco = new Endereco();
@@ -304,7 +395,15 @@ public class GreetingsController {
 		return new ResponseEntity<ShowEndSCH>(showend, HttpStatus.OK);
 	}
 
-//Endpoints de medico
+	/**
+	 * @param Medico medmed
+	 * @return RespMed
+	 * @see Medico
+	 * @see RespMed
+	 * @see Usuario
+	 * @see UsuarioRepository
+	 * @see MedicoRepository
+	 */
 	@PostMapping(value = "postMed")
 	@ResponseBody
 	public ResponseEntity<RespMed> postMed(@RequestBody Medico medmed) {
@@ -326,6 +425,15 @@ public class GreetingsController {
 		}
 	}
 
+	/**
+	 * @param ReqMedSCH reqmed
+	 * @return String
+	 * @see Medico
+	 * @see ReqMedSCH
+	 * @see MedicoRepository
+	 * @see Usuario
+	 * @see UsuarioRepository
+	 */
 	@DeleteMapping(value = "deleteMed")
 	@ResponseBody
 	public ResponseEntity<String> deleteMed(@RequestBody ReqMedSCH reqmed) {
@@ -342,7 +450,15 @@ public class GreetingsController {
 		}
 	}
 
-	@GetMapping(value = "getMed")
+	/**
+	 * @param ReqMedSCH reqmed
+	 * @return ShowMedSCH
+	 * @see ShowMedSCH
+	 * @see ReqMedSCH
+	 * @see Medico
+	 * @see MedicoRepository
+	 */
+	@PostMapping(value = "getMed")
 	@ResponseBody
 	public ResponseEntity<ShowMedSCH> getMed(@RequestBody ReqMedSCH reqmed) {
 		Medico medico = medRep.findByCRM(reqmed.getCrmmed());
@@ -351,8 +467,16 @@ public class GreetingsController {
 		return new ResponseEntity<ShowMedSCH>(showmed, HttpStatus.OK);
 	}
 
-//Endpoint de cidade
-	@GetMapping(value = "getCid")
+
+	/**
+	 * @param ReqCidSCH reqcid
+	 * @return ShowCidSCH
+	 * @see Cidade
+	 * @see ReqCidSCH
+	 * @see ShowCidSCH
+	 * @see CidadeRepository
+	 */
+	@PostMapping(value = "getCid")
 	@ResponseBody
 	public ResponseEntity<ShowCidSCH> getCid(@RequestBody ReqCidSCH reqcid) {
 		Cidade cidade = cidRep.findByCodcid(reqcid.getCodcid());
@@ -361,7 +485,16 @@ public class GreetingsController {
 		return new ResponseEntity<ShowCidSCH>(showcid, HttpStatus.OK);
 	}
 
-	@GetMapping(value = "getEstCids")
+	/**
+	 * 
+	 * @param ReqCidSCH reqcid
+	 * @return List<ShowCidSCH>
+	 * @see Cidade
+	 * @see CidadeRepository
+	 * @see ShowCidSCH
+	 * @see java.util.List
+	 */
+	@PostMapping(value = "getEstCids")
 	@ResponseBody
 	public ResponseEntity<List<ShowCidSCH>> getCids(@RequestBody ReqCidSCH reqcid) {
 		List<Cidade> cidades = cidRep.findByCodest(reqcid.getCodest());
@@ -374,14 +507,26 @@ public class GreetingsController {
 		return new ResponseEntity<List<ShowCidSCH>>(listshowcid, HttpStatus.OK);
 	}
 
-//Endpoint de comorbidade
-	@GetMapping(value = "getCom")
+	/**
+	 * @param ReqComSCH reqcom
+	 * @return Comorbidade
+	 * @see Comorbidade
+	 * @see ReqComSCH
+	 * @see ComorbidadeRepository
+	 */
+	@PostMapping(value = "getCom")
 	@ResponseBody
 	public ResponseEntity<Comorbidade> getCom(@RequestBody ReqComSCH reqcom) {
 		Comorbidade comorbidade = comRep.findByCodcom(reqcom.getCodcom());
 		return new ResponseEntity<Comorbidade>(comorbidade, HttpStatus.OK);
 	}
 
+	/**
+	 * @return List<Comorbidade>
+	 * @see Comorbidade
+	 * @see ComorbidadeRepository
+	 * @see java.util.List
+	 */
 	@GetMapping(value = "getComs")
 	@ResponseBody
 	public ResponseEntity<List<Comorbidade>> getComs() {
@@ -389,8 +534,16 @@ public class GreetingsController {
 		return new ResponseEntity<List<Comorbidade>>(comorbidades, HttpStatus.OK);
 	}
 
-//Endpoint de estado
-	@GetMapping(value = "getEst")
+
+	/**
+	 * @param ReqEstSCH reqest
+	 * @return ShowEstSCH
+	 * @see ShowEstSCH
+	 * @see ReqEstSCH 
+	 * @see Estado
+	 * @see EstadoRepository
+	 */
+	@PostMapping(value = "getEst")
 	@ResponseBody
 	public ResponseEntity<ShowEstSCH> getEst(@RequestBody ReqEstSCH reqest) {
 		Estado estado = estRep.findByCodest(reqest.getCodest());
@@ -399,7 +552,16 @@ public class GreetingsController {
 		return new ResponseEntity<ShowEstSCH>(showest, HttpStatus.OK);
 	}
 
-	@GetMapping(value = "getEsts")
+	/**
+	 * @param ReqEstSCH reqest
+	 * @return List<ShowEstSCH>
+	 * @see ShowEstSCH
+	 * @see ReqEstSCH 
+	 * @see Estado
+	 * @see EstadoRepository
+	 * @see java.util.List
+	 */
+	@PostMapping(value = "getEsts")
 	@ResponseBody
 	public ResponseEntity<List<ShowEstSCH>> getEsts(@RequestBody ReqEstSCH reqest) {
 		List<Estado> estados = estRep.findByCodpai(reqest.getCodpai());
@@ -412,7 +574,14 @@ public class GreetingsController {
 		return new ResponseEntity<List<ShowEstSCH>>(listshowest, HttpStatus.OK);
 	}
 
-//Endpoint de monitoramento paciente
+
+	/**
+	 * @param MonitoramentoPaciente monpac
+	 * @return RespMonPac
+	 * @see RespMonPac
+	 * @see MonitoramentoPaciente
+	 * @see MonitoramentoPacienteRepository
+	 */
 	@PostMapping(value = "postMonPac")
 	@ResponseBody
 	public ResponseEntity<RespMonPac> postMomPac(@RequestBody MonitoramentoPaciente monpac) {
@@ -435,7 +604,15 @@ public class GreetingsController {
 		}
 	}
 
-	@GetMapping(value = "getMonsPac")
+	/**
+	 * @param ReqMonPacSCH reqmompac
+	 * @return List<ShowMonPacSCH>
+	 * @see MonitoramentoPaciente
+	 * @see MonitoramentoPacienteRepository
+	 * @see ShowMonPac
+	 * @see java.util.List
+	 */
+	@PostMapping(value = "getMonsPac")
 	@ResponseBody
 	public ResponseEntity<List<ShowMonPacSCH>> getMonsPac(@RequestBody ReqMonPacSCH reqmompac) {
 		List<MonitoramentoPaciente> monitoramentos = monPacRep.findByCodpac(reqmompac.getCodpac());
@@ -448,7 +625,16 @@ public class GreetingsController {
 		return new ResponseEntity<List<ShowMonPacSCH>>(showmonspac, HttpStatus.OK);
 	}
 
-//Endpoints de paciente
+
+	/**
+	 * @param Paciente pacpac
+	 * @return RespPac
+	 * @see RespPac
+	 * @see Paciente
+	 * @see PacienteRepository
+	 * @see Usuario
+	 * @see CompletePac
+	 */
 	@PostMapping(value = "postORpatchPac")
 	@ResponseBody
 	public ResponseEntity<RespPac> postPac(@RequestBody Paciente pacpac) {
@@ -495,7 +681,15 @@ public class GreetingsController {
 		}
 	}
 
-	@GetMapping(value = "getPac")
+	/**
+	 * @param ReqPacSCH reqpac
+	 * @return ShowPacSCH
+	 * @see ShowPacSCH
+	 * @see ReqPacSCH 
+	 * @see Paciente
+	 * @see PacienteRepository
+	 */
+	@PostMapping(value = "getPac")
 	@ResponseBody
 	public ResponseEntity<ShowPacSCH> getPac(@RequestBody ReqPacSCH reqpac) {
 		Paciente paciente = pacRep.findByCpfusu(reqpac.getCpfusu());
@@ -504,7 +698,15 @@ public class GreetingsController {
 		return new ResponseEntity<ShowPacSCH>(showpac, HttpStatus.OK);
 	}
 
-//Endpoint de paciente comorbidade
+
+	/**
+	 * @param PacienteComorbidade paccompaccom
+	 * @return String
+	 * @see Paciente
+	 * @see Comorbidade 
+	 * @see PacienteComorbidade
+	 * @see PacienteComorbidadeRepository
+	 */
 	@PostMapping(value = "postPacCom")
 	@ResponseBody
 	public ResponseEntity<String> postPacCom(@RequestBody PacienteComorbidade paccompaccom) {
@@ -519,7 +721,13 @@ public class GreetingsController {
 		}
 	}
 
-//Endpoint de solicitacao
+
+	/**
+	 * @param Solicitacao solicitacao
+	 * @return String
+	 * @see SolicitacaoRepository
+	 * @see Solicitacao
+	 */
 	@PostMapping(value = "postSol")
 	@ResponseBody
 	public ResponseEntity<String> postSol(@RequestBody Solicitacao solicitacao) {
@@ -531,7 +739,14 @@ public class GreetingsController {
 		}
 	}
 
-//Endpoint de TesteCovid
+
+	/**
+	 * @param TesteCovid teste
+	 * @return RespTesCov
+	 * @see RespTesCov
+	 * @see TesteCovid
+	 * @see TesteCovidRepository
+	 */
 	@PostMapping(value = "postTesCov")
 	@ResponseBody
 	public ResponseEntity<RespTesCov> postTesCov(@RequestBody TesteCovid teste) {
@@ -550,7 +765,15 @@ public class GreetingsController {
 		}
 	}
 	
-	@GetMapping(value = "getTests")
+	/**
+	 * @param ReqTesCovSCH reqteste
+	 * @return List<ShowTesCovSCH>
+	 * @see ReqTesCovSCH
+	 * @see ShowTesCovSCH
+	 * @see TesteCovid
+	 * @see java.util.List
+	 */
+	@PostMapping(value = "getTests")
 	@ResponseBody
 	public ResponseEntity<List<ShowTesCovSCH>> getTests(@RequestBody ReqTesCovSCH reqteste)
 	{
@@ -565,7 +788,17 @@ public class GreetingsController {
 		return new ResponseEntity<List<ShowTesCovSCH>>(showtests, HttpStatus.OK);
 	}
 
-//Endpoint de Vacina
+
+	/**
+	 * @param Vacina vacvac
+	 * @return RespVac
+	 * @see RespVac
+	 * @see Vacina
+	 * @see VacinaRepository
+	 * @see Paciente
+	 * @see Medico
+	 * @see MedicoRepository
+	 */
 	@PostMapping(value = "postVac")
 	@ResponseBody
 	public ResponseEntity<RespVac> postVac(@RequestBody Vacina vacvac) {
@@ -618,7 +851,14 @@ public class GreetingsController {
 	}
 	
 	
-	@GetMapping(value = "getVacs")
+	/**
+	 * @param ReqVacSCH reqvac
+	 * @return List<ShowVacSCH>
+	 * @see ReqVacSCH
+	 * @see ShowVacSCH
+	 * @see java.util.List
+	 */
+	@PostMapping(value = "getVacs")
 	@ResponseBody
 	public ResponseEntity<List<ShowVacSCH>> getVacs(@RequestBody ReqVacSCH reqvac)
 	{
@@ -633,7 +873,13 @@ public class GreetingsController {
 		return new ResponseEntity<List<ShowVacSCH>>(showvacs, HttpStatus.OK);
 	}
 	
-//Endpoint de pais
+
+	/**
+	 * @return List<Pais>
+	 * @see Pais
+	 * @see PaisRepository
+	 * @see java.util.List
+	 */
 	@GetMapping(value = "getPaises")
 	@ResponseBody
 	public ResponseEntity<List<Pais>> getPaises()
@@ -643,7 +889,13 @@ public class GreetingsController {
 		return new ResponseEntity<List<Pais>>(paises, HttpStatus.OK);
 	}
 	
-//Endpoint de sintomas
+
+	/**
+	 * @return List<Sintoma>
+	 * @see Sintomas
+	 * @see SintomasRepository
+	 * @see java.util.List
+	 */
 	@GetMapping(value = "getSints")
 	@ResponseBody
 	public ResponseEntity<List<Sintoma>> getSints()
@@ -653,7 +905,13 @@ public class GreetingsController {
 		return new ResponseEntity<List<Sintoma>>(sintomas, HttpStatus.OK);
 	}
 
-//Endpoints de functions
+
+	/**
+	 * @param long reqfunc
+	 * @return List<CidadeCovidSCH>
+	 * @see CidadeCovidSCH
+	 * @see CidadeRepository
+	 */
 	@GetMapping(value = "medgetCidCov")
 	@ResponseBody
 	public ResponseEntity<List<CidadeCovidSCH>> medgetCidCov(@RequestBody long reqfunc)
@@ -662,6 +920,13 @@ public class GreetingsController {
 		return new ResponseEntity<List<CidadeCovidSCH>>(lista, HttpStatus.OK);
 	}
 	
+	/**
+	 * @param long reqfunc
+	 * @return List<EmpresaCovidSCH>
+	 * @see EmpresaCovidSCH
+	 * @see EmpresaRepository
+	 * @see java.util.List
+	 */
 	@GetMapping(value = "medgetEmpCov")
 	@ResponseBody
 	public ResponseEntity<List<EmpresaCovidSCH>> medgetEmpCov(@RequestBody long reqfunc)
@@ -670,6 +935,11 @@ public class GreetingsController {
 		return new ResponseEntity<List<EmpresaCovidSCH>>(lista, HttpStatus.OK);
 	}
 	
+	/**
+	 * @param long reqfunc
+	 * @return Long
+	 * @see MedicoRepository
+	 */
 	@GetMapping(value = "medGetPdose")
 	@ResponseBody
 	public ResponseEntity<Long> medGetPdose(@RequestBody long reqfunc)
@@ -678,6 +948,11 @@ public class GreetingsController {
 		return new ResponseEntity<Long>(casos, HttpStatus.OK);
 	}
 	
+	/**
+	 * @param long reqfunc
+	 * @return Long
+	 * @see MedicoRepository
+	 */
 	@GetMapping(value = "medGetSdose")
 	@ResponseBody
 	public ResponseEntity<Long> medGetSdose(@RequestBody long reqfunc)
@@ -686,6 +961,13 @@ public class GreetingsController {
 		return new ResponseEntity<Long>(casos, HttpStatus.OK);
 	}
 	
+	/**
+	 * @param long reqfunc
+	 * @return List<EmpresaCovidSCH>
+	 * @see EmpresaCovidSCH
+	 * @see EmpresaRepository
+	 * @see java.util.List
+	 */
 	@GetMapping(value = "empgetEmpCov")
 	@ResponseBody
 	public ResponseEntity<List<EmpresaCovidSCH>> empgetEmpCov(@RequestBody long reqfunc)
@@ -694,6 +976,16 @@ public class GreetingsController {
 		return new ResponseEntity<List<EmpresaCovidSCH>>(lista, HttpStatus.OK);
 	}
 	
+	/**
+	 * @param long cpfusu
+	 * @return PermisSCH
+	 * @see Paciente
+	 * @see Medico
+	 * @see Empresa
+	 * @see PacienteRepository
+	 * @see MedicoRepository
+	 * @see EmpresaRepository
+	 */
 	public PermisSCH getPermis(long cpfusu)
 	{
 		Paciente paciente = pacRep.findByCpfusu(cpfusu);

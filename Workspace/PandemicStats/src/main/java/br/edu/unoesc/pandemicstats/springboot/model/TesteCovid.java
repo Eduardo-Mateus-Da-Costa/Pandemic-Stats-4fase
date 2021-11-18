@@ -19,6 +19,14 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 
 import lombok.Data;
 
+/**
+ * 
+ * @author Eduardo Mateus Da Costa
+ * @since 30/10/2021
+ * @version 1.4
+ * 
+ */
+
 @org.hibernate.annotations.Table(comment = "Tabela de testes de covid", appliesTo = "teste_covid")
 @Entity
 @Data

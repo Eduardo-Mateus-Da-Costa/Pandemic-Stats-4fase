@@ -6,6 +6,12 @@ import br.edu.unoesc.pandemicstats.springboot.model.Empresa;
 import br.edu.unoesc.pandemicstats.springboot.model.Usuario;
 import lombok.Data;
 
+/**
+ * @author Eduardo Mateus Da Costa
+ * @since 09/11/2021
+ * @version 1.0
+ * @see 
+ */
 @Data
 public class ShowEmpSCH {
 
@@ -19,6 +25,10 @@ public class ShowEmpSCH {
 	private Date valemp;
 	private long cpfusu;
 	
+	/**
+	 * @param Empresa empresa
+	 * @see Usuario
+	 */
 	public void Convert(Empresa empresa)
 	{
 		this.cnpjemp = empresa.getCnpjemp();

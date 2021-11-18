@@ -12,6 +12,16 @@ import javax.persistence.ManyToOne;
 
 import lombok.Data;
 
+/**
+ * 
+ * @author Eduardo Mateus Da Costa
+ * @since 30/10/2021
+ * @version 1.4
+ *  
+ */
+
+
+
 @org.hibernate.annotations.Table(comment = "Tabela de cidades", appliesTo = "cidade")
 @Entity
 @Data

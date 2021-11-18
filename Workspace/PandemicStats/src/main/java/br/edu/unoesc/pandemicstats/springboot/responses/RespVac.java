@@ -4,12 +4,23 @@ import br.edu.unoesc.pandemicstats.springboot.model.Vacina;
 import br.edu.unoesc.pandemicstats.springboot.schemmas.ShowVacSCH;
 import lombok.Data;
 
+/**
+ * @author Eduardo Mateus Da Costa
+ * @since 12/11/2021
+ * @version 1.6
+ * @see ShowVacSCH
+ * @see Vacina
+ */ 
 @Data
 public class RespVac {
 	private ShowVacSCH showvac = new ShowVacSCH();
 	private String erro;
 	private int codstatus;
 	
+	/**
+	 * @param Vacina vacina
+	 * @param int codstatus
+	 */
 	public void RespValVac(Vacina vacina, int codstatus)
 	{
 		if(codstatus == 1)

@@ -7,6 +7,12 @@ import br.edu.unoesc.pandemicstats.springboot.model.Paciente;
 import br.edu.unoesc.pandemicstats.springboot.model.Sintoma;
 import lombok.Data;
 
+/**
+ * @author Eduardo Mateus Da Costa
+ * @since 12/11/2021
+ * @version 1.0
+ * @see MonitoramentoPaciente
+ */
 @Data
 public class ShowMonPacSCH {
 	private long codmon;
@@ -15,6 +21,11 @@ public class ShowMonPacSCH {
 	private long codpac;
 	private long codsin;
 	
+	/**
+	 * @param MonitoramentoPaciente mompac
+	 * @see Paciente
+	 * @see Sintoma
+	 */
 	public void Convert(MonitoramentoPaciente mompac)
 	{
 		this.codmon = mompac.getCodmon();

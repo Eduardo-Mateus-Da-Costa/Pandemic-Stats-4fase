@@ -1,0 +1,8 @@
+br.edu.unoesc.pandemicstats.springboot
+br.edu.unoesc.pandemicstats.springboot.controllers
+br.edu.unoesc.pandemicstats.springboot.model
+br.edu.unoesc.pandemicstats.springboot.PandemicStats.requests
+br.edu.unoesc.pandemicstats.springboot.repository
+br.edu.unoesc.pandemicstats.springboot.responses
+br.edu.unoesc.pandemicstats.springboot.schemmas
+br.edu.unoesc.pandemicstats.springboot.utils

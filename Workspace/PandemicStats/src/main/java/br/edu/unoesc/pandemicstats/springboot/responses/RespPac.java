@@ -4,12 +4,23 @@ import br.edu.unoesc.pandemicstats.springboot.model.Paciente;
 import br.edu.unoesc.pandemicstats.springboot.schemmas.ShowPacSCH;
 import lombok.Data;
 
+/**
+ * @author Eduardo Mateus Da Costa
+ * @since 10/11/2021
+ * @version 1.6
+ * @see ShowPacSCH
+ * @see Paciente
+ */
 @Data
 public class RespPac {
 	private ShowPacSCH showpac = new ShowPacSCH();
 	private String erro;
 	private int codstatus;
 	
+	/**
+	 * @param Paciente paciente
+	 * @param int codstatus
+	 */
 	public void RespValPac(Paciente paciente, int codstatus)
 	{
 		if (codstatus == 500)

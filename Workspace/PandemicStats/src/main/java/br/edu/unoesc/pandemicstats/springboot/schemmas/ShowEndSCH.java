@@ -4,6 +4,12 @@ import br.edu.unoesc.pandemicstats.springboot.model.Cidade;
 import br.edu.unoesc.pandemicstats.springboot.model.Endereco;
 import lombok.Data;
 
+/**
+ * @author Eduardo Mateus Da Costa
+ * @since 11/12/2021
+ * @version 1.0
+ * @see Endereco
+ */
 @Data
 public class ShowEndSCH {
 	private long codend;
@@ -12,6 +18,10 @@ public class ShowEndSCH {
 	private String num;
 	private long codcid;
 	
+	/**
+	 * @param Endereco endereco
+	 * @see Cidade
+	 */
 	public void Convert(Endereco endereco)
 	{
 		this.codend = endereco.getCodend();

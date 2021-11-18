@@ -2,8 +2,18 @@ package br.edu.unoesc.pandemicstats.springboot.utils;
 
 import br.edu.unoesc.pandemicstats.springboot.model.Empresa;
 
+/**
+ * @author Eduardo Mateus Da Costa
+ * @since 12/11/2021
+ * @version 1.2
+ * @see Empresa
+ */
 public class CompleteEmp{
 
+	/**
+	 * @param Empresa obtido
+	 * @param Empresa inserido
+	 */
 	public static void complete(Empresa obtido, Empresa inserido)
 	{
 		if(obtido.getNomemp() == null)
