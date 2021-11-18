@@ -38,7 +38,7 @@ public class Usuario implements Serializable{
 	@Column(columnDefinition = "VARCHAR(20)", nullable = false)
 	private String senusu;
 	
-	@Column(columnDefinition = "VARCHAR(30)", nullable = false)
+	@Column(columnDefinition = "DATE", nullable = false)
 	@JsonFormat(pattern="yyyy-mm-dd")
 	private Date datnasusu;	
 	

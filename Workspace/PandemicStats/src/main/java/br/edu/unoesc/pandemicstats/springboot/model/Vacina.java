@@ -33,7 +33,7 @@ public class Vacina implements Serializable{
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
-	@Column(columnDefinition = "NUMERIC(11, 0)", insertable=false)
+	@Column(columnDefinition = "NUMERIC(10, 0)", insertable=false)
 	private long codvac;
 	
 	@Column(columnDefinition = "DATE", nullable = false)

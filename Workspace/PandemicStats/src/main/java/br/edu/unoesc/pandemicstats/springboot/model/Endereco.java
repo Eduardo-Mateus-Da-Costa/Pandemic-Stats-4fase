@@ -51,6 +51,6 @@ public class Endereco implements Serializable{
 	private Empresa cnpjemp;
 	
 	@ManyToOne
-	@JoinColumn(columnDefinition = "NUMERIC(6, 0)")
+	@JoinColumn(columnDefinition = "NUMERIC(10, 0)")
 	private Cidade codcid;
 }

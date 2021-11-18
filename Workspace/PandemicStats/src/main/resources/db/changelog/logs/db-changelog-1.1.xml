@@ -7,14 +7,12 @@
 		author="Eduardo Mateus da Costa">
 		<sql stripComments="true" splitStatements="true" endDelimiter="@"> <!--@ finaliza pois nas functions tem ; no meio -->
 		
-		<!--Tipo de  resposta cidade-covid -->
+			<!--Tipo de  resposta cidade-covid -->
 			create type tp_cid_covid as 
 			(
 				nomusu varchar(100),
 				sexusu char(1),
-				nomemp varchar(100),
-				dattes date,
-				covpactes char(1)
+				nomemp varchar(100)
 			);@
 			
 			<!--Funcao cidade-covid -->
@@ -23,13 +21,12 @@
 			as
 			$body$
 			begin
-				return query select u.nomusu, u.sexusu, e.nomemp, tc.dattes, tc.covpactes from usuario u 
+				return query select u.nomusu, u.sexusu, e.nomemp from usuario u 
 						inner join empresa e on u.cnpjemp = e.cnpjemp
 						inner join endereco en on en.cpfusu = u.cpfusu
 						inner join cidade c on en.codcid = c.codcid
 						inner join paciente p on p.cpfusu = u.cpfusu
-						inner join teste_covid tc on tc.codpac = p.codpac
-						where ((tc.dattes &gt;= (current_date - 30)) and (c.codcid = codigo));
+						where (p.sitpac = 'ISOLAMENTO' or p.sitpac = 'INTERNADO') and (c.codcid = codigo);
 			end
 			$body$
 			language plpgsql;@
@@ -40,9 +37,7 @@
 			(
 				nomusu varchar(100),
 				sexusu char(1),
-				nomcid varchar(60),
-				dattes date,
-				covpactes char(1)
+				nomcid varchar(60)
 			);@
 			
 			
@@ -52,13 +47,12 @@
 			as
 			$body$
 			begin
-				return query select u.nomusu, u.sexusu, c.nomcid, tc.dattes, tc.covpactes from usuario u 
+				return query select u.nomusu, u.sexusu, c.nomcid from usuario u 
 						inner join empresa e on u.cnpjemp = e.cnpjemp
 						inner join endereco en on en.cpfusu = u.cpfusu
 						inner join cidade c on en.codcid = c.codcid
 						inner join paciente p on p.cpfusu = u.cpfusu
-						inner join teste_covid tc on tc.codpac = p.codpac
-						where ((tc.dattes &gt;= (current_date - 30)) and (e.cnpjemp = cnpj));
+						where (p.sitpac = 'ISOLAMENTO' or p.sitpac = 'INTERNADO') and (e.cnpjemp = cnpj);
 			end
 			$body$
 			language plpgsql;@
@@ -328,6 +322,79 @@
 			$body$
 			language plpgsql;@
 			
+			
+			<!--VIEWS ANTIGAS-->
+
+			<!--1) Relacione o código e nome de
+			pacientes com idades entre 40 e 50
+			anos, que apresentaram tosse.
+			Relacione a consulta em ordem
+			descendente de código; OK
+			2) Relacione o nome do paciente,
+			nome da cidade de residência de
+			pacientes do sexo masculino,
+			residentes nos municípios de
+			Maravilha, Descanso, Pinhalzinho,
+			Chapecó e Itapiranga que
+			apresentaram sintomas e não foram
+			positivados com covid. Relacione o
+			relatório pelo nome da cidade
+			descendente e o nome do paciente
+			ascendente;  OK
+			3) Relacione o código da cidade,
+			nome da cidade, quantidade de casos
+			suspeitos de covid para todas as
+			cidades. Ordene o relatório da cidade
+			com menos casos suspeitos para a
+			cidade com mais casos suspeitos; OK
+			4) Relacione a idade do paciente e
+			quantidade de casos positivos de
+			covid por idade, registrados em dias
+			pares de 2020. Ordene o relatório pela
+			idade com mais casos para a idade
+			com menos casos.-->
+			
+			
+			create view vw_select1 as 
+			select p.codpac, u.nomusu from paciente p 
+			inner join usuario u on u.cpfusu = p.cpfusu_cpfusu 
+			inner join monitoramento_paciente mp on mp.codpac_codpac = p.codpac 
+			inner join sintoma s on mp.codsin_codsin = s.codsin 
+			where s.nomsin ilike '%tosse%' and 
+			(extract(year from current_timestamp) - extract(year from u.datnasusu)&gt;=40) and 
+			(extract(year from current_timestamp) - extract(year from u.datnasusu)&lt;=50)
+			order by p.codpac desc;
+			
+			
+			create view vw_select2 as
+			select u.nomusu, c.nomcid from paciente p 
+			inner join usuario u on u.cpfusu = p.cpfusu_cpfusu 
+			inner join endereco e on e.cpfusu_cpfusu = u.cpfusu
+			inner join cidade c on c.codcid = e.codcid_codcid 
+			inner join teste_covid tc on tc.codpac_codpac = p.codpac 
+			inner join monitoramento_paciente mp on mp.codpac_codpac = p.codpac 
+			where (tc.covpactes = 'N') and (mp.codsin_codsin not null) and (u.sexusu = 'M') and (c.nomcid in('Maravilha', 'Descanso', 'Pinhalzinho', 'Chapecó', 'Itapiranga'))
+			order by c.nomcid desc, u.nomusu;
+			
+			
+			create view vw_select3 as 
+			select c.codcid, c.nomcid, count(distinct(mp.codpac_codpac)) as conta from cidade c 
+			left join endereco e on e.codcid_codcid = c.codcid 
+			left join usuario u on u.cpfusu = e.cpfusu_cpfusu 
+			left join paciente p on p.cpfusu_cpfusu = u.cpfusu 
+			left join monitoramento_paciente mp on mp.codpac_codpac = p.codpac 
+			group by c.codcid
+			order by conta;
+			
+			
+			create view vw_select4 as
+			select to_char(age(u.datnasusu),'YY') as idade, count(*) as casos from paciente p
+			inner join teste_covid tc on tc.codpac_codpac = p.codpac 
+			inner join usuario u on u.cpfusu = p.cpfusu_cpfusu 
+			where tc.covpactes ='P' and ((extract(DAY from tc.dattes)::Integer)%2)=0
+			group by idade
+			order by casos desc;
+		
 		</sql>
 	</changeSet>
 

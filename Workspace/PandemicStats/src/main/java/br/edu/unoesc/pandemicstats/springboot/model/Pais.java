@@ -29,6 +29,6 @@ public class Pais implements Serializable{
 	@Column(columnDefinition = "NUMERIC(3, 0)", insertable = false)
 	private long codpai;
 	
-	@Column(columnDefinition = "VARCHAR(60)", nullable = false)
+	@Column(columnDefinition = "VARCHAR(60)", nullable = false, unique=true)
 	private String nompai;
 }

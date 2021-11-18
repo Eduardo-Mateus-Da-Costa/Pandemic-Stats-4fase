@@ -30,7 +30,7 @@ public class Cidade implements Serializable{
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
-	@Column(columnDefinition = "NUMERIC(6, 0)", insertable = false)
+	@Column(columnDefinition = "NUMERIC(10, 0)", insertable = false)
 	private long codcid;
 	
 	
@@ -38,6 +38,6 @@ public class Cidade implements Serializable{
 	private String nomcid;
 	
 	@ManyToOne
-	@JoinColumn(columnDefinition = "NUMERIC(2, 0)")
+	@JoinColumn(columnDefinition = "NUMERIC(5, 0)")
 	private Estado codest;
 }

@@ -31,7 +31,4 @@ public class Sintoma implements Serializable{
 	
 	@Column(columnDefinition = "VARCHAR(60)", nullable = false)
 	private String nomsin;
-	
-	@Column(columnDefinition = "VARCHAR(300)", nullable = true)
-	private String dessin;
 }

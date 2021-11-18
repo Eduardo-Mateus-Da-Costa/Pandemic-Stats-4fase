@@ -29,13 +29,13 @@ public class Estado implements Serializable{
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
-	@Column(columnDefinition = "NUMERIC(2, 0)", insertable = false)
+	@Column(columnDefinition = "NUMERIC(5, 0)", insertable = false)
 	private long codest;
 	
 	@Column(columnDefinition = "VARCHAR(60)", nullable = false)
 	private String nomest;
 	
 	@ManyToOne
-	@JoinColumn(columnDefinition = "NUMERIC(2, 0)")
+	@JoinColumn(columnDefinition = "NUMERIC(3, 0)")
 	private Pais codpai;
 }
