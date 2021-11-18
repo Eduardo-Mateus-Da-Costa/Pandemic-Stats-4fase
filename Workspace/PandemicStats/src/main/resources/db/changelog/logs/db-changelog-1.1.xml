@@ -227,6 +227,15 @@
 			on paciente, paciente_comorbidade
 			to g_paciente;@
 			
+			<!--Grant medicos-->
+			grant select
+			on vacina, pacientes, teste_covid, sintoma, empresa, monitoramento_paciente, paciente_comorbidade
+			to g_medico;@
+			
+			grant insert 
+			on vacina, teste_covid, monitoramento_paciente
+			to g_medico;@
+			
 			<!--Grant administrador-->
 			grant select, insert, update, delete
 			on all tables in schema public
@@ -363,7 +372,7 @@
 			where s.nomsin ilike '%tosse%' and 
 			(extract(year from current_timestamp) - extract(year from u.datnasusu)&gt;=40) and 
 			(extract(year from current_timestamp) - extract(year from u.datnasusu)&lt;=50)
-			order by p.codpac desc;
+			order by p.codpac desc;@
 			
 			
 			create view vw_select2 as
@@ -374,7 +383,7 @@
 			inner join teste_covid tc on tc.codpac_codpac = p.codpac 
 			inner join monitoramento_paciente mp on mp.codpac_codpac = p.codpac 
 			where (tc.covpactes = 'N') and (mp.codsin_codsin not null) and (u.sexusu = 'M') and (c.nomcid in('Maravilha', 'Descanso', 'Pinhalzinho', 'Chapecó', 'Itapiranga'))
-			order by c.nomcid desc, u.nomusu;
+			order by c.nomcid desc, u.nomusu;@
 			
 			
 			create view vw_select3 as 
@@ -384,7 +393,7 @@
 			left join paciente p on p.cpfusu_cpfusu = u.cpfusu 
 			left join monitoramento_paciente mp on mp.codpac_codpac = p.codpac 
 			group by c.codcid
-			order by conta;
+			order by conta;@
 			
 			
 			create view vw_select4 as
@@ -393,7 +402,7 @@
 			inner join usuario u on u.cpfusu = p.cpfusu_cpfusu 
 			where tc.covpactes ='P' and ((extract(DAY from tc.dattes)::Integer)%2)=0
 			group by idade
-			order by casos desc;
+			order by casos desc;@
 		
 		</sql>
 	</changeSet>

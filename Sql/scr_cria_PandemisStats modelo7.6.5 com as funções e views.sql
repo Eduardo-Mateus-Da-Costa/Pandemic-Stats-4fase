@@ -460,6 +460,15 @@ grant delete
 on paciente, paciente_comorbidade
 to g_paciente;
 
+--Grant medicos
+grant select
+on vacina, pacientes, teste_covid, sintoma, empresa, monitoramento_paciente, paciente_comorbidade
+to g_medico;
+
+grant insert 
+on vacina, teste_covid, monitoramento_paciente
+to g_medico;
+
 --Grant administrador
 grant select, insert, update, delete
 on all tables in schema public
