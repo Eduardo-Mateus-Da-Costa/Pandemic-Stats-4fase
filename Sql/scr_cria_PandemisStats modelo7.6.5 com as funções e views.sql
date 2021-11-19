@@ -29,8 +29,12 @@ create table Empresa (
 	  telemp1   varchar(20) not null, 
 	  telemp2   varchar(20), 
 	  emaemp    varchar(30) unique, 
-	  ramemp    varchar(60) not null, 
+	  ramemp    varchar(60) not null,
+	  cep     numeric(8, 0) not null, 
+	  rua     varchar(60) not null, 
+	   num     varchar(10) not null, 
 	  cpfusu_cpfusu    numeric(11, 0) not null, 
+	  codcid_codcid  numeric(10, 0) not null, 
 	  valemp    date default CURRENT_DATE not null, 
 	  primary key (cnpjemp));
  
@@ -43,23 +47,9 @@ comment on column Empresa.telemp2 is 'Telefone 2 da empresa';
 comment on column Empresa.emaemp is 'Email da empresa';
 comment on column Empresa.ramemp is 'Ramo da empresa';
 comment on column Empresa.valemp is 'Data de inserção da empresa no sistema';
-
-
-create table Endereco (
-	  codend  numeric(10, 0) not null, 
-	  cep     numeric(8, 0) not null, 
-	  rua     varchar(60) not null, 
-	  num     varchar(10) not null, 
-	  codcid_codcid  numeric(10, 0) not null, 
-	  cpfusu_cpfusu  numeric(11, 0), 
-	  cnpjemp_cnpjemp numeric(14, 0), 
-	  primary key (codend));
- 
-comment on table Endereco is 'Tabela de endereços';
-comment on column Endereco.codend is 'Código do endereço';
-comment on column Endereco.cep is 'Número do CEP.';
-comment on column Endereco.rua is 'Nome da rua.';
-comment on column Endereco.num is 'Número da casa/prédio';
+comment on column Empresa.cep is 'Número do CEP.';
+comment on column Empresa.rua is 'Nome da rua.';
+comment on column Empresa.num is 'Número da casa/prédio';
 
 
 create table Estado (
@@ -184,6 +174,10 @@ create table Usuario (
 	  sexusu    char(1) not null check(sexusu in('M','F')), 
 	  telusu    varchar(20) not null, 
 	  emausu    varchar(30) not null unique, 
+	  cep     numeric(8, 0) not null, 
+	  rua     varchar(60) not null, 
+	  num     varchar(10) not null, 
+	  codcid_codcid  numeric(10, 0) not null, 
 	  cnpjemp_cnpjemp   numeric(14, 0), 
 	  valusu    date default CURRENT_DATE not null, 
 	  primary key (cpfusu));
@@ -199,7 +193,9 @@ F- Feminino';
 comment on column Usuario.telusu is 'Telefone do usuario.';
 comment on column Usuario.emausu is 'Email do usuario';
 comment on column Usuario.valusu is 'Data de cadastro do usuário no sistema';
-
+comment on column Usuario.cep is 'Número do CEP.';
+comment on column Usuario.rua is 'Nome da rua.';
+comment on column Usuario.num is 'Número da casa/prédio';
 
 create table Vacina (
 	  codvac numeric(10, 0) not null, 
@@ -220,7 +216,8 @@ comment on column Vacina.fabvac is 'Fabricante da vacina';
 
 alter table Estado add constraint FKEstado513581 foreign key (codpai_codpai) references Pais (codpai);
 alter table Cidade add constraint FKCidade186903 foreign key (codest_codest) references Estado (codest);
-alter table Endereco add constraint FKEndereco686664 foreign key (codcid_codcid) references Cidade (codcid);
+alter table Empresa add constraint FKEmpresa686664 foreign key (codcid_codcid) references Cidade (codcid);
+alter table Usuario add constraint FKUsuario685264 foreign key (codcid_codcid) references Cidade (codcid);
 alter table Monitoramento_paciente add constraint FKMonitorame117070 foreign key (codsin_codsin) references Sintoma (codsin);
 alter table Usuario add constraint FKUsuario505260 foreign key (cnpjemp_cnpjemp) references Empresa (cnpjemp);
 alter table Paciente_Comorbidade add constraint FKPaciente_C231517 foreign key (codcom_codcom) references Comorbidade (codcom);
@@ -233,7 +230,6 @@ alter table Paciente_Comorbidade add constraint FKPaciente_C581063 foreign key (
 alter table Vacina add constraint FKVacina372667 foreign key (codpac_codpac) references Paciente (codpac);
 alter table Paciente add constraint FKPaciente585103 foreign key (cpfusu_cpfusu) references Usuario (cpfusu);
 alter table Medico add constraint FKMedico428695 foreign key (cpfusu_cpfusu) references Usuario (cpfusu);
-alter table Endereco add constraint FKEndereco640457 foreign key (cnpjemp_cpfusu) references Empresa (cnpjemp);
 alter table Solicitacao add constraint FKSolicitaca988784 foreign key (cpfusu_cpfusu) references Usuario (cpfusu);
 
 
@@ -256,10 +252,8 @@ $body$
 begin
 	return query select u.nomusu, u.sexusu, e.nomemp from usuario u 
 			inner join empresa e on u.cnpjemp_cnpjemp = e.cnpjemp
-			inner join endereco en on en.cpfusu_cpfusu = u.cpfusu
-			inner join cidade c on en.codcid_codcid = c.codcid
 			inner join paciente p on p.cpfusu_cpfusu = u.cpfusu
-			where (p.sitpac = 'ISOLAMENTO' or p.sitpac = 'INTERNADO') and (c.codcid = codigo);
+			where (p.sitpac = 'ISOLAMENTO' or p.sitpac = 'INTERNADO') and (u.codcid_codcid = codigo);
 end
 $body$
 language plpgsql;
@@ -282,8 +276,7 @@ $body$
 begin
 	return query select u.nomusu, u.sexusu, c.nomcid from usuario u 
 			inner join empresa e on u.cnpjemp_cnpjemp = e.cnpjemp
-			inner join endereco en on en.cpfusu_cpfusu = u.cpfusu
-			inner join cidade c on en.codcid_codcid = c.codcid
+			inner join cidade c on u.codcid_codcid = c.codcid
 			inner join paciente p on p.cpfusu_cpfusu = u.cpfusu
 			where (p.sitpac = 'ISOLAMENTO' or p.sitpac = 'INTERNADO') and (e.cnpjemp = cnpj);
 end
@@ -301,9 +294,7 @@ begin
 	select count(*) into conta from vacina v
 	inner join paciente p on p.codpac = v.codpac_codpac
 	inner join usuario u on u.cpfusu = p.cpfusu_cpfusu 
-	inner join endereco en on en.cpfusu_cpfusu = u.cpfusu
-	inner join cidade c on c.codcid = en.codcid_codcid 
-	where ((c.codcid = codigo) and (v.dosvac = '1'));
+	where ((u.codcid_codcid = codigo) and (v.dosvac = '1'));
 return conta; 
 end
 $body$
@@ -320,9 +311,7 @@ begin
 	select count(*) into conta from vacina v
 	inner join paciente p on p.codpac = v.codpac_codpac
 	inner join usuario u on u.cpfusu = p.cpfusu_cpfusu 
-	inner join endereco en on en.cpfusu_cpfusu = u.cpfusu
-	inner join cidade c on c.codcid = en.codcid_codcid 
-	where ((c.codcid = codigo) and (v.dosvac = '2'));
+	where ((u.codcid_codcid = codigo) and (v.dosvac = '2'));
 return conta; 
 end
 $body$
@@ -431,7 +420,7 @@ create group g_usuario;
 
 --Grant usuarios
 grant select, insert, update, delete
-on usuario, endereco
+on usuario
 to g_usuario;
 
 grant select
@@ -610,8 +599,7 @@ order by p.codpac desc;
 create view vw_select2 as
 select u.nomusu, c.nomcid from paciente p 
 inner join usuario u on u.cpfusu = p.cpfusu_cpfusu 
-inner join endereco e on e.cpfusu_cpfusu = u.cpfusu
-inner join cidade c on c.codcid = e.codcid_codcid 
+inner join cidade c on c.codcid = u.codcid_codcid 
 inner join teste_covid tc on tc.codpac_codpac = p.codpac 
 inner join monitoramento_paciente mp on mp.codpac_codpac = p.codpac 
 where (tc.covpactes = 'N') and (mp.codsin_codsin not null) and (u.sexusu = 'M') and (c.nomcid in('Maravilha', 'Descanso', 'Pinhalzinho', 'Chapecó', 'Itapiranga'))
@@ -620,8 +608,7 @@ order by c.nomcid desc, u.nomusu;
 
 create view vw_select3 as 
 select c.codcid, c.nomcid, count(distinct(mp.codpac_codpac)) as conta from cidade c 
-left join endereco e on e.codcid_codcid = c.codcid 
-left join usuario u on u.cpfusu = e.cpfusu_cpfusu 
+left join usuario u on c.codcid = u.codcid_codcid 
 left join paciente p on p.cpfusu_cpfusu = u.cpfusu 
 left join monitoramento_paciente mp on mp.codpac_codpac = p.codpac 
 group by c.codcid

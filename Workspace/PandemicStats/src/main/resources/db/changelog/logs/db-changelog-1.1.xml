@@ -22,11 +22,9 @@
 			$body$
 			begin
 				return query select u.nomusu, u.sexusu, e.nomemp from usuario u 
-						inner join empresa e on u.cnpjemp = e.cnpjemp
-						inner join endereco en on en.cpfusu = u.cpfusu
-						inner join cidade c on en.codcid = c.codcid
-						inner join paciente p on p.cpfusu = u.cpfusu
-						where (p.sitpac = 'ISOLAMENTO' or p.sitpac = 'INTERNADO') and (c.codcid = codigo);
+						inner join empresa e on u.cnpjemp_cnpjemp = e.cnpjemp
+						inner join paciente p on p.cpfusu_cpfusu = u.cpfusu
+						where (p.sitpac = 'ISOLAMENTO' or p.sitpac = 'INTERNADO') and (u.codcid_codcid = codigo);
 			end
 			$body$
 			language plpgsql;@
@@ -48,10 +46,9 @@
 			$body$
 			begin
 				return query select u.nomusu, u.sexusu, c.nomcid from usuario u 
-						inner join empresa e on u.cnpjemp = e.cnpjemp
-						inner join endereco en on en.cpfusu = u.cpfusu
-						inner join cidade c on en.codcid = c.codcid
-						inner join paciente p on p.cpfusu = u.cpfusu
+						inner join empresa e on u.cnpjemp_cnpjemp = e.cnpjemp
+						inner join cidade c on u.codcid_codcid = c.codcid
+						inner join paciente p on p.cpfusu_cpfusu = u.cpfusu
 						where (p.sitpac = 'ISOLAMENTO' or p.sitpac = 'INTERNADO') and (e.cnpjemp = cnpj);
 			end
 			$body$
@@ -66,11 +63,9 @@
 				conta NUMERIC := 0;
 			begin
 				select count(*) into conta from vacina v
-				inner join paciente p on p.codpac = v.codpac
-				inner join usuario u on u.cpfusu = p.cpfusu
-				inner join endereco en on en.cpfusu = u.cpfusu
-				inner join cidade c on c.codcid = en.codcid
-				where ((c.codcid = codigo) and (v.dosvac = '1'));
+				inner join paciente p on p.codpac = v.codpac_codpac
+				inner join usuario u on u.cpfusu = p.cpfusu_cpfusu
+				where ((u.codcid_codcid = codigo) and (v.dosvac = '1'));
 			return conta; 
 			end
 			$body$
@@ -85,11 +80,9 @@
 				conta NUMERIC := 0;
 			begin
 				select count(*) into conta from vacina v
-				inner join paciente p on p.codpac = v.codpac
-				inner join usuario u on u.cpfusu = p.cpfusu
-				inner join endereco en on en.cpfusu = u.cpfusu
-				inner join cidade c on c.codcid = en.codcid
-				where ((c.codcid = codigo) and (v.dosvac = '2'));
+				inner join paciente p on p.codpac = v.codpac_codpac
+				inner join usuario u on u.cpfusu = p.cpfusu_cpfusu
+				where ((u.codcid_codcid = codigo) and (v.dosvac = '2'));
 			return conta; 
 			end
 			$body$
@@ -102,7 +95,7 @@
 			$body$
 			begin
 				if (new.dosvac &gt; 2) or (new.dosvac &lt; 1) then
-					raise exception 'Dose invalida';
+					raise exception 'Dose inválida';
 				end if;
 				return new;		
 			end
@@ -123,7 +116,7 @@
 			$body$
 			begin
 				if (new.datvac &gt; (current_date)) then
-					raise exception 'Data invalida';
+					raise exception 'Data inválida';
 				end if;
 				return new;		
 			end
@@ -198,7 +191,7 @@
 			
 			<!--Grant usuarios-->
 			grant select, insert, update, delete
-			on usuario, endereco
+			on usuario
 			to g_usuario;@
 			
 			grant select
@@ -378,8 +371,7 @@
 			create view vw_select2 as
 			select u.nomusu, c.nomcid from paciente p 
 			inner join usuario u on u.cpfusu = p.cpfusu_cpfusu 
-			inner join endereco e on e.cpfusu_cpfusu = u.cpfusu
-			inner join cidade c on c.codcid = e.codcid_codcid 
+			inner join cidade c on c.codcid = u.codcid_codcid 
 			inner join teste_covid tc on tc.codpac_codpac = p.codpac 
 			inner join monitoramento_paciente mp on mp.codpac_codpac = p.codpac 
 			where (tc.covpactes = 'N') and (mp.codsin_codsin not null) and (u.sexusu = 'M') and (c.nomcid in('Maravilha', 'Descanso', 'Pinhalzinho', 'Chapecó', 'Itapiranga'))
@@ -388,8 +380,7 @@
 			
 			create view vw_select3 as 
 			select c.codcid, c.nomcid, count(distinct(mp.codpac_codpac)) as conta from cidade c 
-			left join endereco e on e.codcid_codcid = c.codcid 
-			left join usuario u on u.cpfusu = e.cpfusu_cpfusu 
+			left join usuario u on c.codcid = u.codcid_codcid 
 			left join paciente p on p.cpfusu_cpfusu = u.cpfusu 
 			left join monitoramento_paciente mp on mp.codpac_codpac = p.codpac 
 			group by c.codcid
