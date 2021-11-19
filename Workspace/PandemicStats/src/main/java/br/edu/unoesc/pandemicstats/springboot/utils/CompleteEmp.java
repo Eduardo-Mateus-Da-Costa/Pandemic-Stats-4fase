@@ -48,5 +48,21 @@ public class CompleteEmp{
 		{
 			obtido.setCpfusu(inserido.getCpfusu());
 		}
+		if(obtido.getCep() != 0)
+		{
+			inserido.setCep(obtido.getCep());
+		}
+		if(obtido.getCodcid() != null)
+		{
+			inserido.setCodcid(obtido.getCodcid());
+		}
+		if(obtido.getNum() != null)
+		{
+			inserido.setNum(obtido.getNum());
+		}
+		if(obtido.getRua() != null)
+		{
+			inserido.setRua(obtido.getRua());
+		}
 	}
 }

@@ -8,6 +8,7 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
 
 import org.hibernate.annotations.ColumnDefault;
 
@@ -51,6 +52,15 @@ public class Usuario implements Serializable{
 	@Column(columnDefinition = "VARCHAR(30)", nullable = false, unique = true)
 	private String emausu;
 	
+	@Column(columnDefinition = "NUMERIC(8,0)", nullable=false)
+	private long cep;
+	
+	@Column(columnDefinition = "VARCHAR(60)", nullable=false)
+	private String rua;
+	
+	@Column(columnDefinition = "VARCHAR(10)", nullable=false)
+	private String num;
+	
 	@Column(columnDefinition = "DATE", insertable=false, nullable=false)
 	@ColumnDefault(value="CURRENT_DATE")
 	@JsonFormat(pattern="yyyy-mm-dd")
@@ -60,4 +70,7 @@ public class Usuario implements Serializable{
 	@JoinColumn(columnDefinition = "NUMERIC(14, 0)", nullable = true)
 	private Empresa cnpjemp;
 	
+	@OneToOne
+	@JoinColumn(columnDefinition = "NUMERIC(10,0", nullable=false)
+	private Cidade codcid;
 }

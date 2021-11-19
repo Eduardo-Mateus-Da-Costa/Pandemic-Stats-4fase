@@ -18,11 +18,9 @@
 			COMMENT ON COLUMN empresa.emaemp IS 'Email da empresa';
 			COMMENT ON COLUMN empresa.ramemp IS 'Ramo da empresa';
 			COMMENT ON COLUMN empresa.valemp IS 'Data de inserção da empresa no sistema';
-			
-			COMMENT ON COLUMN endereco.codend IS 'Código do endereço';
-			COMMENT ON COLUMN endereco.cep IS 'Número do CEP.';
-			COMMENT ON COLUMN endereco.rua IS 'Nome da rua.';
-			COMMENT ON COLUMN endereco.num IS 'Número da casa/prédio';
+			COMMENT ON COLUMN empresa.cep IS 'Número do CEP.';
+			COMMENT ON COLUMN empresa.rua IS 'Nome da rua.';
+			COMMENT ON COLUMN empresa.num IS 'Número da casa/prédio';
 			
 			COMMENT ON COLUMN estado.codest IS 'Código do estado';
 			COMMENT ON COLUMN estado.nomest IS 'Nome do estado';
@@ -74,6 +72,9 @@
 			COMMENT ON COLUMN usuario.telusu IS 'Telefone do usuario.';
 			COMMENT ON COLUMN usuario.emausu IS 'Email do usuario';
 			COMMENT ON COLUMN usuario.valusu IS 'Data de cadastro do usuário no sistema';
+			COMMENT ON COLUMN usuario.cep IS 'Número do CEP.';
+			COMMENT ON COLUMN usuario.rua IS 'Nome da rua.';
+			COMMENT ON COLUMN usuario.num IS 'Número da casa/prédio';
 			
 			COMMENT ON COLUMN vacina.codvac IS 'Chave primária da tabela vacina';
 			COMMENT ON COLUMN vacina.datvac IS 'Data da vacinação';

@@ -41,8 +41,6 @@ public class GreetingsController {
 	@Autowired
 	EmpresaRepository empRep;
 	@Autowired
-	EnderecoRepository endRep;
-	@Autowired
 	EstadoRepository estRep;
 	@Autowired
 	MedicoRepository medRep;
@@ -146,7 +144,6 @@ public class GreetingsController {
 	 * @see Usuario
 	 * @see UsuarioRepository
 	 * @see EmpresaRepository
-	 * @see EnderecoRepository
 	 */
 	@DeleteMapping(value = "deleteUsu")
 	@ResponseBody
@@ -157,11 +154,7 @@ public class GreetingsController {
 			if (empresa != null) {
 				usuRep.setCnpjempNull(empresa.getCnpjemp());
 			}
-
-			Endereco endereco = endRep.findByCPF(requsu.getCpfusu());
-			if (endereco != null) {
-				endRep.deleteById(endereco.getCodend());
-			}
+			
 			Usuario usuario = usuRep.findByCPF(requsu.getCpfusu());
 			usuRep.dropUser(usuario.getEmausu());
 			usuRep.deleteByCPF(requsu.getCpfusu());
@@ -338,63 +331,6 @@ public class GreetingsController {
 		showemp.Convert(empresa);
 		return new ResponseEntity<ShowEmpSCH>(showemp, HttpStatus.OK);
 	}
-
-	/**
-	 * @param Endereco endend
-	 * @return RespEnd
-	 * @see RespEnd
-	 * @see Endereco
-	 * @see EnderecoRepository
-	 * @see Empresa
-	 * @see CompleteEnd
-	 * @see Usuario
-	 */
-	@PostMapping(value = "postORpatchEnd")
-	@ResponseBody
-	public ResponseEntity<RespEnd> postORpatchEnd(@RequestBody Endereco endend) {
-		Endereco endereco = new Endereco();
-		Usuario utmp = endend.getCpfusu();
-		Empresa etmp = endend.getCnpjemp();
-		if ((utmp != null) || (etmp != null)) {
-			if (utmp != null) {
-				endereco = endRep.findByCPF(utmp.getCpfusu());
-			} else {
-				endereco = endRep.findByCNPJ(etmp.getCnpjemp());
-			}
-			CompleteEnd.complete(endend, endereco);
-			endRep.save(endereco);
-			RespEnd respend = new RespEnd();
-			respend.RespValEnd(endereco, 0);
-			return new ResponseEntity<RespEnd>(respend, HttpStatus.CREATED);
-		} else {
-			RespEnd respend = new RespEnd();
-			respend.RespValEnd(null, 500);
-			return new ResponseEntity<RespEnd>(respend, HttpStatus.BAD_REQUEST);
-		}
-	}
-
-	/**
-	 * @param ReqEndSCH reqend
-	 * @return ShowEndSCH
-	 * @see ReqEndSCH
-	 * @see ShowEndSCH
-	 * @see Endereco
-	 * @see EnderecoRepository
-	 */
-	@PostMapping(value = "getEnd")
-	@ResponseBody
-	public ResponseEntity<ShowEndSCH> getEnd(@RequestBody ReqEndSCH reqend) {
-		Endereco endereco = new Endereco();
-		if (reqend.getCpfusu() != 0) {
-			endereco = endRep.findByCPF(reqend.getCpfusu());
-		} else {
-			endereco = endRep.findByCNPJ(reqend.getCnpjemp());
-		}
-		ShowEndSCH showend = new ShowEndSCH();
-		showend.Convert(endereco);
-		return new ResponseEntity<ShowEndSCH>(showend, HttpStatus.OK);
-	}
-
 	/**
 	 * @param Medico medmed
 	 * @return RespMed
