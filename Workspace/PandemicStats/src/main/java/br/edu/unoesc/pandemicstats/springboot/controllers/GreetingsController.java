@@ -671,7 +671,7 @@ public class GreetingsController {
 			return new ResponseEntity<String>("Solicitacao vazia", HttpStatus.BAD_REQUEST);
 		} else {
 			solRep.save(solicitacao);
-			return new ResponseEntity<String>("Salva", HttpStatus.BAD_REQUEST);
+			return new ResponseEntity<String>("Salva", HttpStatus.OK);
 		}
 	}
 
