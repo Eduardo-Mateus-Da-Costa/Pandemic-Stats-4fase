@@ -16,37 +16,37 @@ public class CompleteEmp{
 	 */
 	public static void complete(Empresa obtido, Empresa inserido)
 	{
-		if(obtido.getNomemp() == null)
+		if(obtido.getNomemp() != null)
 		{
-			obtido.setNomemp(inserido.getNomemp());
+			inserido.setNomemp(obtido.getNomemp());
 		}
-		if(obtido.getNomfanemp() == null)
+		if(obtido.getNomfanemp() != null)
 		{
-			obtido.setNomfanemp(inserido.getNomfanemp());
+			inserido.setNomfanemp(obtido.getNomfanemp());
 		}
-		if(obtido.getTelemp1() == null)
+		if(obtido.getTelemp1() != null)
 		{
-			obtido.setTelemp1(inserido.getTelemp1());
+			inserido.setTelemp1(obtido.getTelemp1());
 		}
-		if(obtido.getEmaemp() == null)
+		if(obtido.getEmaemp() != null)
 		{
-			obtido.setEmaemp(inserido.getEmaemp());
+			inserido.setEmaemp(obtido.getEmaemp());
 		}
-		if(obtido.getTelemp2() == null)
+		if(obtido.getTelemp2() != null)
 		{
-			obtido.setTelemp2(inserido.getTelemp2());
+			inserido.setTelemp2(obtido.getTelemp2());
 		}
-		if(obtido.getRamemp() == null)
+		if(obtido.getRamemp() != null)
 		{
-			obtido.setRamemp(inserido.getRamemp());
+			inserido.setRamemp(obtido.getRamemp());
 		}
-		if(obtido.getValemp() == null)
+		if(obtido.getValemp() != null)
 		{
-			obtido.setValemp(inserido.getValemp());
+			inserido.setValemp(obtido.getValemp());
 		}
-		if(obtido.getCpfusu() == null)
+		if(obtido.getCpfusu() != null)
 		{
-			obtido.setCpfusu(inserido.getCpfusu());
+			inserido.setCpfusu(obtido.getCpfusu());
 		}
 		if(obtido.getCep() != 0)
 		{

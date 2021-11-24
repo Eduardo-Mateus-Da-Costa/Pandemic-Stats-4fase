@@ -281,7 +281,7 @@
 						  (25, 'Sergipe', 33),
 						  (26,'São Paulo', 33),
 						  (27, 'Tocantins', 33),
-						  (28, 'Outro');
+						  (28, 'Outro', 33);
 						  
 					insert into cidade(codcid, nomcid, codest_codest) values
 						  (1,'São José do Cedro', 24),  
@@ -294,7 +294,7 @@
 						  (8, 'Chapecó', 24),
 						  (9, 'Lages', 24),
 						  (10, 'Balneário Camboriú', 24),
-						  (11, 'Outro');	 
+						  (11, 'Outro', 24);	 
 						  
 						  
 					insert into sintoma(codsin, nomsin) values

@@ -233,6 +233,97 @@ alter table Medico add constraint FKMedico428695 foreign key (cpfusu_cpfusu) ref
 alter table Solicitacao add constraint FKSolicitaca988784 foreign key (cpfusu_cpfusu) references Usuario (cpfusu);
 
 
+--CRIAÇÃO DAS SEQUENCIAS PARA AS TABELAS
+
+create sequence public.seq_cidade
+	increment by 1
+	minvalue 1
+	maxvalue 9223372036854775807
+	start 1
+	cache 1
+	no cycle;
+
+
+create sequence public.seq_comorbidade
+	increment by 1
+	minvalue 1
+	maxvalue 9223372036854775807
+	start 1
+	cache 1
+	no cycle;
+
+create sequence public.seq_estado
+	increment by 1
+	minvalue 1
+	maxvalue 9223372036854775807
+	start 1
+	cache 1
+	no cycle;
+
+create sequence public.seq_monitoramento_paciente
+	increment by 1
+	minvalue 1
+	maxvalue 9223372036854775807
+	start 1
+	cache 1
+	no cycle;
+
+create sequence public.seq_paciente
+	increment by 1
+	minvalue 1
+	maxvalue 9223372036854775807
+	start 1
+	cache 1
+	no cycle;
+
+create sequence public.seq_paciente_comorbidade
+	increment by 1
+	minvalue 1
+	maxvalue 9223372036854775807
+	start 1
+	cache 1
+	no cycle;
+
+create sequence public.seq_pais
+	increment by 1
+	minvalue 1
+	maxvalue 9223372036854775807
+	start 1
+	cache 1
+	no cycle;
+
+create sequence public.seq_sintoma
+	increment by 1
+	minvalue 1
+	maxvalue 9223372036854775807
+	start 1
+	cache 1
+	no cycle;
+
+create sequence public.seq_solicitacao
+	increment by 1
+	minvalue 1
+	maxvalue 9223372036854775807
+	start 1
+	cache 1
+	no cycle;
+
+create sequence public.seq_teste_covid
+	increment by 1
+	minvalue 1
+	maxvalue 9223372036854775807
+	start 1
+	cache 1
+	no cycle;
+
+create sequence public.seq_vacina
+	increment by 1
+	minvalue 1
+	maxvalue 9223372036854775807
+	start 1
+	cache 1
+	no cycle;
+
 --CRIAÇÃO DAS FUNÇÕES, VIEWS E TRIGGERS
 
 
@@ -451,7 +542,7 @@ to g_paciente;
 
 --Grant medicos
 grant select
-on vacina, pacientes, teste_covid, sintoma, empresa, monitoramento_paciente, paciente_comorbidade
+on vacina, paciente, teste_covid, sintoma, empresa, monitoramento_paciente, paciente_comorbidade
 to g_medico;
 
 grant insert 

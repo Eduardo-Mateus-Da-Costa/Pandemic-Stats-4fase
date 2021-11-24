@@ -10,6 +10,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.SequenceGenerator;
 
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.OnDelete;
@@ -24,9 +25,10 @@ import lombok.Data;
  * @author Eduardo Mateus Da Costa
  * @since 30/10/2021
  * @version 1.4
- * 
+ * @see lombok.Data
  */
 
+@SequenceGenerator(name = "seq_teste_covid", sequenceName = "seq_teste_covid", allocationSize = 1, initialValue = 1)
 @org.hibernate.annotations.Table(comment = "Tabela de testes de covid", appliesTo = "teste_covid")
 @Entity
 @Data
@@ -34,7 +36,7 @@ public class TesteCovid implements Serializable{
 	private static final long serialVersionUID = 1L;
 	
 	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "seq_teste_covid")
 	@Column(columnDefinition = "NUMERIC(10, 0)", insertable=false)
 	private long codtes;
 	

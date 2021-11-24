@@ -10,6 +10,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.SequenceGenerator;
 
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.OnDelete;
@@ -24,9 +25,10 @@ import lombok.Data;
  * @author Eduardo Mateus Da Costa
  * @since 30/10/2021
  * @version 1.3
- * 
+ * @see lombok.Data
  */
 
+@SequenceGenerator(name = "seq_monitoramento_paciente", sequenceName = "seq_monitoramento_paciente", allocationSize = 1, initialValue = 1)
 @org.hibernate.annotations.Table(comment = "Tabela de vinculação monitoramento pacientes", appliesTo = "monitoramento_paciente")
 @Entity
 @Data
@@ -34,7 +36,7 @@ public class MonitoramentoPaciente implements Serializable{
 	private static final long serialVersionUID = 1L;
 	
 	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "seq_monitoramento_paciente")
 	@Column(columnDefinition = "NUMERIC(10, 0)", insertable = false)
 	private long codmon;
 	

@@ -21,7 +21,7 @@ import lombok.Data;
  * @author Eduardo Mateus Da Costa
  * @since 30/10/2021
  * @version 2.0
- * 
+ * @see lombok.Data
  */
 
 @org.hibernate.annotations.Table(comment = "Tabela de empresas", appliesTo = "empresa")

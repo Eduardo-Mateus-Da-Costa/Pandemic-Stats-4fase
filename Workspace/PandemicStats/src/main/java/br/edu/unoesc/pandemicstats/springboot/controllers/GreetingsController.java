@@ -24,7 +24,7 @@ import br.edu.unoesc.pandemicstats.springboot.utils.*;
 /**
  * @author Eduardo Mateus Da Costa
  * @since 30/10/2021
- * @version 7.8
+ * @version 8.0
  * @see br.edu.unoesc.pandemicstats.springboot.model
  * @see br.edu.unoesc.pandemicstats.springboot.repository
  * @see br.edu.unoesc.pandemicstats.springboot.responses
@@ -72,7 +72,7 @@ public class GreetingsController {
 	 * @see PermisSCH
 	 * @see UsuarioRepository
 	 */
-	@RequestMapping(value="/postusu")
+	@RequestMapping(value="postUsu")
 	@ResponseBody
 	public ResponseEntity<RespUsu> postUsu(@RequestBody Usuario usuusu) {
 		try {
@@ -122,11 +122,11 @@ public class GreetingsController {
 				usuRep.alterUserPassword(usuario.getEmausu(), usuusu.getSenusu());
 			}
 			CompleteUsu.complete(usuusu, usuario);
-			usuRep.save(usuusu);
+			usuRep.save(usuario);
 			
-			PermisSCH permissoes = getPermis(usuusu.getCpfusu());
+			PermisSCH permissoes = getPermis(usuario.getCpfusu());
 			RespUsu respusu = new RespUsu();
-			respusu.RespValUsu(usuusu, 0, permissoes);
+			respusu.RespValUsu(usuario, 0, permissoes);
 			return new ResponseEntity<RespUsu>(respusu, HttpStatus.OK);
 		} catch (Exception e) {
 			RespUsu respusu = new RespUsu();
@@ -192,7 +192,7 @@ public class GreetingsController {
 	 * @see RespUsu
 	 * @see UsuarioRepository
 	 */
-	@PostMapping(value = "/login")
+	@PostMapping(value = "postLogin")
 	@ResponseBody
 	public ResponseEntity<RespUsu> login(@RequestBody ReqLoginSCH reqlogin) {
 		Usuario usuario = new Usuario();
@@ -277,9 +277,9 @@ public class GreetingsController {
 				empRep.grantDBEmpresa(usuario2.getEmausu());
 			}
 			CompleteEmp.complete(empemp, empresa);
-			empRep.save(empemp);
+			empRep.save(empresa);
 			RespEmp respemp = new RespEmp();
-			respemp.RespValEmp(empemp, 0);
+			respemp.RespValEmp(empresa, 0);
 			return new ResponseEntity<RespEmp>(respemp, HttpStatus.OK);
 		} catch (Exception e) {
 			RespEmp respemp = new RespEmp();
@@ -323,7 +323,7 @@ public class GreetingsController {
 	 * @see Empresa
 	 * @see EmpresaRepository
 	 */
-	@GetMapping(value = "getEmp")
+	@PostMapping(value = "getEmp")
 	@ResponseBody
 	public ResponseEntity<ShowEmpSCH> getEmp(@RequestBody ReqEmpSCH reqemp) {
 		Empresa empresa = empRep.findByCnpjemp(reqemp.getCnpjemp());
@@ -594,9 +594,9 @@ public class GreetingsController {
 							return new ResponseEntity<RespPac>(resppac, HttpStatus.OK);
 						} else {
 							CompletePac.complete(pacpac, paciente);
-							pacRep.save(pacpac);
+							pacRep.save(paciente);
 							RespPac resppac = new RespPac();
-							resppac.RespValPac(pacpac, 0);
+							resppac.RespValPac(paciente, 0);
 							return new ResponseEntity<RespPac>(resppac, HttpStatus.OK);
 						}
 					}
@@ -709,7 +709,7 @@ public class GreetingsController {
 	 * @see TesteCovid
 	 * @see java.util.List
 	 */
-	@PostMapping(value = "getTests")
+	@GetMapping(value = "getTests")
 	@ResponseBody
 	public ResponseEntity<List<ShowTesCovSCH>> getTests(@RequestBody ReqTesCovSCH reqteste)
 	{
@@ -794,7 +794,7 @@ public class GreetingsController {
 	 * @see ShowVacSCH
 	 * @see java.util.List
 	 */
-	@PostMapping(value = "getVacs")
+	@GetMapping(value = "getVacs")
 	@ResponseBody
 	public ResponseEntity<List<ShowVacSCH>> getVacs(@RequestBody ReqVacSCH reqvac)
 	{

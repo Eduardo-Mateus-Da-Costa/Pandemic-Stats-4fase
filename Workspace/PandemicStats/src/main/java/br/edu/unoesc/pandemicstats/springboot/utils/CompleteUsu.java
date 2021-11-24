@@ -16,37 +16,37 @@ public class CompleteUsu {
 	 */
 	public static void complete(Usuario obtido, Usuario inserido)
 	{
-		if(obtido.getCnpjemp() == null)
+		if(obtido.getCnpjemp() != null)
 		{
-			obtido.setCnpjemp(inserido.getCnpjemp());
+			inserido.setCnpjemp(obtido.getCnpjemp());
 		}
-		if(obtido.getNomusu() == null)
+		if(obtido.getNomusu() != null)
 		{
-			obtido.setNomusu(inserido.getNomusu());
+			inserido.setNomusu(obtido.getNomusu());
 		}
-		if(obtido.getSenusu() == null)
+		if(obtido.getSenusu() != null)
 		{
-			obtido.setSenusu(inserido.getSenusu());
+			inserido.setSenusu(obtido.getSenusu());
 		}
-		if(obtido.getDatnasusu() == null)
+		if(obtido.getDatnasusu() != null)
 		{
-			obtido.setDatnasusu(inserido.getDatnasusu());
+			inserido.setDatnasusu(obtido.getDatnasusu());
 		}
-		if(obtido.getSexusu() == ' ')
+		if(obtido.getSexusu() != ' ')
 		{
-			obtido.setSexusu(inserido.getSexusu());
+			inserido.setSexusu(obtido.getSexusu());
 		}
-		if(obtido.getTelusu() == null)
+		if(obtido.getTelusu() != null)
 		{
-			obtido.setTelusu(inserido.getTelusu());
+			inserido.setTelusu(obtido.getTelusu());
 		}
-		if(obtido.getEmausu() == null)
+		if(obtido.getEmausu() != null)
 		{
-			obtido.setEmausu(inserido.getEmausu());
+			inserido.setEmausu(obtido.getEmausu());
 		}
-		if(obtido.getValusu() == null)
+		if(obtido.getValusu() != null)
 		{
-			obtido.setValusu(inserido.getValusu());
+			inserido.setValusu(obtido.getValusu());
 		}
 		if(obtido.getCep() != 0)
 		{

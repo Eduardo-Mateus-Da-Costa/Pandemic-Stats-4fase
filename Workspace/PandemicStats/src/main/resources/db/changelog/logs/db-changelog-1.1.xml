@@ -222,7 +222,7 @@
 			
 			<!--Grant medicos-->
 			grant select
-			on vacina, pacientes, teste_covid, sintoma, empresa, monitoramento_paciente, paciente_comorbidade
+			on vacina, paciente, teste_covid, sintoma, empresa, monitoramento_paciente, paciente_comorbidade
 			to g_medico;@
 			
 			grant insert 
@@ -374,7 +374,7 @@
 			inner join cidade c on c.codcid = u.codcid_codcid 
 			inner join teste_covid tc on tc.codpac_codpac = p.codpac 
 			inner join monitoramento_paciente mp on mp.codpac_codpac = p.codpac 
-			where (tc.covpactes = 'N') and (mp.codsin_codsin not null) and (u.sexusu = 'M') and (c.nomcid in('Maravilha', 'Descanso', 'Pinhalzinho', 'Chapecó', 'Itapiranga'))
+			where (tc.covpactes = 'N') and (mp.codsin_codsin notnull) and (u.sexusu = 'M') and (c.nomcid in('Maravilha', 'Descanso', 'Pinhalzinho', 'Chapecó', 'Itapiranga'))
 			order by c.nomcid desc, u.nomusu;@
 			
 			

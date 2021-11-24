@@ -20,7 +20,7 @@ import lombok.Data;
  * @author Eduardo Mateus Da Costa
  * @since 30/10/2021
  * @version 2.5
- * 
+ * @see lombok.Data
  */
 
 @org.hibernate.annotations.Table(comment = "Tabela de usuarios", appliesTo = "usuario")

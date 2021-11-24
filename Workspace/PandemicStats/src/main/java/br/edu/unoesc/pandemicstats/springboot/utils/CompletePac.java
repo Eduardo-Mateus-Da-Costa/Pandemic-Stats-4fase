@@ -15,21 +15,21 @@ public class CompletePac {
 	 */
 	public static void complete(Paciente obtido, Paciente inserido)
 	{
-		if(obtido.getCpfusu() == null)
+		if(obtido.getCpfusu() != null)
 		{
-			obtido.setCpfusu(inserido.getCpfusu());
+			inserido.setCpfusu(obtido.getCpfusu());
 		}
-		if(obtido.getGrurispac() == ' ')
+		if(obtido.getGrurispac() != ' ')
 		{
-			obtido.setGrurispac(inserido.getGrurispac());
+			inserido.setGrurispac(obtido.getGrurispac());
 		}
-		if(obtido.getPespac() == 0)
+		if(obtido.getPespac() != 0)
 		{
-			obtido.setPespac(inserido.getPespac());
+			inserido.setPespac(obtido.getPespac());
 		}
-		if(obtido.getSitpac() == null)
+		if(obtido.getSitpac() != null)
 		{
-			obtido.setSitpac(inserido.getSitpac());
+			inserido.setSitpac(obtido.getSitpac());
 		}
 	}
 }
