@@ -11,5 +11,4 @@ import lombok.Data;
 @Data
 public class ReqMedSCH {
 	private String crmmed;
-	private long cpfusu;
 }

@@ -34,4 +34,7 @@ public interface PacienteRepository extends JpaRepository<Paciente, Long> {
 	@Modifying(clearAutomatically = true)
 	@Query(nativeQuery = true, value ="call grant_paciente(:usuario)")
 	void grantDBPaciente(@Param("usuario") String usuario);
+	
+	@Query(value = "select p from Paciente p where p.codpac = ?1")
+	Paciente findByCodpac(long codpac);
 }

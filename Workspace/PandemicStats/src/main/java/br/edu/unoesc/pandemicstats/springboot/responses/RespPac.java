@@ -43,6 +43,11 @@ public class RespPac {
 			this.codstatus = codstatus;
 			this.erro = "Peso inválido";
 		}
+		else if (codstatus == 506)
+		{
+			this.codstatus = codstatus;
+			this.erro = "Usuário não cadastrado";
+		}
 		else
 		{
 			this.codstatus = 200;

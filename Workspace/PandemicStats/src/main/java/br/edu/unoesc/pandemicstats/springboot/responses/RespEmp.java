@@ -33,6 +33,11 @@ public class RespEmp{
 			this.codstatus = codstatus;
 			this.erro = "CNPJs iguais";
 		}
+		else if(codstatus==506)
+		{
+			this.codstatus = codstatus;
+			this.erro = "Usuário não cadastrado";
+		}
 		else
 		{
 			this.codstatus = 200;

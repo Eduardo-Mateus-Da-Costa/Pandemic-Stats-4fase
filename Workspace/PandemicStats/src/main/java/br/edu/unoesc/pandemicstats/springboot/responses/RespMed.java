@@ -28,6 +28,11 @@ public class RespMed{
 			this.codstatus = codstatus;
 			this.erro = "CRM já em uso";
 		}
+		if(codstatus==506)
+		{
+			this.codstatus = codstatus;
+			this.erro = "Usuário não cadastrado";
+		}
 		else
 		{
 			this.codstatus = codstatus;

@@ -47,6 +47,11 @@ public class RespUsu{
 			this.codstatus = codstatus;
 			this.erro = "Email não encontrado";
 		}
+		else if(codstatus==506)
+		{
+			this.codstatus = codstatus;
+			this.erro = "Usuario não cadastrado";
+		}
 		else
 		{
 			this.codstatus = 200;

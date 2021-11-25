@@ -10,6 +10,5 @@ import lombok.Data;
  */
 @Data
 public class ReqMonPacSCH {
-	private long codmon;
 	private long codpac;
 }

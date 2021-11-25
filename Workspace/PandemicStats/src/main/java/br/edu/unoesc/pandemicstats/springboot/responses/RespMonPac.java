@@ -33,6 +33,11 @@ public class RespMonPac {
 			this.codstatus = codstatus;
 			this.erro = "Intensidade de sintoma invalido";
 		}
+		else if (codstatus == 506)
+		{
+			this.codstatus = codstatus;
+			this.erro = "Pacinete não encontrado";
+		}
 		else
 		{
 			this.codstatus = 200;

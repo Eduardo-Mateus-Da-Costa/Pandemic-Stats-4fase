@@ -11,5 +11,4 @@ import lombok.Data;
 @Data
 public class ReqEmpSCH {
 	private long cnpjemp;
-	private long cpfusu;
 }

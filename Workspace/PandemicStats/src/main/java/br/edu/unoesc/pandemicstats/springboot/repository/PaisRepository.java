@@ -1,6 +1,7 @@
 package br.edu.unoesc.pandemicstats.springboot.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import br.edu.unoesc.pandemicstats.springboot.model.Pais;
@@ -15,4 +16,6 @@ import br.edu.unoesc.pandemicstats.springboot.model.Pais;
 @Repository
 public interface PaisRepository extends JpaRepository<Pais, Long> {
 
+	@Query(value = "select p from Pais p where p.codpai = ?1")
+	Pais findByCodpai(long codpai);
 }
