@@ -63,6 +63,9 @@ public class GreetingsController {
 	@Autowired
 	SolicitacaoRepository solRep;
 	
+	@Autowired
+	EmailSender emaSend;
+	
 	
 	/**
 	 * @param Usuario usuusu
@@ -84,6 +87,7 @@ public class GreetingsController {
 				return new ResponseEntity<RespUsu>(respusu, HttpStatus.CONFLICT);
 			} else {
 				usuRep.save(usuusu);
+				emaSend.Enviar(usuusu.getEmausu(), "Seja bem vindo ao PandemicStats", "Seja bem vindo ao PandemicStats"); 
 				usuRep.createDBUser(usuusu.getEmausu(), usuusu.getSenusu());
 				usuRep.grantDBUser(usuusu.getEmausu());
 				usuario = usuRep.findByCPF(usuusu.getCpfusu());
@@ -287,7 +291,7 @@ public class GreetingsController {
 		try {
 			Empresa empresa = empRep.findByCnpjemp(empemp.getCnpjemp());
 			Usuario usuario1 = empresa.getCpfusu();
-			Usuario usuario2 = empemp.getCpfusu();
+			Usuario usuario2 = empemp.getCpfusu(); //Adicionar verificação do novo dono
 			if(usuario1.getCpfusu() != usuario2.getCpfusu())
 			{
 				Empresa emp = empRep.findByCpfusu(usuario1.getCpfusu());
@@ -498,20 +502,6 @@ public class GreetingsController {
 	}
 
 	/**
-	 * @param ReqComSCH reqcom
-	 * @return Comorbidade
-	 * @see Comorbidade
-	 * @see ReqComSCH
-	 * @see ComorbidadeRepository
-	 */
-	@PostMapping(value = "getCom")
-	@ResponseBody
-	public ResponseEntity<Comorbidade> getCom(@RequestBody ReqComSCH reqcom) {
-		Comorbidade comorbidade = comRep.findByCodcom(reqcom.getCodcom());
-		return new ResponseEntity<Comorbidade>(comorbidade, HttpStatus.OK);
-	}
-
-	/**
 	 * @return List<Comorbidade>
 	 * @see Comorbidade
 	 * @see ComorbidadeRepository
@@ -524,7 +514,6 @@ public class GreetingsController {
 		return new ResponseEntity<List<Comorbidade>>(comorbidades, HttpStatus.OK);
 	}
 
-//PAREI AQUI
 	/**
 	 * @param ReqEstSCH reqest
 	 * @return ShowEstSCH
