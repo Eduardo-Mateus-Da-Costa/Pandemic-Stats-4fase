@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -20,6 +21,8 @@ import br.edu.unoesc.pandemicstats.springboot.repository.*;
 import br.edu.unoesc.pandemicstats.springboot.responses.*;
 import br.edu.unoesc.pandemicstats.springboot.schemmas.*;
 import br.edu.unoesc.pandemicstats.springboot.utils.*;
+import br.unoesc.pandemicstats.springboot.data.model.TipoCidCov;
+import br.unoesc.pandemicstats.springboot.data.model.TipoEmpCov;
 
 /**
  * @author Eduardo Mateus Da Costa
@@ -961,8 +964,8 @@ public class GreetingsController {
 		{
 			return new ResponseEntity<String>("Cidade não encontrada", HttpStatus.OK);
 		}
-		List<CidadeCovidSCH> lista = medRep.cidadeCovid(reqfunc);
-		return new ResponseEntity<List<CidadeCovidSCH>>(lista, HttpStatus.OK);
+		List<TipoCidCov> lista = CidCov.CidadeCovid(reqfunc);
+		return new ResponseEntity<List<TipoCidCov>>(lista, HttpStatus.OK);
 	}
 	
 	/**
@@ -981,8 +984,8 @@ public class GreetingsController {
 		{
 			return new ResponseEntity<String>("Empresa não encontrada", HttpStatus.OK);
 		}
-		List<EmpresaCovidSCH> lista = medRep.empresaCovid(reqfunc);
-		return new ResponseEntity<List<EmpresaCovidSCH>>(lista, HttpStatus.OK);
+		List<TipoEmpCov> lista = EmpCov.EmpresaCovid(reqfunc);
+		return new ResponseEntity<List<TipoEmpCov>>(lista, HttpStatus.OK);
 	}
 	
 	/**
@@ -992,7 +995,7 @@ public class GreetingsController {
 	 */
 	@GetMapping(value = "medGetPdose")
 	@ResponseBody
-	public ResponseEntity<?> medGetPdose(@RequestBody long reqfunc)
+	public ResponseEntity<?> medGetPdose(@RequestParam long reqfunc)
 	{
 		Cidade cidade = cidRep.findByCodcid(reqfunc);
 		if (cidade == null)
@@ -1010,7 +1013,7 @@ public class GreetingsController {
 	 */
 	@GetMapping(value = "medGetSdose")
 	@ResponseBody
-	public ResponseEntity<?> medGetSdose(@RequestBody long reqfunc)
+	public ResponseEntity<?> medGetSdose(@RequestParam long reqfunc)
 	{
 		Cidade cidade = cidRep.findByCodcid(reqfunc);
 		if (cidade == null)
@@ -1018,6 +1021,7 @@ public class GreetingsController {
 			return new ResponseEntity<String>("Cidade não encontrada", HttpStatus.OK);
 		}
 		long casos = medRep.SDoseCidade(reqfunc);
+		System.out.println(casos);
 		return new ResponseEntity<Long>(casos, HttpStatus.OK);
 	}
 	
@@ -1030,15 +1034,15 @@ public class GreetingsController {
 	 */
 	@GetMapping(value = "empgetEmpCov")
 	@ResponseBody
-	public ResponseEntity<?> empgetEmpCov(@RequestBody long reqfunc)
+	public ResponseEntity<?> empgetEmpCov(@RequestParam long reqfunc)
 	{
 		Empresa empresa = empRep.findByCnpjemp(reqfunc);
 		if (empresa == null)
 		{
 			return new ResponseEntity<String>("Empresa não encontrada", HttpStatus.BAD_REQUEST);
 		}
-		List<EmpresaCovidSCH> lista = empRep.empresaCovid(reqfunc);
-		return new ResponseEntity<List<EmpresaCovidSCH>>(lista, HttpStatus.OK);
+		List<TipoEmpCov> lista = EmpCov.EmpresaCovid(reqfunc);
+		return new ResponseEntity<List<TipoEmpCov>>(lista, HttpStatus.OK);
 	}
 	
 	/**

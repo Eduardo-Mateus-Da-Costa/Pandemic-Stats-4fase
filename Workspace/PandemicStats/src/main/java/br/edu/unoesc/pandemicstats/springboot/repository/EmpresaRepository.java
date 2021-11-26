@@ -1,7 +1,5 @@
 package br.edu.unoesc.pandemicstats.springboot.repository;
 
-import java.util.List;
-
 import javax.transaction.Transactional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -10,7 +8,6 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import br.edu.unoesc.pandemicstats.springboot.model.Empresa;
-import br.edu.unoesc.pandemicstats.springboot.schemmas.EmpresaCovidSCH;
 
 /**
  * @author Eduardo Mateus Da Costa
@@ -19,7 +16,6 @@ import br.edu.unoesc.pandemicstats.springboot.schemmas.EmpresaCovidSCH;
  * @see JpaRepository
  * @see Empresa
  * @see java.util.List
- * @see EmpresaCovidSCH
  */
 
 @Repository
@@ -56,14 +52,5 @@ public interface EmpresaRepository extends JpaRepository<Empresa, Long> {
 	@Modifying(clearAutomatically = true)
 	@Query(nativeQuery = true, value ="call revoke_group(:usuario, :grupo)")
 	void revokeEmpresa(@Param("usuario") String usuario, @Param("grupo") String grupo);
-	
-	/**
-	 * @param long codigo
-	 * @return List<EmpresaCovidSCH>
-	 */
-	@Transactional
-	@Modifying(clearAutomatically = true)
-	@Query(nativeQuery = true, value ="select empresa_covid(:codigo)")
-	List<EmpresaCovidSCH> empresaCovid(@Param("codigo") long codigo);
 	
 }
