@@ -33,6 +33,16 @@ public class RespVac {
 			this.codstatus = codstatus;
 			this.erro = "Dose ja tomada";
 		}
+		else if(codstatus == 503)
+		{
+			this.codstatus = codstatus;
+			this.erro = "Médico não encontrado";
+		}
+		else if(codstatus == 504)
+		{
+			this.codstatus = codstatus;
+			this.erro = "Paciente não encontrado";
+		}
 		else
 		{
 			this.codstatus = 200;

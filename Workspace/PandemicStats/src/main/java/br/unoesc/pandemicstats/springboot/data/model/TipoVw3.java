@@ -5,6 +5,13 @@ import java.util.Map;
 
 import lombok.Data;
 
+/**
+ * @author Eduardo Mateus Da Costa
+ * @since 25/11/2021
+ * @version 1.1
+ * @see Map
+ * @see Object
+ */
 @Data
 public class TipoVw3 implements Serializable{
 	private static final long serialVersionUID = 1L;
@@ -18,7 +25,9 @@ public class TipoVw3 implements Serializable{
 	private String conta;
 	
 	
-	
+	/**
+	 * @param values
+	 */
 	 public TipoVw3(Map<String, Object> values) {
 	    	this.codcid = values.get(CODCID) != null ? (String) values.get(CODCID): null;
 	    	this.nomcid = values.get(NOMCID) != null ? (String) values.get(NOMCID) : null;
@@ -26,7 +35,11 @@ public class TipoVw3 implements Serializable{
 	    }
 
 
-
+	 /**
+	  * @param codcid
+	  * @param nomcid
+	  * @param conta
+	  */
 	public TipoVw3(String codcid, String nomcid, String conta) {
 		this.codcid = codcid;
 		this.nomcid = nomcid;

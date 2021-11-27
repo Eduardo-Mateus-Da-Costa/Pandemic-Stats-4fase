@@ -33,5 +33,15 @@ public class RespTesCov {
 			this.codstatus = codstatus;
 			this.erro = "Resultado invalido";
 		}
+		else if(codstatus==502)
+		{
+			this.codstatus = codstatus;
+			this.erro = "Paciente não encontrado";
+		}
+		else
+		{
+			this.codstatus = 200;
+			showtescov.Convert(teste);
+		}
 	}
 }

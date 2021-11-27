@@ -5,9 +5,21 @@ import java.io.IOException;
 
 import lombok.Data;
 
+/**
+ * @author Eduardo Mateus Da Costa
+ * @since 27/11/2021
+ * @version 1.2
+ */
 @Data
 public class JSONimporter {
 	
+	/**
+	 * @param String filename
+	 * @return String 
+	 * @see java.io.FileReader
+	 * @see java.io.BufferedReader
+	 * @see StringBuilder
+	 */
 	public String importer(String filename)
 	{
 		String file = "C:\\Users\\duduc\\Desktop\\Entradas\\" + filename +".json";
@@ -23,13 +35,10 @@ public class JSONimporter {
 			fr.close();
 			
 			String jsonArray = new String(json.toString());
-			System.out.println(jsonArray);
 			
 			return jsonArray;
 			}catch(IOException e)
 			{
-				e.printStackTrace();
-				System.out.println("Parou");
 				return "0";
 			}
 		

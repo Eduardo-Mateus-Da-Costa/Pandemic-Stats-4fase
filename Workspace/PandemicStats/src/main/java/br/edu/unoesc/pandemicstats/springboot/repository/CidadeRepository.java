@@ -35,7 +35,6 @@ public interface CidadeRepository extends JpaRepository<Cidade, Long> {
 	 * @return List<Cidade>
 	 * 
 	 */
-	
 	@Query(value = "select c from Cidade c where c.codest.codest = ?1")
 	List<Cidade> findByCodest(long codest);
 }

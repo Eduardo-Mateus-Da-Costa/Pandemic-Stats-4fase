@@ -16,6 +16,10 @@ import br.edu.unoesc.pandemicstats.springboot.model.Pais;
 @Repository
 public interface PaisRepository extends JpaRepository<Pais, Long> {
 
+	/**
+	 * @param long codpai
+	 * @return Pais
+	 */
 	@Query(value = "select p from Pais p where p.codpai = ?1")
 	Pais findByCodpai(long codpai);
 }

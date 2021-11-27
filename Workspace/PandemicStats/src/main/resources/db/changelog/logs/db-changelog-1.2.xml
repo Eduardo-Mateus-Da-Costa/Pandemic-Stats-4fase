@@ -325,6 +325,70 @@
 							  (12, 'Algumas doenças hematológicas (incluindo anemia falciforme e talassemia)'),
 							  (13, 'Gestação');
 			
+					<!--Usuario-->
+					insert into usuario(cpfusu, cep, emausu, nomusu, num, senusu, rua, telusu, codcid_codcid, datnasusu, sexusu) 
+					select id, (id+10), 'usuario.'||id||'@gmail.com', 'Usuario '||id, 'Num '||id, 'Senha'||id, 'Rua'||id, cast((id+1000) as varchar), id, cast('2020-05-20' as date)+id,  
+					case when mod(id, 2)=0 then 'M' else 'F' end
+					from generate_series(1, 11) as t(id);
+					
+					<!--Empresa-->
+					insert into empresa(cnpjemp, cep, emaemp, nomemp, num, ramemp, rua, telemp1, codcid_codcid, cpfusu_cpfusu) 
+					select id, (id+10), 'empresa.'||id||'@gmail.com', 'Empresa '||id, 'Num '||id, 'Ramo'||id, 'Rua'||id, cast((id+1000) as varchar), id, id 
+					from generate_series(1, 11) as t(id);
+					
+					insert into empresa(cnpjemp, cep, emaemp, nomemp, num, ramemp, rua, telemp1, codcid_codcid, cpfusu_cpfusu) 
+					select id, (id+10), 'empresa.'||id||'@gmail.com', 'Empresa '||id, 'Num '||id, 'Ramo'||id, 'Rua'||id, cast((id+1000) as varchar), (id-11), (id-11) 
+					from generate_series(12, 22) as t(id);
+					
+					<!--Usuario-->
+					insert into usuario(cpfusu, cep, emausu, nomusu, num, senusu, rua, telusu, codcid_codcid, cnpjemp_cnpjemp, datnasusu, sexusu) 
+					select id, (id+10), 'usuario.'||id||'@gmail.com', 'Usuario '||id, 'Num '||id, 'Senha'||id, 'Rua'||id, cast((id+1000) as varchar), (id-11), id, cast('2020-05-20' as date)+id,  
+					case when mod(id, 2)=0 then 'M' else 'F' end
+					from generate_series(12, 22) as t(id);
+					
+					<!--Paciente-->
+					insert into paciente(codpac, grurispac, pespac, sitpac, cpfusu_cpfusu) 
+					select id, case when mod(id, 2)=0 then 'S' else 'N' end, (30.5+id), case when mod(id, 2)=0 then 'BEM' else 'ISOLAMENTO' end, id
+					from generate_series(1, 22) as t(id);
+					
+					<!--Teste covid-->
+					insert into teste_covid(codtes, covpactes, codpac_codpac) 
+					select nextval('seq_teste_covid'), case when mod(id, 2)=0 then 'P' else 'N' end, id
+					from generate_series(1, 22) as t(id);
+					
+					<!--Monitoramento Paciente-->
+					insert into monitoramento_paciente(codmon, intsin, codpac_codpac, codsin_codsin) 
+					select nextval('seq_monitoramento_paciente'), case when mod(id, 2)=0 then 'P' else 'M' end, id, id
+					from generate_series(1, 11) as t(id);
+					
+					insert into monitoramento_paciente(codmon, intsin, codpac_codpac, codsin_codsin) 
+					select nextval('seq_monitoramento_paciente'), case when mod(id, 2)=0 then 'C' else 'S' end, id, id-11
+					from generate_series(12, 22) as t(id);
+					
+					<!--Paciente Comorbidade-->
+					insert into paciente_comorbidade(codpaccom, codpac_codpac, codcom_codcom) 
+					select nextval('seq_paciente_comorbidade'), id, id
+					from generate_series(1, 13) as t(id);
+					
+					insert into paciente_comorbidade(codpaccom, codpac_codpac, codcom_codcom) 
+					select nextval('seq_paciente_comorbidade'), id, id-13
+					from generate_series(14, 22) as t(id);
+					
+					<!--Medico-->
+					insert into medico(crmmed, cpfusu_cpfusu) 
+					select id, id
+					from generate_series(1, 22) as t(id);
+					
+					<!--Vacina-->
+					insert into vacina(codvac, dosvac, codpac_codpac, crmmed_crmmed) 
+					select nextval('seq_vacina'), case when mod(id, 2)=0 then 1 else 2 end , id, cast(id as varchar)
+					from generate_series(1, 22) as t(id);
+					
+					<!--Solicitacao-->
+					insert into solicitacao(codsol, dessol, cpfusu_cpfusu) 
+					select nextval('seq_solicitacao'), 'Descição'||id, id
+					from generate_series(1, 22) as t(id);
+			
 				</sql>
 	</changeSet>
 

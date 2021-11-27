@@ -78,22 +78,43 @@ public interface MedicoRepository extends JpaRepository<Medico, String> {
 	long SDoseCidade(@Param("codigo") long codigo);
 	
 	
+	/**
+	 * @param long codcid
+	 * @return List<Map<String, Object>>
+	 */
 	@Transactional
 	@Query(nativeQuery = true, value ="select f.nomusu as "+ TipoCidCov.NOMUSU +","+" f.sexusu as "+ TipoCidCov.SEXUSU +","+" f.nomemp as "+ TipoCidCov.NOMEMP +" from cidade_covid(:codcid) f")
 	List<Map<String, Object>> funcCidCov(@Param("codcid") long codcid);
 	
+	/**
+	 * @return List<Map<String, Object>>
+	 */
 	@Transactional
 	@Query(nativeQuery = true, value ="select vw.nomusu as "+ TipoVw1.NOMUSU+","+" vw.codpac as "+ TipoVw1.CODPAC +" from vw_select1 vw")
 	List<Map<String, Object>> selectVw1();
 	
+	
+	/**
+	 * @return List<Map<String, Object>>
+	 */
 	@Transactional
 	@Query(nativeQuery = true, value ="select vw.nomusu as "+ TipoVw2.NOMUSU +","+" vw.nomcid as "+ TipoVw2.NOMCID +" from vw_select2 vw")
 	List<Map<String, Object>> selectVw2();
 	
+	
+	
+	/**
+	 * @return List<Map<String, Object>>
+	 */
 	@Transactional
 	@Query(nativeQuery = true, value ="select vw.codcid as "+ TipoVw3.CODCID +","+" vw.nomcid as "+ TipoVw3.NOMCID +","+"vw.conta as "+ TipoVw3.CONTA +" from vw_select3 vw")
 	List<Map<String, Object>> selectVw3();
 	
+	
+	
+	/**
+	 * @return List<Map<String, Object>>
+	 */
 	@Query(nativeQuery = true, value ="select vw.idade as "+ TipoVw4.IDADE +","+" vw.casos as "+ TipoVw4.CASOS + " from vw_select4 vw")
 	List<Map<String, Object>> selectVw4();
 }

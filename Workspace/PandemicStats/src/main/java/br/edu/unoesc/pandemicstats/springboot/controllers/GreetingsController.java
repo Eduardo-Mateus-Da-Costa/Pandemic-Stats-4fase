@@ -29,7 +29,7 @@ import br.edu.unoesc.pandemicstats.springboot.utils.*;
 /**
  * @author Eduardo Mateus Da Costa
  * @since 30/10/2021
- * @version 8.0
+ * @version 9.0
  * @see br.edu.unoesc.pandemicstats.springboot.model
  * @see br.edu.unoesc.pandemicstats.springboot.repository
  * @see br.edu.unoesc.pandemicstats.springboot.responses
@@ -79,6 +79,9 @@ public class GreetingsController {
 	 * @see RespUsu
 	 * @see PermisSCH
 	 * @see UsuarioRepository
+	 * @see Empresa
+	 * @see EmpresaRepository
+	 * @see EmailSender
 	 */
 	@RequestMapping(value="postUsu")
 	@ResponseBody
@@ -134,6 +137,9 @@ public class GreetingsController {
 	 * @see RespUsu
 	 * @see Usuario
 	 * @see UsuarioRepository
+	 * @see Empresa
+	 * @see EmpresaRepository
+	 * @see EmailSender
 	 */
 	@PatchMapping(value = "patchUsu")
 	@ResponseBody
@@ -198,6 +204,7 @@ public class GreetingsController {
 	 * @see Usuario
 	 * @see UsuarioRepository
 	 * @see EmpresaRepository
+	 * @see EmailSender
 	 */
 	@DeleteMapping(value = "deleteUsu")
 	@ResponseBody
@@ -292,6 +299,7 @@ public class GreetingsController {
 	 * @see Usuario
 	 * @see EmpresaRepository
 	 * @see UsuarioRepository
+	 * @see EmailSender
 	 */
 	@PostMapping(value = "postEmp")
 	@ResponseBody
@@ -341,6 +349,7 @@ public class GreetingsController {
 	 * @see Usuario
 	 * @see CompleteEmp
 	 * @see EmpresaRepository
+	 * @see EmailSender
 	 */
 	@PatchMapping(value = "patchEmp")
 	@ResponseBody
@@ -392,6 +401,7 @@ public class GreetingsController {
 	 * @see EmpresaRepository
 	 * @see Usuario
 	 * @see UsuarioRepository
+	 * @see EmailSender
 	 */
 	@DeleteMapping(value = "deleteEmp")
 	@ResponseBody
@@ -420,9 +430,10 @@ public class GreetingsController {
 
 	/**
 	 * @param long cnpjemp
-	 * @return ShowEmpSCH
+	 * @return ShowEmpSCH or RespEmp
 	 * @see ShowEmpSCH
 	 * @see Empresa
+	 * @see RespEmp
 	 * @see EmpresaRepository
 	 */
 	@GetMapping(value = "getEmp")
@@ -432,7 +443,9 @@ public class GreetingsController {
 			Empresa empresa = empRep.findByCnpjemp(cnpjemp);
 			if (empresa == null)
 			{
-				return new ResponseEntity<String>("Empresa não cadastrada", HttpStatus.BAD_REQUEST);
+				RespEmp respemp = new RespEmp();
+				respemp.RespValEmp(null, 508);
+				return new ResponseEntity<RespEmp>(respemp, HttpStatus.CONFLICT);
 			}
 			ShowEmpSCH showemp = new ShowEmpSCH();
 			showemp.Convert(empresa);
@@ -515,7 +528,7 @@ public class GreetingsController {
 
 	/**
 	 * @param String crmmed
-	 * @return ShowMedSCH
+	 * @return ShowMedSCH or String
 	 * @see ShowMedSCH
 	 * @see Medico
 	 * @see MedicoRepository
@@ -536,7 +549,7 @@ public class GreetingsController {
 
 	/**
 	 * @param long codcid
-	 * @return ShowCidSCH
+	 * @return ShowCidSCH or String
 	 * @see Cidade
 	 * @see ShowCidSCH
 	 * @see CidadeRepository
@@ -557,7 +570,7 @@ public class GreetingsController {
 	/**
 	 * 
 	 * @param long codest
-	 * @return List<ShowCidSCH>
+	 * @return List<ShowCidSCH> or String
 	 * @see Cidade
 	 * @see CidadeRepository
 	 * @see ShowCidSCH
@@ -596,7 +609,7 @@ public class GreetingsController {
 
 	/**
 	 * @param long codest
-	 * @return ShowEstSCH
+	 * @return ShowEstSCH or String
 	 * @see ShowEstSCH
 	 * @see Estado
 	 * @see EstadoRepository
@@ -616,7 +629,7 @@ public class GreetingsController {
 
 	/**
 	 * @param long codpai
-	 * @return List<ShowEstSCH>
+	 * @return List<ShowEstSCH> or String 
 	 * @see ShowEstSCH
 	 * @see ReqEstSCH 
 	 * @see Estado
@@ -681,7 +694,7 @@ public class GreetingsController {
 
 	/**
 	 * @param long codpac
-	 * @return List<ShowMonPacSCH>
+	 * @return List<ShowMonPacSCH> or String 
 	 * @see MonitoramentoPaciente
 	 * @see MonitoramentoPacienteRepository
 	 * @see ShowMonPac
@@ -770,7 +783,7 @@ public class GreetingsController {
 
 	/**
 	 * @param long cpfusu
-	 * @return ShowPacSCH
+	 * @return ShowPacSCH or String
 	 * @see ShowPacSCH
 	 * @see ReqPacSCH 
 	 * @see Paciente
@@ -852,13 +865,15 @@ public class GreetingsController {
 	 */
 	@PostMapping(value = "postTesCov")
 	@ResponseBody
-	public ResponseEntity<?> postTesCov(@RequestBody TesteCovid teste) {
+	public ResponseEntity<RespTesCov> postTesCov(@RequestBody TesteCovid teste) {
 		try {
 			Paciente paciente = teste.getCodpac();
 			paciente = pacRep.findByCodpac(paciente.getCodpac());
 			if (paciente == null)
 			{
-				return new ResponseEntity<String>("Paciente não encontrado", HttpStatus.BAD_REQUEST);
+				RespTesCov resptescov = new RespTesCov();
+				resptescov.RespValTesCov(null, 502);
+				return new ResponseEntity<RespTesCov>(resptescov, HttpStatus.BAD_REQUEST);
 			}
 			
 			if (teste.getDattes() == null) {
@@ -883,7 +898,7 @@ public class GreetingsController {
 	
 	/**
 	 * @param long codpac
-	 * @return List<ShowTesCovSCH>
+	 * @return List<ShowTesCovSCH> or String
 	 * @see ShowTesCovSCH
 	 * @see TesteCovid
 	 * @see java.util.List
@@ -918,6 +933,7 @@ public class GreetingsController {
 	 * @see Paciente
 	 * @see Medico
 	 * @see MedicoRepository
+	 * @see PacienteRepository
 	 */
 	@PostMapping(value = "postVac")
 	@ResponseBody
@@ -933,7 +949,9 @@ public class GreetingsController {
 			paciente = pacRep.findByCodpac(paciente.getCodpac());
 			if (paciente == null)
 			{
-				return new ResponseEntity<String>("Paciente não encontrado", HttpStatus.BAD_REQUEST);
+				RespVac respvac = new RespVac();
+				respvac.RespValVac(null, 504);
+				return new ResponseEntity<RespVac>(respvac, HttpStatus.BAD_REQUEST);
 			}
 			List<Vacina> vacinas = vacRep.findByCodpac(paciente.getCodpac());
 			for(Vacina vactmp : vacinas)
@@ -958,7 +976,9 @@ public class GreetingsController {
 			Medico medico = medRep.findByCRM(medicovac.getCrmmed());
 			if (medico == null) 
 			{
-				return new ResponseEntity<String>("Médico não encontrado", HttpStatus.BAD_REQUEST);
+				RespVac respvac = new RespVac();
+				respvac.RespValVac(null, 503);
+				return new ResponseEntity<RespVac>(respvac, HttpStatus.BAD_REQUEST);
 			}
 			vacRep.save(vacvac);
 			RespVac respvac = new RespVac();
@@ -974,8 +994,10 @@ public class GreetingsController {
 	
 	/**
 	 * @param long codpac
-	 * @return List<ShowVacSCH>
+	 * @return List<ShowVacSCH> or String
 	 * @see ShowVacSCH
+	 * @see Paciente
+	 * @see PacienteRepository
 	 * @see java.util.List
 	 */
 	@GetMapping(value = "getVacs")
@@ -1031,7 +1053,7 @@ public class GreetingsController {
 
 	/**
 	 * @param long reqfunc
-	 * @return List<CidadeCovidSCH>
+	 * @return List<Map<String, Object>> or String
 	 * @see CidadeCovidSCH
 	 * @see CidadeRepository
 	 */
@@ -1050,7 +1072,7 @@ public class GreetingsController {
 	
 	/**
 	 * @param long reqfunc
-	 * @return List<EmpresaCovidSCH>
+	 * @return List<Map<String, Object>> or String
 	 * @see EmpresaCovidSCH
 	 * @see EmpresaRepository
 	 * @see java.util.List
@@ -1106,25 +1128,9 @@ public class GreetingsController {
 	}
 	
 	/**
-	 * @param long reqfunc
-	 * @return List<EmpresaCovidSCH>
-	 * @see EmpresaCovidSCH
-	 * @see EmpresaRepository
-	 * @see java.util.List
+	 * @return List<Map<String, Object>> or String
+	 * @see MedicoRepository
 	 */
-	@GetMapping(value = "empgetEmpCov")
-	@ResponseBody
-	public ResponseEntity<?> empgetEmpCov(@RequestBody long reqfunc)
-	{
-		Empresa empresa = empRep.findByCnpjemp(reqfunc);
-		if (empresa == null)
-		{
-			return new ResponseEntity<String>("Empresa não encontrada", HttpStatus.BAD_REQUEST);
-		}
-		List<Map<String, Object>> lista = empRep.funcEmpCov(reqfunc);
-		return new ResponseEntity<List<Map<String, Object>>>(lista, HttpStatus.OK);
-	}
-	
 	@GetMapping(value = "getVw1")
 	@ResponseBody
 	public ResponseEntity<?> getVw1()
@@ -1140,6 +1146,10 @@ public class GreetingsController {
 		}
 	}
 	
+	/**
+	 * @return List<Map<String, Object>> or String
+	 * @see MedicoRepository
+	 */
 	@GetMapping(value = "getVw2")
 	@ResponseBody
 	public ResponseEntity<?> getVw2()
@@ -1155,6 +1165,10 @@ public class GreetingsController {
 		}
 	}
 	
+	/**
+	 * @return List<Map<String, Object>> or String
+	 * @see MedicoRepository
+	 */
 	@GetMapping(value = "getVw3")
 	@ResponseBody
 	public ResponseEntity<?> getVw3()
@@ -1170,6 +1184,10 @@ public class GreetingsController {
 		}
 	}
 	
+	/**
+	 * @return List<Map<String, Object>> or String
+	 * @see MedicoRepository
+	 */
 	@GetMapping(value = "getVw4")
 	@ResponseBody
 	public ResponseEntity<?> getVw4()
@@ -1185,7 +1203,14 @@ public class GreetingsController {
 		}
 	}
 	
-	
+	/**
+	 * @param String filename
+	 * @return RespUsu or String
+	 * @see postUsu
+	 * @see JSONimporter
+	 * @see Gson
+	 * @see Usuario
+	 */
 	@PostMapping(value = "postUsuJSON")
 	@ResponseBody
 	public ResponseEntity<?> postUsuJSON(@RequestBody String filename)
@@ -1208,6 +1233,14 @@ public class GreetingsController {
 		}
 	}
 	
+	
+	/**
+	 * @param String filename
+	 * @return RespEmp or String
+	 * @see JSONimporter
+	 * @see Empresa
+	 * @see Gson
+	 */
 	@PostMapping(value = "postEmpJSON")
 	@ResponseBody
 	public ResponseEntity<?> postEmpJSON(@RequestBody String filename)
@@ -1229,12 +1262,18 @@ public class GreetingsController {
 		}
 	}
 	
+	
+	/**
+	 * @param String filename
+	 * @param String url
+	 * @return String
+	 * @see JSONexporter
+	 */
 	@GetMapping(value = "exportToJSON")
 	@ResponseBody
 	public ResponseEntity<?> exportToJSON(@RequestParam String filename, @RequestParam String url)
 	{
 		try {
-			System.out.println("filename ="+filename + "url="+url);
 			JSONexporter exporter = new JSONexporter();
 			exporter.exportfromurl(url, filename);
 			return new ResponseEntity<String>("Exportado", HttpStatus.CREATED);

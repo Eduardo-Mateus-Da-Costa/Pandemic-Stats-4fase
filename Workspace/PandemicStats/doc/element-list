@@ -6,3 +6,4 @@ br.edu.unoesc.pandemicstats.springboot.repository
 br.edu.unoesc.pandemicstats.springboot.responses
 br.edu.unoesc.pandemicstats.springboot.schemmas
 br.edu.unoesc.pandemicstats.springboot.utils
+br.unoesc.pandemicstats.springboot.data.model

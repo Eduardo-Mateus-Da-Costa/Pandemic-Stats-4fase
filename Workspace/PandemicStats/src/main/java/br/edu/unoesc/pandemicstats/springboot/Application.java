@@ -11,7 +11,6 @@ import org.springframework.boot.autoconfigure.domain.EntityScan;
  * @author Eduardo Mateus da Costa
  * @since 30/10/2021
  * @version 1.0
- * 
  */
 @EntityScan(basePackages = "br.edu.unoesc.pandemicstats.springboot.model")
 @SpringBootApplication

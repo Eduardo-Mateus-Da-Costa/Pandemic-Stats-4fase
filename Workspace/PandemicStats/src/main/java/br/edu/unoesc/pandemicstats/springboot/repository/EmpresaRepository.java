@@ -29,7 +29,6 @@ public interface EmpresaRepository extends JpaRepository<Empresa, Long> {
 	 * @param long cnpj
 	 * @return Empresa
 	 */
-	
 	@Query(value = "select e from Empresa e where e.cnpjemp = ?1")
 	Empresa findByCnpjemp(long cnpj);
 	
@@ -40,6 +39,10 @@ public interface EmpresaRepository extends JpaRepository<Empresa, Long> {
 	@Query(value = "select e from Empresa e where e.cpfusu.cpfusu = ?1")
 	Empresa findByCpfusu(long cpfusu);
 	
+	/**
+	 * @param String emaemp
+	 * @return Empresa
+	 */
 	@Query(value = "select e from Empresa e where e.emaemp = ?1")
 	Empresa findByEmail(String emaemp);
 	
@@ -61,6 +64,12 @@ public interface EmpresaRepository extends JpaRepository<Empresa, Long> {
 	@Query(nativeQuery = true, value ="call revoke_group(:usuario, :grupo)")
 	void revokeEmpresa(@Param("usuario") String usuario, @Param("grupo") String grupo);
 	
+	
+	/**
+	 * 
+	 * @param long cnpjemp
+	 * @return List<Map<String, Object>>
+	 */
 	@Transactional
 	@Query(nativeQuery = true, value ="select f.nomusu as "+ TipoEmpCov.NOMUSU +","+" f.sexusu as "+ TipoEmpCov.SEXUSU +","+" f.nomcid as "+ TipoEmpCov.NOMCID +" from empresa_covid(:cnpjemp) f")
 	List<Map<String, Object>> funcEmpCov(@Param("cnpjemp") long cnpjemp);

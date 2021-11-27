@@ -152,6 +152,32 @@
 			for each row
 			execute procedure controla_sitpac();@
 			
+			
+			<!--Funcao trigger-controla-unicidade-comorbidade--> 
+			create or replace function controla_comorbidade()
+			returns trigger
+			as
+			$body$
+			declare 
+				codcom numeric := 0;
+			begin
+				select pc.codcom_codcom into codcom from paciente_comorbidade pc
+				where pc.codpac_codpac = new.codpac_codpac;
+			    if (new.codcom_codcom = codcom) then
+			        raise exception 'Já cadastrado';
+			    end if;
+			    return new;
+			end
+			$body$
+			language plpgsql;@
+			
+			<!--Trigger-controla-unicidade-comorbidade-->
+			create trigger paciente_comorbidade_before_tg
+			before insert or update
+			on paciente_comorbidade
+			for each row
+			execute procedure controla_comorbidade();@
+			
 			<!--View conta-medicos -->
 			create view vw_conta_medicos as
 			select count(*) from medico;@

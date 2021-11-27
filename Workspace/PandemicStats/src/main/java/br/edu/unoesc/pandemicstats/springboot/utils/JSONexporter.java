@@ -9,9 +9,23 @@ import java.net.URL;
 
 import org.json.JSONArray;
 
+/**
+ * @author Eduardo Mateus Da Costa
+ * @since 27/11/2021
+ * @version 1.2
+ * @see FileWriter
+ */
 public class JSONexporter {
 	FileWriter writeFile = null;
 	
+	
+	/**
+	 * @param String url
+	 * @param String filename
+	 * @see JSONArray
+	 * @see URL
+	 * @see BufferedReader
+	 */
 	public void exportfromurl(String url, String filename)
 	{
 	    int codigoSucesso = 200;
@@ -35,13 +49,17 @@ public class JSONexporter {
 	       	 	
 	        } catch (Exception e) {
 	            e.printStackTrace();
-	            System.out.println("Falhou aqui");
 	        }
 	  }
 
 	
 	
-	
+	/**
+	 * @param JSONArray json
+	 * @param String filename
+	 * @see JSONArray
+	 * Função de exportação de arquivos JSON
+	 */
 	public void exporter(JSONArray json, String filename)
 	{
 		String saida = "C:\\Users\\duduc\\Desktop\\Saidas\\" + filename + ".json";

@@ -43,6 +43,11 @@ public class RespEmp{
 			this.codstatus = codstatus;
 			this.erro = "Email já em uso";
 		}
+		else if(codstatus==508)
+		{
+			this.codstatus = codstatus;
+			this.erro = "Empresa não cadastrada";
+		}
 		else if(codstatus==509)
 		{
 			this.codstatus = codstatus;
