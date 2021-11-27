@@ -13,8 +13,12 @@ import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 import br.edu.unoesc.pandemicstats.springboot.model.*;
 import br.edu.unoesc.pandemicstats.springboot.repository.*;
@@ -86,17 +90,35 @@ public class GreetingsController {
 				RespUsu respusu = new RespUsu();
 				respusu.RespValUsu(null, 503, null);
 				return new ResponseEntity<RespUsu>(respusu, HttpStatus.CONFLICT);
-			} else {
-				usuRep.save(usuusu);
-				emaSend.Enviar(usuusu.getEmausu(), "Seja bem vindo ao PandemicStats", "Seja bem vindo ao PandemicStats"); 
-				usuRep.createDBUser(usuusu.getEmausu(), usuusu.getSenusu());
-				usuRep.grantDBUser(usuusu.getEmausu());
-				usuario = usuRep.findByCPF(usuusu.getCpfusu());
-				PermisSCH permissoes = getPermis(usuario.getCpfusu());
+			} 
+			usuario = usuRep.findByEmail(usuusu.getEmausu());
+			if(usuario != null)
+			{
 				RespUsu respusu = new RespUsu();
-				respusu.RespValUsu(usuario, 0, permissoes);
-				return new ResponseEntity<RespUsu>(respusu, HttpStatus.CREATED);
+				respusu.RespValUsu(null, 508, null);
+				return new ResponseEntity<RespUsu>(respusu, HttpStatus.CONFLICT);
 			}
+			int codigo = 0;
+			if (usuusu.getCnpjemp() != null)
+			{
+				Empresa empresa = usuusu.getCnpjemp();
+				empresa = empRep.findByCnpjemp(empresa.getCnpjemp());
+				if (empresa == null)
+				{
+					usuusu.setCnpjemp(null);
+					codigo = 507;
+				}
+			}
+			usuRep.save(usuusu);
+			emaSend.Enviar(usuusu.getEmausu(), "Seja bem vindo ao PandemicStats \r\n Está é uma mensagem automática favor não responda!", "Seja bem vindo ao PandemicStats"); 
+			usuRep.createDBUser(usuusu.getEmausu(), usuusu.getSenusu());
+			usuRep.grantDBUser(usuusu.getEmausu());
+			usuario = usuRep.findByCPF(usuusu.getCpfusu());
+			PermisSCH permissoes = getPermis(usuario.getCpfusu());
+			RespUsu respusu = new RespUsu();
+			respusu.RespValUsu(usuario, codigo, permissoes);
+			return new ResponseEntity<RespUsu>(respusu, HttpStatus.CREATED);
+			
 		} catch (Exception e) {
 			e.printStackTrace();
 			RespUsu respusu = new RespUsu();
@@ -126,19 +148,40 @@ public class GreetingsController {
 			}
 			if(usuusu.getEmausu() != usuario.getEmausu())
 			{
-				usuRep.alterUserEmail(usuario.getEmausu(), usuusu.getEmausu());
+				Usuario usuario2 = usuRep.findByEmail(usuusu.getEmausu());
+				if (usuario2 != null)
+				{
+					RespUsu respusu = new RespUsu();
+					respusu.RespValUsu(null, 508, null);
+					return new ResponseEntity<RespUsu>(respusu, HttpStatus.CONFLICT);
+				}
+				else
+				{
+					usuRep.alterUserEmail(usuario.getEmausu(), usuusu.getEmausu());
+					usuario.setEmausu(usuusu.getEmausu());
+				}
 			}
 			if(usuusu.getSenusu() != usuario.getSenusu())
 			{
 				usuRep.alterUserPassword(usuario.getEmausu(), usuusu.getSenusu());
 			}
-			//Adicionar método de verificação de cnpj da empresa
+			int codigo = 0;
+			if (usuusu.getCnpjemp() != null)
+			{
+				Empresa empresa = usuusu.getCnpjemp();
+				empresa = empRep.findByCnpjemp(empresa.getCnpjemp());
+				if (empresa == null)
+				{
+					usuusu.setCnpjemp(null);
+					codigo = 507;
+				}
+			}
 			CompleteUsu.complete(usuusu, usuario);
 			usuRep.save(usuario);
-			
+			emaSend.Enviar(usuario.getEmausu(), "Dados alterados com sucesso \r\n Se não foi você por favor entre em contato com nossos Administradores pelo email pandemicstats.contato@gmail.com \r\n Está é uma mensagem automática favor não responda!", "Dados PandemicStats alterados"); 
 			PermisSCH permissoes = getPermis(usuario.getCpfusu());
 			RespUsu respusu = new RespUsu();
-			respusu.RespValUsu(usuario, 0, permissoes);
+			respusu.RespValUsu(usuario, codigo, permissoes);
 			return new ResponseEntity<RespUsu>(respusu, HttpStatus.OK);
 		} catch (Exception e) {
 			RespUsu respusu = new RespUsu();
@@ -149,29 +192,29 @@ public class GreetingsController {
 	
 	
 	/**
-	 * @param ReqUsuSCH requsu
+	 * @param long cpfusu
 	 * @return String
 	 * @see Empresa
-	 * @see ReqUsuSCH
 	 * @see Usuario
 	 * @see UsuarioRepository
 	 * @see EmpresaRepository
 	 */
 	@DeleteMapping(value = "deleteUsu")
 	@ResponseBody
-	public ResponseEntity<String> deleteUsu(@RequestBody ReqUsuSCH requsu) {
+	public ResponseEntity<String> deleteUsu(@RequestBody long cpfusu) {
 		try {
-			Usuario usuario = usuRep.findByCPF(requsu.getCpfusu());
+			Usuario usuario = usuRep.findByCPF(cpfusu);
 			if (usuario == null)
 			{
 				return new ResponseEntity<String>("Usuário não cadastrado", HttpStatus.BAD_REQUEST);
 			}
-			Empresa empresa = empRep.findByCpfusu(requsu.getCpfusu());
+			Empresa empresa = empRep.findByCpfusu(cpfusu);
 			if (empresa != null) {
 				usuRep.setCnpjempNull(empresa.getCnpjemp());
 			}
 			usuRep.dropUser(usuario.getEmausu());
-			usuRep.deleteByCPF(requsu.getCpfusu());
+			usuRep.deleteByCPF(cpfusu);
+			emaSend.Enviar(usuario.getEmausu(), "Remoção de casdastro feita com sucesso \r\n Se não foi você por favor entre em contato com nossos Administradores pelo email pandemicstats.contato@gmail.com \r\n Está é uma mensagem automática favor não responda!", "Remoção de casdastro PandemicStats"); 
 			return new ResponseEntity<String>("Deletado com sucesso", HttpStatus.OK);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -180,27 +223,33 @@ public class GreetingsController {
 	}
 
 	/**
-	 * @param ReqUsuSCH requsu
+	 * @param long cpfusu
 	 * @return RespUsu
 	 * @see Usuario
 	 * @see PermisSCH
 	 * @see RespUsu
 	 * @see UsuarioRepository
 	 */
-	@PostMapping(value = "getUsu")
+	@GetMapping(value = "getUsu")
 	@ResponseBody
-	public ResponseEntity<RespUsu> getUsu(@RequestBody ReqUsuSCH requsu) {
-		Usuario usuario = usuRep.findByCPF(requsu.getCpfusu());
-		if (usuario == null)
-		{
+	public ResponseEntity<RespUsu> getUsu(@RequestBody long cpfusu) {
+		try {
+			Usuario usuario = usuRep.findByCPF(cpfusu);
+			if (usuario == null)
+			{
+				RespUsu respusu = new RespUsu();
+				respusu.RespValUsu(null, 506, null);
+				return new ResponseEntity<RespUsu>(respusu, HttpStatus.BAD_REQUEST);
+			}
+			PermisSCH permissoes = getPermis(usuario.getCpfusu());
 			RespUsu respusu = new RespUsu();
-			respusu.RespValUsu(null, 506, null);
-			return new ResponseEntity<RespUsu>(respusu, HttpStatus.BAD_REQUEST);
+			respusu.RespValUsu(usuario, 0, permissoes);
+			return new ResponseEntity<RespUsu>(respusu, HttpStatus.OK);
+		} catch (Exception e) {
+			RespUsu respusu = new RespUsu();
+			respusu.RespValUsu(null, 500, null);
+			return new ResponseEntity<RespUsu>(respusu, HttpStatus.OK);
 		}
-		PermisSCH permissoes = getPermis(usuario.getCpfusu());
-		RespUsu respusu = new RespUsu();
-		respusu.RespValUsu(usuario, 0, permissoes);
-		return new ResponseEntity<RespUsu>(respusu, HttpStatus.OK);
 	}
 
 	/**
@@ -262,14 +311,21 @@ public class GreetingsController {
 				RespEmp respemp = new RespEmp();
 				respemp.RespValEmp(null, 503);
 				return new ResponseEntity<RespEmp>(respemp, HttpStatus.CONFLICT);
-			} else {
-				empRep.save(empemp);
-				empRep.grantDBEmpresa(usuario.getEmausu());
+			} 
+			empresa = empRep.findByEmail(empemp.getEmaemp());
+			if(empresa != null)
+			{
 				RespEmp respemp = new RespEmp();
-				empresa = empRep.findByCnpjemp(empemp.getCnpjemp());
-				respemp.RespValEmp(empresa, 0);
-				return new ResponseEntity<RespEmp>(respemp, HttpStatus.CREATED);
+				respemp.RespValEmp(null, 507);
+				return new ResponseEntity<RespEmp>(respemp, HttpStatus.CONFLICT);
 			}
+			empRep.save(empemp);
+			emaSend.Enviar(empemp.getEmaemp(), "Casdastro empresarial feito com sucesso \r\n Está é uma mensagem automática favor não responda!", "Casdastro empresarial PandemicStats"); 
+			empRep.grantDBEmpresa(usuario.getEmausu());
+			RespEmp respemp = new RespEmp();
+			empresa = empRep.findByCnpjemp(empemp.getCnpjemp());
+			respemp.RespValEmp(empresa, 0);
+			return new ResponseEntity<RespEmp>(respemp, HttpStatus.CREATED);
 		} catch (Exception e) {
 			RespEmp respemp = new RespEmp();
 			respemp.RespValEmp(null, 500);
@@ -292,18 +348,33 @@ public class GreetingsController {
 		try {
 			Empresa empresa = empRep.findByCnpjemp(empemp.getCnpjemp());
 			Usuario usuario1 = empresa.getCpfusu();
-			Usuario usuario2 = empemp.getCpfusu(); //Adicionar verificação do novo dono
+			Usuario usuario2 = empemp.getCpfusu(); 
 			if(usuario1.getCpfusu() != usuario2.getCpfusu())
 			{
-				Empresa emp = empRep.findByCpfusu(usuario1.getCpfusu());
-				if (emp == null)
+				usuario2 = usuRep.findByCPF(usuario2.getCpfusu());
+				if (usuario2 == null)
 				{
-					empRep.revokeEmpresa(usuario1.getEmausu(), "g_empresa");
+					RespEmp respemp = new RespEmp();
+					respemp.RespValEmp(null, 509);
+					return new ResponseEntity<RespEmp>(respemp, HttpStatus.BAD_REQUEST);
 				}
-				empRep.grantDBEmpresa(usuario2.getEmausu());
+			}
+			Empresa empresa2 = empRep.findByEmail(empemp.getEmaemp());
+			if(empresa2 != null)
+			{
+				RespEmp respemp = new RespEmp();
+				respemp.RespValEmp(null, 507);
+				return new ResponseEntity<RespEmp>(respemp, HttpStatus.CONFLICT);
 			}
 			CompleteEmp.complete(empemp, empresa);
 			empRep.save(empresa);
+			emaSend.Enviar(empresa.getEmaemp(), "Alteração de dados empresarial feita com sucesso \r\n Se não foi você por favor entre em contato com nossos Administradores pelo email pandemicstats.contato@gmail.com \r\n Está é uma mensagem automática favor não responda!", "Alteração de dados empresarial PandemicStats"); 
+			Empresa emp = empRep.findByCpfusu(usuario1.getCpfusu());
+			if (emp == null)
+			{
+				empRep.revokeEmpresa(usuario1.getEmausu(), "g_empresa");
+			}
+			empRep.grantDBEmpresa(usuario2.getEmausu());
 			RespEmp respemp = new RespEmp();
 			respemp.RespValEmp(empresa, 0);
 			return new ResponseEntity<RespEmp>(respemp, HttpStatus.OK);
@@ -315,9 +386,8 @@ public class GreetingsController {
 	}
 
 	/**
-	 * @param ReqEmpSCH reqemp
+	 * @param long cnpjemp
 	 * @return String
-	 * @see ReqEmpSCH
 	 * @see Empresa
 	 * @see EmpresaRepository
 	 * @see Usuario
@@ -325,15 +395,16 @@ public class GreetingsController {
 	 */
 	@DeleteMapping(value = "deleteEmp")
 	@ResponseBody
-	public ResponseEntity<String> deleteEmp(@RequestBody ReqEmpSCH reqemp) {
+	public ResponseEntity<String> deleteEmp(@RequestBody long cnpjemp) {
 		try {
-			Empresa empresa = empRep.findByCnpjemp(reqemp.getCnpjemp());
+			Empresa empresa = empRep.findByCnpjemp(cnpjemp);
 			if (empresa == null)
 			{
 				return new ResponseEntity<String>("Empresa não cadastrada", HttpStatus.BAD_REQUEST);
 			}
-			usuRep.setCnpjempNull(reqemp.getCnpjemp());
-			empRep.deleteById(reqemp.getCnpjemp());
+			usuRep.setCnpjempNull(cnpjemp);
+			empRep.deleteById(cnpjemp);
+			emaSend.Enviar(empresa.getEmaemp(), "Remoção de casdastro empresarial feita com sucesso \r\n Se não foi você por favor entre em contato com nossos Administradores pelo email pandemicstats.contato@gmail.com \r\n Está é uma mensagem automática favor não responda!", "Remoção de casdastro empresarial PandemicStats"); 
 			Usuario usuario = empresa.getCpfusu();
 			usuario = usuRep.findByCPF(usuario.getCpfusu());
 			Empresa emp = empRep.findByCpfusu(usuario.getCpfusu());
@@ -348,24 +419,29 @@ public class GreetingsController {
 	}
 
 	/**
-	 * @param ReqEmpSCH reqemp
+	 * @param long cnpjemp
 	 * @return ShowEmpSCH
 	 * @see ShowEmpSCH
-	 * @see ReqEmpSCH
 	 * @see Empresa
 	 * @see EmpresaRepository
 	 */
-	@PostMapping(value = "getEmp")
+	@GetMapping(value = "getEmp")
 	@ResponseBody
-	public ResponseEntity<?> getEmp(@RequestBody ReqEmpSCH reqemp) {
-		Empresa empresa = empRep.findByCnpjemp(reqemp.getCnpjemp());
-		if (empresa == null)
-		{
-			return new ResponseEntity<String>("Empresa não cadastrada", HttpStatus.BAD_REQUEST);
+	public ResponseEntity<?> getEmp(@RequestBody long cnpjemp) {
+		try {
+			Empresa empresa = empRep.findByCnpjemp(cnpjemp);
+			if (empresa == null)
+			{
+				return new ResponseEntity<String>("Empresa não cadastrada", HttpStatus.BAD_REQUEST);
+			}
+			ShowEmpSCH showemp = new ShowEmpSCH();
+			showemp.Convert(empresa);
+			return new ResponseEntity<ShowEmpSCH>(showemp, HttpStatus.OK);
+		} catch (Exception e) {
+			RespEmp respemp = new RespEmp();
+			respemp.RespValEmp(null, 500);
+			return new ResponseEntity<RespEmp>(respemp, HttpStatus.CONFLICT);
 		}
-		ShowEmpSCH showemp = new ShowEmpSCH();
-		showemp.Convert(empresa);
-		return new ResponseEntity<ShowEmpSCH>(showemp, HttpStatus.OK);
 	}
 	/**
 	 * @param Medico medmed
@@ -379,44 +455,49 @@ public class GreetingsController {
 	@PostMapping(value = "postMed")
 	@ResponseBody
 	public ResponseEntity<RespMed> postMed(@RequestBody Medico medmed) {
-		Medico medico = new Medico();
-		System.out.println(medmed);
-		medico = medRep.findByCRM(medmed.getCrmmed());
-		if (medico != null) {
-			RespMed respmed = new RespMed();
-			respmed.RespValMed(null, 501);
-			return new ResponseEntity<RespMed>(respmed, HttpStatus.CONFLICT);
-		} else {
-			Usuario usuario = medmed.getCpfusu();
-			usuario = usuRep.findByCPF(usuario.getCpfusu());
-			if (usuario == null)
-			{
+		try {
+			Medico medico = new Medico();
+			System.out.println(medmed);
+			medico = medRep.findByCRM(medmed.getCrmmed());
+			if (medico != null) {
 				RespMed respmed = new RespMed();
-				respmed.RespValMed(null, 506);
+				respmed.RespValMed(null, 501);
 				return new ResponseEntity<RespMed>(respmed, HttpStatus.CONFLICT);
+			} else {
+				Usuario usuario = medmed.getCpfusu();
+				usuario = usuRep.findByCPF(usuario.getCpfusu());
+				if (usuario == null)
+				{
+					RespMed respmed = new RespMed();
+					respmed.RespValMed(null, 506);
+					return new ResponseEntity<RespMed>(respmed, HttpStatus.CONFLICT);
+				}
+				medRep.save(medmed);
+				medRep.grantDBMedico(usuario.getEmausu());
+				RespMed respmed = new RespMed();
+				respmed.RespValMed(medmed, 0);
+				return new ResponseEntity<RespMed>(respmed, HttpStatus.CREATED);
 			}
-			medRep.save(medmed);
-			medRep.grantDBMedico(usuario.getEmausu());
+		} catch (Exception e) {
 			RespMed respmed = new RespMed();
-			respmed.RespValMed(medmed, 0);
-			return new ResponseEntity<RespMed>(respmed, HttpStatus.CREATED);
+			respmed.RespValMed(null, 500);
+			return new ResponseEntity<RespMed>(respmed, HttpStatus.CONFLICT);
 		}
 	}
 
 	/**
-	 * @param ReqMedSCH reqmed
+	 * @param String crmmed
 	 * @return String
 	 * @see Medico
-	 * @see ReqMedSCH
 	 * @see MedicoRepository
 	 * @see Usuario
 	 * @see UsuarioRepository
 	 */
 	@DeleteMapping(value = "deleteMed")
 	@ResponseBody
-	public ResponseEntity<String> deleteMed(@RequestBody ReqMedSCH reqmed) {
+	public ResponseEntity<String> deleteMed(@RequestBody String crmmed) {
 		try {
-			Medico medico= medRep.findByCRM(reqmed.getCrmmed());
+			Medico medico= medRep.findByCRM(crmmed);
 			if (medico == null)
 			{
 				return new ResponseEntity<String>("Médico não encontrado", HttpStatus.BAD_REQUEST);
@@ -433,17 +514,16 @@ public class GreetingsController {
 	}
 
 	/**
-	 * @param ReqMedSCH reqmed
+	 * @param String crmmed
 	 * @return ShowMedSCH
 	 * @see ShowMedSCH
-	 * @see ReqMedSCH
 	 * @see Medico
 	 * @see MedicoRepository
 	 */
-	@PostMapping(value = "getMed")
+	@GetMapping(value = "getMed")
 	@ResponseBody
-	public ResponseEntity<?> getMed(@RequestBody ReqMedSCH reqmed) {
-		Medico medico = medRep.findByCRM(reqmed.getCrmmed());
+	public ResponseEntity<?> getMed(@RequestBody String crmmed) {
+		Medico medico = medRep.findByCRM(crmmed);
 		if (medico == null)
 		{
 			return new ResponseEntity<String>("Médico não encontrado", HttpStatus.BAD_REQUEST);
@@ -455,17 +535,16 @@ public class GreetingsController {
 
 
 	/**
-	 * @param ReqCidSCH reqcid
+	 * @param long codcid
 	 * @return ShowCidSCH
 	 * @see Cidade
-	 * @see ReqCidSCH
 	 * @see ShowCidSCH
 	 * @see CidadeRepository
 	 */
-	@PostMapping(value = "getCid")
+	@GetMapping(value = "getCid")
 	@ResponseBody
-	public ResponseEntity<?> getCid(@RequestBody ReqCidSCH reqcid) {
-		Cidade cidade = cidRep.findByCodcid(reqcid.getCodcid());
+	public ResponseEntity<?> getCid(@RequestBody long codcid) {
+		Cidade cidade = cidRep.findByCodcid(codcid);
 		if (cidade == null)
 		{
 			return new ResponseEntity<String>("Cidade não encontrada", HttpStatus.BAD_REQUEST);
@@ -477,22 +556,22 @@ public class GreetingsController {
 
 	/**
 	 * 
-	 * @param ReqCidSCH reqcid
+	 * @param long codest
 	 * @return List<ShowCidSCH>
 	 * @see Cidade
 	 * @see CidadeRepository
 	 * @see ShowCidSCH
 	 * @see java.util.List
 	 */
-	@PostMapping(value = "getEstCids")
+	@GetMapping(value = "getEstCids")
 	@ResponseBody
-	public ResponseEntity<?> getCids(@RequestBody ReqCidSCH reqcid) {
-		Estado estado = estRep.findByCodest(reqcid.getCodest());
+	public ResponseEntity<?> getCids(@RequestBody long codest) {
+		Estado estado = estRep.findByCodest(codest);
 		if (estado == null)
 		{
 			return new ResponseEntity<String>("Estado não encontrado", HttpStatus.BAD_REQUEST);
 		}
-		List<Cidade> cidades = cidRep.findByCodest(reqcid.getCodest());
+		List<Cidade> cidades = cidRep.findByCodest(codest);
 		List<ShowCidSCH> listshowcid = new ArrayList<ShowCidSCH>();
 		for (Cidade ctmp : cidades) {
 			ShowCidSCH sctmp = new ShowCidSCH();
@@ -516,17 +595,16 @@ public class GreetingsController {
 	}
 
 	/**
-	 * @param ReqEstSCH reqest
+	 * @param long codest
 	 * @return ShowEstSCH
 	 * @see ShowEstSCH
-	 * @see ReqEstSCH 
 	 * @see Estado
 	 * @see EstadoRepository
 	 */
-	@PostMapping(value = "getEst")
+	@GetMapping(value = "getEst")
 	@ResponseBody
-	public ResponseEntity<?> getEst(@RequestBody ReqEstSCH reqest) {
-		Estado estado = estRep.findByCodest(reqest.getCodest());
+	public ResponseEntity<?> getEst(@RequestBody long codest) {
+		Estado estado = estRep.findByCodest(codest);
 		if (estado == null)
 		{
 			return new ResponseEntity<String>("Estado não encontrado", HttpStatus.BAD_REQUEST);
@@ -537,7 +615,7 @@ public class GreetingsController {
 	}
 
 	/**
-	 * @param ReqEstSCH reqest
+	 * @param long codpai
 	 * @return List<ShowEstSCH>
 	 * @see ShowEstSCH
 	 * @see ReqEstSCH 
@@ -545,15 +623,15 @@ public class GreetingsController {
 	 * @see EstadoRepository
 	 * @see java.util.List
 	 */
-	@PostMapping(value = "getEsts")
+	@GetMapping(value = "getEsts")
 	@ResponseBody
-	public ResponseEntity<?> getEsts(@RequestBody ReqEstSCH reqest) {
-		Pais pais = paiRep.findByCodpai(reqest.getCodpai());
+	public ResponseEntity<?> getEsts(@RequestBody long codpai) {
+		Pais pais = paiRep.findByCodpai(codpai);
 		if (pais == null)
 		{
 			return new ResponseEntity<String>("Pais não encontrado", HttpStatus.BAD_REQUEST);
 		}
-		List<Estado> estados = estRep.findByCodpai(reqest.getCodpai());
+		List<Estado> estados = estRep.findByCodpai(codpai);
 		List<ShowEstSCH> listshowest = new ArrayList<ShowEstSCH>();
 		for (Estado etmp : estados) {
 			ShowEstSCH setmp = new ShowEstSCH();
@@ -602,22 +680,22 @@ public class GreetingsController {
 	}
 
 	/**
-	 * @param ReqMonPacSCH reqmompac
+	 * @param long codpac
 	 * @return List<ShowMonPacSCH>
 	 * @see MonitoramentoPaciente
 	 * @see MonitoramentoPacienteRepository
 	 * @see ShowMonPac
 	 * @see java.util.List
 	 */
-	@PostMapping(value = "getMonsPac")
+	@GetMapping(value = "getMonsPac")
 	@ResponseBody
-	public ResponseEntity<?> getMonsPac(@RequestBody ReqMonPacSCH reqmompac) {
-		Paciente paciente = pacRep.findByCodpac(reqmompac.getCodpac());
+	public ResponseEntity<?> getMonsPac(@RequestBody long codpac) {
+		Paciente paciente = pacRep.findByCodpac(codpac);
 		if (paciente == null)
 		{
 			return new ResponseEntity<String>("Paciente não encontrado", HttpStatus.BAD_REQUEST);
 		}
-		List<MonitoramentoPaciente> monitoramentos = monPacRep.findByCodpac(reqmompac.getCodpac());
+		List<MonitoramentoPaciente> monitoramentos = monPacRep.findByCodpac(codpac);
 		List<ShowMonPacSCH> showmonspac = new ArrayList<ShowMonPacSCH>();
 		for (MonitoramentoPaciente mptmp : monitoramentos) {
 			ShowMonPacSCH smptmp = new ShowMonPacSCH();
@@ -691,17 +769,17 @@ public class GreetingsController {
 	}
 
 	/**
-	 * @param ReqPacSCH reqpac
+	 * @param long cpfusu
 	 * @return ShowPacSCH
 	 * @see ShowPacSCH
 	 * @see ReqPacSCH 
 	 * @see Paciente
 	 * @see PacienteRepository
 	 */
-	@PostMapping(value = "getPac")
+	@GetMapping(value = "getPac")
 	@ResponseBody
-	public ResponseEntity<?> getPac(@RequestBody ReqPacSCH reqpac) {
-		Paciente paciente = pacRep.findByCpfusu(reqpac.getCpfusu());
+	public ResponseEntity<?> getPac(@RequestBody long cpfusu) {
+		Paciente paciente = pacRep.findByCpfusu(cpfusu);
 		if (paciente == null)
 		{
 			return new ResponseEntity<String>("Paciente não encontrado", HttpStatus.BAD_REQUEST);
@@ -775,46 +853,51 @@ public class GreetingsController {
 	@PostMapping(value = "postTesCov")
 	@ResponseBody
 	public ResponseEntity<?> postTesCov(@RequestBody TesteCovid teste) {
-		Paciente paciente = teste.getCodpac();
-		paciente = pacRep.findByCodpac(paciente.getCodpac());
-		if (paciente == null)
-		{
-			return new ResponseEntity<String>("Paciente não encontrado", HttpStatus.BAD_REQUEST);
-		}
-		
-		if (teste.getDattes() == null) {
-			teste.setDattes(new java.sql.Date(new java.util.Date().getTime()));
-		}
-		if ((teste.getCovpactes() == 'P') || (teste.getCovpactes() == 'N')) {
-			tesCovRep.save(teste);
+		try {
+			Paciente paciente = teste.getCodpac();
+			paciente = pacRep.findByCodpac(paciente.getCodpac());
+			if (paciente == null)
+			{
+				return new ResponseEntity<String>("Paciente não encontrado", HttpStatus.BAD_REQUEST);
+			}
+			
+			if (teste.getDattes() == null) {
+				teste.setDattes(new java.sql.Date(new java.util.Date().getTime()));
+			}
+			if ((teste.getCovpactes() == 'P') || (teste.getCovpactes() == 'N')) {
+				tesCovRep.save(teste);
+				RespTesCov resptescov = new RespTesCov();
+				resptescov.RespValTesCov(teste, 0);
+				return new ResponseEntity<RespTesCov>(resptescov, HttpStatus.CREATED);
+			} else {
+				RespTesCov resptescov = new RespTesCov();
+				resptescov.RespValTesCov(null, 501);
+				return new ResponseEntity<RespTesCov>(resptescov, HttpStatus.BAD_REQUEST);
+			}
+		} catch (Exception e) {
 			RespTesCov resptescov = new RespTesCov();
-			resptescov.RespValTesCov(teste, 0);
-			return new ResponseEntity<RespTesCov>(resptescov, HttpStatus.CREATED);
-		} else {
-			RespTesCov resptescov = new RespTesCov();
-			resptescov.RespValTesCov(null, 501);
+			resptescov.RespValTesCov(null, 500);
 			return new ResponseEntity<RespTesCov>(resptescov, HttpStatus.BAD_REQUEST);
 		}
 	}
 	
 	/**
-	 * @param ReqTesCovSCH reqteste
+	 * @param long codpac
 	 * @return List<ShowTesCovSCH>
-	 * @see ReqTesCovSCH
 	 * @see ShowTesCovSCH
 	 * @see TesteCovid
 	 * @see java.util.List
 	 */
 	@GetMapping(value = "getTests")
 	@ResponseBody
-	public ResponseEntity<?> getTests(@RequestBody ReqTesCovSCH reqteste)
+	public ResponseEntity<?> getTests(@RequestBody long codpac)
 	{
-		Paciente paciente = pacRep.findByCodpac(reqteste.getCodpac());
+		Paciente paciente = pacRep.findByCodpac(codpac);
 		if (paciente == null)
 		{
 			return new ResponseEntity<String>("Paciente não encontrado", HttpStatus.BAD_REQUEST);
 		}
-		List<TesteCovid> testes = tesCovRep.findByCodpac(reqteste.getCodpac());
+		List<TesteCovid> testes = tesCovRep.findByCodpac(codpac);
 		List<ShowTesCovSCH> showtests = new ArrayList<ShowTesCovSCH>();
 		for(TesteCovid teste : testes)
 		{
@@ -890,22 +973,21 @@ public class GreetingsController {
 	
 	
 	/**
-	 * @param ReqVacSCH reqvac
+	 * @param long codpac
 	 * @return List<ShowVacSCH>
-	 * @see ReqVacSCH
 	 * @see ShowVacSCH
 	 * @see java.util.List
 	 */
 	@GetMapping(value = "getVacs")
 	@ResponseBody
-	public ResponseEntity<?> getVacs(@RequestBody ReqVacSCH reqvac)
+	public ResponseEntity<?> getVacs(@RequestBody long codpac)
 	{
-		Paciente paciente = pacRep.findByCodpac(reqvac.getCodpac());
+		Paciente paciente = pacRep.findByCodpac(codpac);
 		if (paciente == null)
 		{
 			return new ResponseEntity<String>("Paciente não encontrado", HttpStatus.BAD_REQUEST);
 		}
-		List<Vacina> vacinas = vacRep.findByCodpac(reqvac.getCodpac());
+		List<Vacina> vacinas = vacRep.findByCodpac(codpac);
 		List<ShowVacSCH> showvacs = new ArrayList<ShowVacSCH>();
 		for(Vacina vacina : vacinas)
 		{
@@ -1102,6 +1184,65 @@ public class GreetingsController {
 			return new ResponseEntity<String>("Deu erro", HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
+	
+	
+	@PostMapping(value = "postUsuJSON")
+	@ResponseBody
+	public ResponseEntity<?> postUsuJSON(@RequestBody String filename)
+	{
+		try {
+			String jsonusuario = new String();
+			JSONimporter importer = new JSONimporter();
+			jsonusuario = importer.importer(filename);
+			if(jsonusuario.equals("0"))
+			{
+				return new ResponseEntity<String>("Falhou", HttpStatus.INTERNAL_SERVER_ERROR);
+			}
+			Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd").create();
+			Usuario usuario = gson.fromJson(jsonusuario, Usuario.class);
+			ResponseEntity<RespUsu> resp = postUsu(usuario);
+			return resp;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return new ResponseEntity<String>("Falhou", HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+	
+	@PostMapping(value = "postEmpJSON")
+	@ResponseBody
+	public ResponseEntity<?> postEmpJSON(@RequestBody String filename)
+	{
+		try {
+			String jsonempresa = new String();
+			JSONimporter importer = new JSONimporter();
+			jsonempresa = importer.importer(filename);
+			if(jsonempresa.equals("0"))
+			{
+				return new ResponseEntity<String>("Falhou", HttpStatus.INTERNAL_SERVER_ERROR);
+			}
+			Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd").create();
+			Empresa empresa = gson.fromJson(jsonempresa, Empresa.class);
+			ResponseEntity<RespEmp> resp = postEmp(empresa);
+			return resp;
+		} catch (Exception e) {
+			return new ResponseEntity<String>("Falhou", HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+	
+	@GetMapping(value = "exportToJSON")
+	@ResponseBody
+	public ResponseEntity<?> exportToJSON(@RequestParam String filename, @RequestParam String url)
+	{
+		try {
+			System.out.println("filename ="+filename + "url="+url);
+			JSONexporter exporter = new JSONexporter();
+			exporter.exportfromurl(url, filename);
+			return new ResponseEntity<String>("Exportado", HttpStatus.CREATED);
+		} catch (Exception e) {
+			return new ResponseEntity<String>("Falhou", HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+	
 	
 	/**
 	 * @param long cpfusu

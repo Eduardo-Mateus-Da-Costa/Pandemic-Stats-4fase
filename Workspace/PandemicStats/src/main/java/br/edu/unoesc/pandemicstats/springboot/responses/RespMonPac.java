@@ -26,7 +26,7 @@ public class RespMonPac {
 		if (codstatus == 500)
 		{
 			this.codstatus = codstatus;
-			this.erro = "Erro ao inserir";
+			this.erro = "Erro interno ou variavel nula";
 		}
 		else if (codstatus == 501)
 		{

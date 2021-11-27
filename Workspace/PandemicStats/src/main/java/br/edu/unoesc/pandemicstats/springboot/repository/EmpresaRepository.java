@@ -40,6 +40,10 @@ public interface EmpresaRepository extends JpaRepository<Empresa, Long> {
 	@Query(value = "select e from Empresa e where e.cpfusu.cpfusu = ?1")
 	Empresa findByCpfusu(long cpfusu);
 	
+	@Query(value = "select e from Empresa e where e.emaemp = ?1")
+	Empresa findByEmail(String emaemp);
+	
+	
 	/**
 	 * @param String usuario
 	 */

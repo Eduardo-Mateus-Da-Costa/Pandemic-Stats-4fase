@@ -26,7 +26,7 @@ public class RespEmp{
 		if(codstatus==500)
 		{
 			this.codstatus = codstatus;
-			this.erro = "Emails iguais.";
+			this.erro = "Erro interno ou variavel nula";
 		}
 		else if(codstatus==503)
 		{
@@ -37,6 +37,16 @@ public class RespEmp{
 		{
 			this.codstatus = codstatus;
 			this.erro = "Usuário não cadastrado";
+		}
+		else if(codstatus==507)
+		{
+			this.codstatus = codstatus;
+			this.erro = "Email já em uso";
+		}
+		else if(codstatus==509)
+		{
+			this.codstatus = codstatus;
+			this.erro = "Novo dono não cadastrado no sistema";
 		}
 		else
 		{

@@ -30,7 +30,7 @@ public class RespUsu{
 		if(codstatus==500)
 		{
 			this.codstatus = codstatus;
-			this.erro = "Emails iguais.";
+			this.erro = "Erro interno ou variável nula";
 		}
 		else if(codstatus==503)
 		{
@@ -51,6 +51,18 @@ public class RespUsu{
 		{
 			this.codstatus = codstatus;
 			this.erro = "Usuario não cadastrado";
+		}
+		else if(codstatus==507)
+		{
+			this.codstatus = 200;
+			showusu.Convert(usuario);
+			this.permissoes = permissoes;
+			this.erro = "Usuario cadastrado, porém empresa informada não encontrada, por favor verifique os dados repassados ou peça para que o gerente da sua empresa cadastre-a";
+		}
+		else if(codstatus==508)
+		{
+			this.codstatus = codstatus;
+			this.erro = "Email já cadastrado, por favor use outro";
 		}
 		else
 		{

@@ -23,13 +23,7 @@ public class RespVac {
 	 */
 	public void RespValVac(Vacina vacina, int codstatus)
 	{
-		if(codstatus == 1)
-		{
-			this.codstatus = 201;
-			this.erro = "Medico informado nao cadastrado";
-			showvac.Convert(vacina);
-		}
-		else if(codstatus == 501)
+		if(codstatus == 501)
 		{
 			this.codstatus = codstatus;
 			this.erro = "Dosvac ou Datvac invalida";

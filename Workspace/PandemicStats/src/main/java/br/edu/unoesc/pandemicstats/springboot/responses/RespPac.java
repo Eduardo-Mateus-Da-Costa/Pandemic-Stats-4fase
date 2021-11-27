@@ -26,7 +26,7 @@ public class RespPac {
 		if (codstatus == 500)
 		{
 			this.codstatus = codstatus;
-			this.erro = "Erro interno";
+			this.erro = "Erro interno ou variavel nula";
 		}
 		else if (codstatus == 501)
 		{

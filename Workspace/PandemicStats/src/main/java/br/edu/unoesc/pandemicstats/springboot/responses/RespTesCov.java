@@ -23,7 +23,12 @@ public class RespTesCov {
 	 */
 	public void RespValTesCov(TesteCovid teste, int codstatus)
 	{
-		if(codstatus==501)
+		if(codstatus==500)
+		{
+			this.codstatus = codstatus;
+			this.erro = "Erro interno ou variável nula";
+		}
+		else if(codstatus==501)
 		{
 			this.codstatus = codstatus;
 			this.erro = "Resultado invalido";

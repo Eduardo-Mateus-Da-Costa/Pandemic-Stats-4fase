@@ -23,6 +23,11 @@ public class RespMed{
 	 */
 	public void RespValMed(Medico med, int codstatus)
 	{
+		if(codstatus==500)
+		{
+			this.codstatus = codstatus;
+			this.erro = "Erro interno ou variável nula";
+		}
 		if(codstatus==501)
 		{
 			this.codstatus = codstatus;
