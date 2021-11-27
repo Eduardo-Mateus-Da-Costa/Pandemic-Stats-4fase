@@ -256,10 +256,8 @@ $body$
 begin
 	return query select u.nomusu, u.sexusu, e.nomemp from usuario u 
 			inner join empresa e on u.cnpjemp_cnpjemp = e.cnpjemp
-			inner join endereco en on en.cpfusu_cpfusu = u.cpfusu
-			inner join cidade c on en.codcid_codcid = c.codcid
 			inner join paciente p on p.cpfusu_cpfusu = u.cpfusu
-			where (p.sitpac = 'ISOLAMENTO' or p.sitpac = 'INTERNADO') and (c.codcid = codigo);
+			where (p.sitpac = 'ISOLAMENTO' or p.sitpac = 'INTERNADO') and (u.codcid_codcid = codigo);
 end
 $body$
 language plpgsql;
@@ -282,8 +280,7 @@ $body$
 begin
 	return query select u.nomusu, u.sexusu, c.nomcid from usuario u 
 			inner join empresa e on u.cnpjemp_cnpjemp = e.cnpjemp
-			inner join endereco en on en.cpfusu_cpfusu = u.cpfusu
-			inner join cidade c on en.codcid_codcid = c.codcid
+			inner join cidade c on u.codcid_codcid = c.codcid
 			inner join paciente p on p.cpfusu_cpfusu = u.cpfusu
 			where (p.sitpac = 'ISOLAMENTO' or p.sitpac = 'INTERNADO') and (e.cnpjemp = cnpj);
 end
@@ -301,9 +298,7 @@ begin
 	select count(*) into conta from vacina v
 	inner join paciente p on p.codpac = v.codpac_codpac
 	inner join usuario u on u.cpfusu = p.cpfusu_cpfusu 
-	inner join endereco en on en.cpfusu_cpfusu = u.cpfusu
-	inner join cidade c on c.codcid = en.codcid_codcid 
-	where ((c.codcid = codigo) and (v.dosvac = '1'));
+	where ((u.codcid_codcid = codigo) and (v.dosvac = '1'));
 return conta; 
 end
 $body$
@@ -584,15 +579,14 @@ quantidade de casos positivos de
 covid por idade, registrados em dias
 pares de 2020. Ordene o relatório pela
 idade com mais casos para a idade
-com menos casos.*/
+com menos casos. OK*/
 
 
 create view vw_select1 as 
 select p.codpac, u.nomusu from paciente p 
 inner join usuario u on u.cpfusu = p.cpfusu_cpfusu 
-inner join monitoramento_paciente mp on mp.codpac_codpac = p.codpac 
-inner join sintoma s on mp.codsin_codsin = s.codsin 
-where s.nomsin ilike '%tosse%' and 
+inner join monitoramento_paciente mp on mp.codpac_codpac = p.codpac n 
+where (mp.codsin_codsin = 3) and 
 (extract(year from current_timestamp) - extract(year from u.datnasusu)>=40) and 
 (extract(year from current_timestamp) - extract(year from u.datnasusu)<=50)
 order by p.codpac desc;

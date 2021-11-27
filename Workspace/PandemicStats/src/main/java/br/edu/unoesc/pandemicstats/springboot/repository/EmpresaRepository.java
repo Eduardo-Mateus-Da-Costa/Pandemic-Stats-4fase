@@ -1,5 +1,8 @@
 package br.edu.unoesc.pandemicstats.springboot.repository;
 
+import java.util.List;
+import java.util.Map;
+
 import javax.transaction.Transactional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -8,6 +11,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import br.edu.unoesc.pandemicstats.springboot.model.Empresa;
+import br.unoesc.pandemicstats.springboot.data.model.TipoEmpCov;
 
 /**
  * @author Eduardo Mateus Da Costa
@@ -52,5 +56,9 @@ public interface EmpresaRepository extends JpaRepository<Empresa, Long> {
 	@Modifying(clearAutomatically = true)
 	@Query(nativeQuery = true, value ="call revoke_group(:usuario, :grupo)")
 	void revokeEmpresa(@Param("usuario") String usuario, @Param("grupo") String grupo);
+	
+	@Transactional
+	@Query(nativeQuery = true, value ="select f.nomusu as "+ TipoEmpCov.NOMUSU +","+" f.sexusu as "+ TipoEmpCov.SEXUSU +","+" f.nomcid as "+ TipoEmpCov.NOMCID +" from empresa_covid(:cnpjemp) f")
+	List<Map<String, Object>> funcEmpCov(@Param("cnpjemp") long cnpjemp);
 	
 }

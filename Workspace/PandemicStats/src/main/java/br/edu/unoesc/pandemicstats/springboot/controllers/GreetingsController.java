@@ -2,6 +2,7 @@ package br.edu.unoesc.pandemicstats.springboot.controllers;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -12,7 +13,6 @@ import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -21,8 +21,6 @@ import br.edu.unoesc.pandemicstats.springboot.repository.*;
 import br.edu.unoesc.pandemicstats.springboot.responses.*;
 import br.edu.unoesc.pandemicstats.springboot.schemmas.*;
 import br.edu.unoesc.pandemicstats.springboot.utils.*;
-import br.unoesc.pandemicstats.springboot.data.model.TipoCidCov;
-import br.unoesc.pandemicstats.springboot.data.model.TipoEmpCov;
 
 /**
  * @author Eduardo Mateus Da Costa
@@ -964,8 +962,8 @@ public class GreetingsController {
 		{
 			return new ResponseEntity<String>("Cidade não encontrada", HttpStatus.OK);
 		}
-		List<TipoCidCov> lista = CidCov.CidadeCovid(reqfunc);
-		return new ResponseEntity<List<TipoCidCov>>(lista, HttpStatus.OK);
+		List<Map<String, Object>> lista = medRep.funcCidCov(reqfunc);
+		return new ResponseEntity<List<Map<String, Object>>>(lista, HttpStatus.OK);
 	}
 	
 	/**
@@ -984,8 +982,8 @@ public class GreetingsController {
 		{
 			return new ResponseEntity<String>("Empresa não encontrada", HttpStatus.OK);
 		}
-		List<TipoEmpCov> lista = EmpCov.EmpresaCovid(reqfunc);
-		return new ResponseEntity<List<TipoEmpCov>>(lista, HttpStatus.OK);
+		List<Map<String, Object>> lista = empRep.funcEmpCov(reqfunc);
+		return new ResponseEntity<List<Map<String, Object>>>(lista, HttpStatus.OK);
 	}
 	
 	/**
@@ -995,7 +993,7 @@ public class GreetingsController {
 	 */
 	@GetMapping(value = "medGetPdose")
 	@ResponseBody
-	public ResponseEntity<?> medGetPdose(@RequestParam long reqfunc)
+	public ResponseEntity<?> medGetPdose(@RequestBody long reqfunc)
 	{
 		Cidade cidade = cidRep.findByCodcid(reqfunc);
 		if (cidade == null)
@@ -1013,7 +1011,7 @@ public class GreetingsController {
 	 */
 	@GetMapping(value = "medGetSdose")
 	@ResponseBody
-	public ResponseEntity<?> medGetSdose(@RequestParam long reqfunc)
+	public ResponseEntity<?> medGetSdose(@RequestBody long reqfunc)
 	{
 		Cidade cidade = cidRep.findByCodcid(reqfunc);
 		if (cidade == null)
@@ -1034,15 +1032,75 @@ public class GreetingsController {
 	 */
 	@GetMapping(value = "empgetEmpCov")
 	@ResponseBody
-	public ResponseEntity<?> empgetEmpCov(@RequestParam long reqfunc)
+	public ResponseEntity<?> empgetEmpCov(@RequestBody long reqfunc)
 	{
 		Empresa empresa = empRep.findByCnpjemp(reqfunc);
 		if (empresa == null)
 		{
 			return new ResponseEntity<String>("Empresa não encontrada", HttpStatus.BAD_REQUEST);
 		}
-		List<TipoEmpCov> lista = EmpCov.EmpresaCovid(reqfunc);
-		return new ResponseEntity<List<TipoEmpCov>>(lista, HttpStatus.OK);
+		List<Map<String, Object>> lista = empRep.funcEmpCov(reqfunc);
+		return new ResponseEntity<List<Map<String, Object>>>(lista, HttpStatus.OK);
+	}
+	
+	@GetMapping(value = "getVw1")
+	@ResponseBody
+	public ResponseEntity<?> getVw1()
+	{
+		try
+		{
+			List<Map<String, Object>> lista = medRep.selectVw1();
+			return new ResponseEntity<List<Map<String, Object>>>(lista, HttpStatus.OK);
+		}catch(Exception e)
+		{
+			e.printStackTrace();
+			return new ResponseEntity<String>("Deu erro", HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+	
+	@GetMapping(value = "getVw2")
+	@ResponseBody
+	public ResponseEntity<?> getVw2()
+	{
+		try
+		{
+			List<Map<String, Object>> lista = medRep.selectVw2();
+			return new ResponseEntity<List<Map<String, Object>>>(lista, HttpStatus.OK);
+		}catch(Exception e)
+		{
+			e.printStackTrace();
+			return new ResponseEntity<String>("Deu erro", HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+	
+	@GetMapping(value = "getVw3")
+	@ResponseBody
+	public ResponseEntity<?> getVw3()
+	{
+		try
+		{
+			List<Map<String, Object>> lista = medRep.selectVw3();
+			return new ResponseEntity<List<Map<String, Object>>>(lista, HttpStatus.OK);
+		}catch(Exception e)
+		{
+			e.printStackTrace();
+			return new ResponseEntity<String>("Deu erro", HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+	
+	@GetMapping(value = "getVw4")
+	@ResponseBody
+	public ResponseEntity<?> getVw4()
+	{
+		try
+		{
+			List<Map<String, Object>> lista = medRep.selectVw4();
+			return new ResponseEntity<List<Map<String, Object>>>(lista, HttpStatus.OK);
+		}catch(Exception e)
+		{
+			e.printStackTrace();
+			return new ResponseEntity<String>("Deu erro", HttpStatus.INTERNAL_SERVER_ERROR);
+		}
 	}
 	
 	/**
@@ -1088,5 +1146,5 @@ public class GreetingsController {
 		
 		return permissao;
 	}
-
+	
 }

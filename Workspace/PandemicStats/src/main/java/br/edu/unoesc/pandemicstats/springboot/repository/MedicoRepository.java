@@ -1,5 +1,8 @@
 package br.edu.unoesc.pandemicstats.springboot.repository;
 
+import java.util.List;
+import java.util.Map;
+
 import javax.transaction.Transactional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -9,6 +12,11 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import br.edu.unoesc.pandemicstats.springboot.model.Medico;
+import br.unoesc.pandemicstats.springboot.data.model.TipoCidCov;
+import br.unoesc.pandemicstats.springboot.data.model.TipoVw1;
+import br.unoesc.pandemicstats.springboot.data.model.TipoVw2;
+import br.unoesc.pandemicstats.springboot.data.model.TipoVw3;
+import br.unoesc.pandemicstats.springboot.data.model.TipoVw4;
 
 /**
  * @author Eduardo Mateus Da Costa
@@ -68,4 +76,24 @@ public interface MedicoRepository extends JpaRepository<Medico, String> {
 	@Transactional
 	@Query(nativeQuery = true, value ="select s_dose_cidade(:codigo)")
 	long SDoseCidade(@Param("codigo") long codigo);
+	
+	
+	@Transactional
+	@Query(nativeQuery = true, value ="select f.nomusu as "+ TipoCidCov.NOMUSU +","+" f.sexusu as "+ TipoCidCov.SEXUSU +","+" f.nomemp as "+ TipoCidCov.NOMEMP +" from cidade_covid(:codcid) f")
+	List<Map<String, Object>> funcCidCov(@Param("codcid") long codcid);
+	
+	@Transactional
+	@Query(nativeQuery = true, value ="select vw.nomusu as "+ TipoVw1.NOMUSU+","+" vw.codpac as "+ TipoVw1.CODPAC +" from vw_select1 vw")
+	List<Map<String, Object>> selectVw1();
+	
+	@Transactional
+	@Query(nativeQuery = true, value ="select vw.nomusu as "+ TipoVw2.NOMUSU +","+" vw.nomcid as "+ TipoVw2.NOMCID +" from vw_select2 vw")
+	List<Map<String, Object>> selectVw2();
+	
+	@Transactional
+	@Query(nativeQuery = true, value ="select vw.codcid as "+ TipoVw3.CODCID +","+" vw.nomcid as "+ TipoVw3.NOMCID +","+"vw.conta as "+ TipoVw3.CONTA +" from vw_select3 vw")
+	List<Map<String, Object>> selectVw3();
+	
+	@Query(nativeQuery = true, value ="select vw.idade as "+ TipoVw4.IDADE +","+" vw.casos as "+ TipoVw4.CASOS + " from vw_select4 vw")
+	List<Map<String, Object>> selectVw4();
 }
