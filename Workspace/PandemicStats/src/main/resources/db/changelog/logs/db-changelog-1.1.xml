@@ -361,7 +361,7 @@
 			as
 			$body$
 			begin
-				execute format('alter role %I rename to %L', email, newemail);
+				execute format('alter role %I rename to %I', email, newemail);
 			end
 			$body$
 			language plpgsql;@
@@ -371,7 +371,7 @@
 			as
 			$body$
 			begin
-				execute format('revoke %I FROM %L', email, grupo);
+				execute format('revoke %I FROM %I', grupo, email);
 			end
 			$body$
 			language plpgsql;@

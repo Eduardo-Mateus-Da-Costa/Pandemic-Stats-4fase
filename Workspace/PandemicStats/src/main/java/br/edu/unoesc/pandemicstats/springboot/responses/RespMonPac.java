@@ -38,6 +38,11 @@ public class RespMonPac {
 			this.codstatus = codstatus;
 			this.erro = "Pacinete não encontrado";
 		}
+		else if (codstatus == 507)
+		{
+			this.codstatus = codstatus;
+			this.erro = "Sintoma não encontrado";
+		}
 		else
 		{
 			this.codstatus = 200;

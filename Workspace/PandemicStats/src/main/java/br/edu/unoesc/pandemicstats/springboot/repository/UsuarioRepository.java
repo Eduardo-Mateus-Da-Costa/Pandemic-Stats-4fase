@@ -83,8 +83,8 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
 	 */
 	@Transactional
 	@Modifying(clearAutomatically = true)
-	@Query(nativeQuery = true, value ="call alter_email(:usuario, :newemail)")
-	void alterUserEmail(@Param("usuario") String usuario, @Param("newemail") String newemail);
+	@Query(nativeQuery = true, value ="call alter_email(:usuario, :email)")
+	void alterUserEmail(@Param("usuario") String usuario, @Param("email") String email);
 	
 	/**
 	 * @param String usuario

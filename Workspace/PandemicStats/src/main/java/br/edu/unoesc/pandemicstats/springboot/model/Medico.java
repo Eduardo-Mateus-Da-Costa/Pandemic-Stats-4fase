@@ -29,7 +29,7 @@ public class Medico implements Serializable{
 	private String crmmed;
 	
 	@OneToOne
-	@JoinColumn(columnDefinition = "NUMERIC(11, 0)", nullable = false)
+	@JoinColumn(columnDefinition = "NUMERIC(11, 0)", nullable = false, unique = true)
 	private Usuario cpfusu;
 	
 }

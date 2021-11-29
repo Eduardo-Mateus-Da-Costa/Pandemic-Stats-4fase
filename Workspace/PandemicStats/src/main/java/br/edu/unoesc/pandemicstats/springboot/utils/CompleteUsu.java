@@ -32,7 +32,7 @@ public class CompleteUsu {
 		{
 			inserido.setDatnasusu(obtido.getDatnasusu());
 		}
-		if(obtido.getSexusu() != ' ')
+		if(obtido.getSexusu() != '\u0000')
 		{
 			inserido.setSexusu(obtido.getSexusu());
 		}

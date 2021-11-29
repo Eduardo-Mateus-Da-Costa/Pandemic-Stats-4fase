@@ -153,7 +153,7 @@ public class GreetingsController {
 				respusu.RespValUsu(null, 506, null);
 				return new ResponseEntity<RespUsu>(respusu, HttpStatus.BAD_REQUEST);
 			}
-			if(usuusu.getEmausu() != usuario.getEmausu())
+			if((usuusu.getEmausu() != usuario.getEmausu()) && (usuusu.getEmausu() != null))
 			{
 				Usuario usuario2 = usuRep.findByEmail(usuusu.getEmausu());
 				if (usuario2 != null)
@@ -168,7 +168,7 @@ public class GreetingsController {
 					usuario.setEmausu(usuusu.getEmausu());
 				}
 			}
-			if(usuusu.getSenusu() != usuario.getSenusu())
+			if((usuusu.getSenusu() != usuario.getSenusu()) && (usuusu.getSenusu() != null))
 			{
 				usuRep.alterUserPassword(usuario.getEmausu(), usuusu.getSenusu());
 			}
@@ -191,6 +191,7 @@ public class GreetingsController {
 			respusu.RespValUsu(usuario, codigo, permissoes);
 			return new ResponseEntity<RespUsu>(respusu, HttpStatus.OK);
 		} catch (Exception e) {
+			e.printStackTrace();
 			RespUsu respusu = new RespUsu();
 			respusu.RespValUsu(null, 500, null);
 			return new ResponseEntity<RespUsu>(respusu, HttpStatus.CONFLICT);
@@ -209,7 +210,7 @@ public class GreetingsController {
 	 */
 	@DeleteMapping(value = "deleteUsu")
 	@ResponseBody
-	public ResponseEntity<String> deleteUsu(@RequestBody long cpfusu) {
+	public ResponseEntity<String> deleteUsu(@RequestParam long cpfusu) {
 		try {
 			Usuario usuario = usuRep.findByCPF(cpfusu);
 			if (usuario == null)
@@ -240,7 +241,7 @@ public class GreetingsController {
 	 */
 	@GetMapping(value = "getUsu")
 	@ResponseBody
-	public ResponseEntity<RespUsu> getUsu(@RequestBody long cpfusu) {
+	public ResponseEntity<RespUsu> getUsu(@RequestParam long cpfusu) {
 		try {
 			Usuario usuario = usuRep.findByCPF(cpfusu);
 			if (usuario == null)
@@ -359,15 +360,19 @@ public class GreetingsController {
 			Empresa empresa = empRep.findByCnpjemp(empemp.getCnpjemp());
 			Usuario usuario1 = empresa.getCpfusu();
 			Usuario usuario2 = empemp.getCpfusu(); 
-			if(usuario1.getCpfusu() != usuario2.getCpfusu())
+			if(usuario2 != null)
 			{
-				usuario2 = usuRep.findByCPF(usuario2.getCpfusu());
-				if (usuario2 == null)
+				if(usuario1.getCpfusu() != usuario2.getCpfusu())
 				{
-					RespEmp respemp = new RespEmp();
-					respemp.RespValEmp(null, 509);
-					return new ResponseEntity<RespEmp>(respemp, HttpStatus.BAD_REQUEST);
+					usuario2 = usuRep.findByCPF(usuario2.getCpfusu());
+					if (usuario2 == null)
+					{
+						RespEmp respemp = new RespEmp();
+						respemp.RespValEmp(null, 509);
+						return new ResponseEntity<RespEmp>(respemp, HttpStatus.BAD_REQUEST);
+					}
 				}
+					
 			}
 			Empresa empresa2 = empRep.findByEmail(empemp.getEmaemp());
 			if(empresa2 != null)
@@ -383,8 +388,8 @@ public class GreetingsController {
 			if (emp == null)
 			{
 				empRep.revokeEmpresa(usuario1.getEmausu(), "g_empresa");
+				empRep.grantDBEmpresa(usuario2.getEmausu());
 			}
-			empRep.grantDBEmpresa(usuario2.getEmausu());
 			RespEmp respemp = new RespEmp();
 			respemp.RespValEmp(empresa, 0);
 			return new ResponseEntity<RespEmp>(respemp, HttpStatus.OK);
@@ -406,7 +411,7 @@ public class GreetingsController {
 	 */
 	@DeleteMapping(value = "deleteEmp")
 	@ResponseBody
-	public ResponseEntity<String> deleteEmp(@RequestBody long cnpjemp) {
+	public ResponseEntity<String> deleteEmp(@RequestParam long cnpjemp) {
 		try {
 			Empresa empresa = empRep.findByCnpjemp(cnpjemp);
 			if (empresa == null)
@@ -439,7 +444,7 @@ public class GreetingsController {
 	 */
 	@GetMapping(value = "getEmp")
 	@ResponseBody
-	public ResponseEntity<?> getEmp(@RequestBody long cnpjemp) {
+	public ResponseEntity<?> getEmp(@RequestParam long cnpjemp) {
 		try {
 			Empresa empresa = empRep.findByCnpjemp(cnpjemp);
 			if (empresa == null)
@@ -470,8 +475,7 @@ public class GreetingsController {
 	@ResponseBody
 	public ResponseEntity<RespMed> postMed(@RequestBody Medico medmed) {
 		try {
-			Medico medico = new Medico();
-			System.out.println(medmed);
+			Medico medico = new Medico();;
 			medico = medRep.findByCRM(medmed.getCrmmed());
 			if (medico != null) {
 				RespMed respmed = new RespMed();
@@ -486,6 +490,14 @@ public class GreetingsController {
 					respmed.RespValMed(null, 506);
 					return new ResponseEntity<RespMed>(respmed, HttpStatus.CONFLICT);
 				}
+				medico = medRep.findByCPF(usuario.getCpfusu());
+				if (medico != null)
+				{
+					
+					RespMed respmed = new RespMed();
+					respmed.RespValMed(null, 507);
+					return new ResponseEntity<RespMed>(respmed, HttpStatus.CONFLICT);
+				}
 				medRep.save(medmed);
 				medRep.grantDBMedico(usuario.getEmausu());
 				RespMed respmed = new RespMed();
@@ -493,6 +505,7 @@ public class GreetingsController {
 				return new ResponseEntity<RespMed>(respmed, HttpStatus.CREATED);
 			}
 		} catch (Exception e) {
+			e.printStackTrace();
 			RespMed respmed = new RespMed();
 			respmed.RespValMed(null, 500);
 			return new ResponseEntity<RespMed>(respmed, HttpStatus.CONFLICT);
@@ -536,7 +549,7 @@ public class GreetingsController {
 	 */
 	@GetMapping(value = "getMed")
 	@ResponseBody
-	public ResponseEntity<?> getMed(@RequestBody String crmmed) {
+	public ResponseEntity<?> getMed(@RequestParam String crmmed) {
 		Medico medico = medRep.findByCRM(crmmed);
 		if (medico == null)
 		{
@@ -557,7 +570,7 @@ public class GreetingsController {
 	 */
 	@GetMapping(value = "getCid")
 	@ResponseBody
-	public ResponseEntity<?> getCid(@RequestBody long codcid) {
+	public ResponseEntity<?> getCid(@RequestParam long codcid) {
 		Cidade cidade = cidRep.findByCodcid(codcid);
 		if (cidade == null)
 		{
@@ -579,7 +592,7 @@ public class GreetingsController {
 	 */
 	@GetMapping(value = "getEstCids")
 	@ResponseBody
-	public ResponseEntity<?> getCids(@RequestBody long codest) {
+	public ResponseEntity<?> getCids(@RequestParam long codest) {
 		Estado estado = estRep.findByCodest(codest);
 		if (estado == null)
 		{
@@ -617,7 +630,7 @@ public class GreetingsController {
 	 */
 	@GetMapping(value = "getEst")
 	@ResponseBody
-	public ResponseEntity<?> getEst(@RequestBody long codest) {
+	public ResponseEntity<?> getEst(@RequestParam long codest) {
 		Estado estado = estRep.findByCodest(codest);
 		if (estado == null)
 		{
@@ -639,7 +652,7 @@ public class GreetingsController {
 	 */
 	@GetMapping(value = "getEsts")
 	@ResponseBody
-	public ResponseEntity<?> getEsts(@RequestBody long codpai) {
+	public ResponseEntity<?> getEsts(@RequestParam long codpai) {
 		Pais pais = paiRep.findByCodpai(codpai);
 		if (pais == null)
 		{
@@ -667,6 +680,9 @@ public class GreetingsController {
 	@ResponseBody
 	public ResponseEntity<RespMonPac> postMomPac(@RequestBody MonitoramentoPaciente monpac) {
 		try {
+			if (monpac.getDatmon() == null) {
+				monpac.setDatmon(new java.sql.Date(new java.util.Date().getTime()));
+			}
 			char intsin = monpac.getIntsin();
 			if ((intsin == 'P') || (intsin == 'M') || (intsin == 'C') || (intsin == 'S')) {
 				Paciente paciente = monpac.getCodpac();
@@ -675,6 +691,14 @@ public class GreetingsController {
 				{
 					RespMonPac respmonpac = new RespMonPac();
 					respmonpac.RespValMomPac(null, 506);
+					return new ResponseEntity<RespMonPac>(respmonpac, HttpStatus.BAD_REQUEST);
+				}
+				Sintoma sintoma = monpac.getCodsin();
+				sintoma = sinRep.findByCodsin(sintoma.getCodsin());
+				if (sintoma == null)
+				{
+					RespMonPac respmonpac = new RespMonPac();
+					respmonpac.RespValMomPac(null, 507);
 					return new ResponseEntity<RespMonPac>(respmonpac, HttpStatus.BAD_REQUEST);
 				}
 				monPacRep.save(monpac);
@@ -703,7 +727,7 @@ public class GreetingsController {
 	 */
 	@GetMapping(value = "getMonsPac")
 	@ResponseBody
-	public ResponseEntity<?> getMonsPac(@RequestBody long codpac) {
+	public ResponseEntity<?> getMonsPac(@RequestParam long codpac) {
 		Paciente paciente = pacRep.findByCodpac(codpac);
 		if (paciente == null)
 		{
@@ -798,7 +822,7 @@ public class GreetingsController {
 	 */
 	@GetMapping(value = "getPac")
 	@ResponseBody
-	public ResponseEntity<?> getPac(@RequestBody long cpfusu) {
+	public ResponseEntity<?> getPac(@RequestParam long cpfusu) {
 		Paciente paciente = pacRep.findByCpfusu(cpfusu);
 		if (paciente == null)
 		{
@@ -828,6 +852,11 @@ public class GreetingsController {
 			return new ResponseEntity<String>("Paciente não encontrado", HttpStatus.BAD_REQUEST);
 		}
 		Comorbidade comorbidade = paccompaccom.getCodcom();
+		comorbidade = comRep.findByCodcom(comorbidade.getCodcom());
+		if (comorbidade == null)
+		{
+			return new ResponseEntity<String>("Comorbidade não encontrada", HttpStatus.BAD_REQUEST);
+		}
 		PacienteComorbidade paccom = pacComRep.findByCodpacANDCodcom(paciente.getCodpac(), comorbidade.getCodcom());
 		if (paccom != null) {
 			return new ResponseEntity<String>("Ja estava cadastrado", HttpStatus.OK);
@@ -874,6 +903,9 @@ public class GreetingsController {
 	@ResponseBody
 	public ResponseEntity<RespTesCov> postTesCov(@RequestBody TesteCovid teste) {
 		try {
+			if (teste.getDattes() == null) {
+				teste.setDattes(new java.sql.Date(new java.util.Date().getTime()));
+			}
 			Paciente paciente = teste.getCodpac();
 			paciente = pacRep.findByCodpac(paciente.getCodpac());
 			if (paciente == null)
@@ -912,7 +944,7 @@ public class GreetingsController {
 	 */
 	@GetMapping(value = "getTests")
 	@ResponseBody
-	public ResponseEntity<?> getTests(@RequestBody long codpac)
+	public ResponseEntity<?> getTests(@RequestParam long codpac)
 	{
 		Paciente paciente = pacRep.findByCodpac(codpac);
 		if (paciente == null)
@@ -1009,7 +1041,7 @@ public class GreetingsController {
 	 */
 	@GetMapping(value = "getVacs")
 	@ResponseBody
-	public ResponseEntity<?> getVacs(@RequestBody long codpac)
+	public ResponseEntity<?> getVacs(@RequestParam long codpac)
 	{
 		Paciente paciente = pacRep.findByCodpac(codpac);
 		if (paciente == null)
@@ -1066,7 +1098,7 @@ public class GreetingsController {
 	 */
 	@GetMapping(value = "medgetCidCov")
 	@ResponseBody
-	public ResponseEntity<?> medgetCidCov(@RequestBody long reqfunc)
+	public ResponseEntity<?> medgetCidCov(@RequestParam long reqfunc)
 	{
 		Cidade cidade = cidRep.findByCodcid(reqfunc);
 		if (cidade == null)
@@ -1086,7 +1118,7 @@ public class GreetingsController {
 	 */
 	@GetMapping(value = "medgetEmpCov")
 	@ResponseBody
-	public ResponseEntity<?> medgetEmpCov(@RequestBody long reqfunc)
+	public ResponseEntity<?> medgetEmpCov(@RequestParam long reqfunc)
 	{
 		Empresa empresa = empRep.findByCnpjemp(reqfunc);
 		if (empresa == null)
@@ -1104,7 +1136,7 @@ public class GreetingsController {
 	 */
 	@GetMapping(value = "medGetPdose")
 	@ResponseBody
-	public ResponseEntity<?> medGetPdose(@RequestBody long reqfunc)
+	public ResponseEntity<?> medGetPdose(@RequestParam long reqfunc)
 	{
 		Cidade cidade = cidRep.findByCodcid(reqfunc);
 		if (cidade == null)
@@ -1122,7 +1154,7 @@ public class GreetingsController {
 	 */
 	@GetMapping(value = "medGetSdose")
 	@ResponseBody
-	public ResponseEntity<?> medGetSdose(@RequestBody long reqfunc)
+	public ResponseEntity<?> medGetSdose(@RequestParam long reqfunc)
 	{
 		Cidade cidade = cidRep.findByCodcid(reqfunc);
 		if (cidade == null)

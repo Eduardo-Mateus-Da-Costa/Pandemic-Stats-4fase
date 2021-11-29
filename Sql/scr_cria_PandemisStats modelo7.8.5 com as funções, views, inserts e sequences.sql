@@ -64,7 +64,7 @@ comment on column Estado.codest is 'Código do estado';
 
 create table Medico (
 	  crmmed varchar(30) not null, 
-	  cpfusu_cpfusu numeric(11, 0) not null, 
+	  cpfusu_cpfusu numeric(11, 0) not null unique, 
 	  primary key (crmmed));
  
 comment on table Medico is 'Tabela de medicos';

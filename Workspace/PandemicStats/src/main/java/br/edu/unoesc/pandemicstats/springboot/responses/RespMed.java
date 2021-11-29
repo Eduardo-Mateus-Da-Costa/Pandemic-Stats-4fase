@@ -28,15 +28,20 @@ public class RespMed{
 			this.codstatus = codstatus;
 			this.erro = "Erro interno ou variável nula";
 		}
-		if(codstatus==501)
+		else if(codstatus==501)
 		{
 			this.codstatus = codstatus;
 			this.erro = "CRM já em uso";
 		}
-		if(codstatus==506)
+		else if(codstatus==506)
 		{
 			this.codstatus = codstatus;
 			this.erro = "Usuário não cadastrado";
+		}
+		else if(codstatus==507)
+		{
+			this.codstatus = codstatus;
+			this.erro = "CPF já cadastrado como médico";
 		}
 		else
 		{
