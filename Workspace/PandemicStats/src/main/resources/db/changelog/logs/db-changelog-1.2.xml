@@ -348,13 +348,13 @@
 					
 					<!--Paciente-->
 					insert into paciente(codpac, grurispac, pespac, sitpac, cpfusu_cpfusu) 
-					select id, case when mod(id, 2)=0 then 'S' else 'N' end, (30.5+id), case when mod(id, 2)=0 then 'BEM' else 'ISOLAMENTO' end, id
-					from generate_series(1, 22) as t(id);
+					select nextval('seq_paciente'), case when mod(id, 2)=0 then 'S' else 'N' end, (30.5+id), case when mod(id, 2)=0 then 'BEM' else 'ISOLAMENTO' end, id
+					from generate_series(12, 22) as t(id);
 					
 					<!--Teste covid-->
 					insert into teste_covid(codtes, covpactes, codpac_codpac) 
 					select nextval('seq_teste_covid'), case when mod(id, 2)=0 then 'P' else 'N' end, id
-					from generate_series(1, 22) as t(id);
+					from generate_series(1, 11) as t(id);
 					
 					<!--Monitoramento Paciente-->
 					insert into monitoramento_paciente(codmon, intsin, codpac_codpac, codsin_codsin) 
@@ -362,17 +362,13 @@
 					from generate_series(1, 11) as t(id);
 					
 					insert into monitoramento_paciente(codmon, intsin, codpac_codpac, codsin_codsin) 
-					select nextval('seq_monitoramento_paciente'), case when mod(id, 2)=0 then 'C' else 'S' end, id, id-11
+					select nextval('seq_monitoramento_paciente'), case when mod(id, 2)=0 then 'C' else 'S' end, id-11, id-11
 					from generate_series(12, 22) as t(id);
 					
 					<!--Paciente Comorbidade-->
 					insert into paciente_comorbidade(codpaccom, codpac_codpac, codcom_codcom) 
 					select nextval('seq_paciente_comorbidade'), id, id
-					from generate_series(1, 13) as t(id);
-					
-					insert into paciente_comorbidade(codpaccom, codpac_codpac, codcom_codcom) 
-					select nextval('seq_paciente_comorbidade'), id, id-13
-					from generate_series(14, 22) as t(id);
+					from generate_series(1, 11) as t(id);
 					
 					<!--Medico-->
 					insert into medico(crmmed, cpfusu_cpfusu) 
@@ -382,7 +378,7 @@
 					<!--Vacina-->
 					insert into vacina(codvac, dosvac, codpac_codpac, crmmed_crmmed) 
 					select nextval('seq_vacina'), case when mod(id, 2)=0 then 1 else 2 end , id, cast(id as varchar)
-					from generate_series(1, 22) as t(id);
+					from generate_series(1, 11) as t(id);
 					
 					<!--Solicitacao-->
 					insert into solicitacao(codsol, dessol, cpfusu_cpfusu) 

@@ -35,6 +35,7 @@ import br.edu.unoesc.pandemicstats.springboot.utils.*;
  * @see br.edu.unoesc.pandemicstats.springboot.responses
  * @see br.edu.unoesc.pandemicstats.springboot.schemmas
  * @see br.edu.unoesc.pandemicstats.springboot.utils
+ * @see br.edu.unoesc.pandemicstats.springboot.data.model
  */
 @RestController
 public class GreetingsController {
@@ -751,6 +752,12 @@ public class GreetingsController {
 						}
 						paciente = pacRep.findByCpfusu(usuario.getCpfusu());
 						if (paciente == null) {
+							if(usuario.getCnpjemp() == null)
+							{
+								RespPac resppac = new RespPac();
+								resppac.RespValPac(null, 507);
+								return new ResponseEntity<RespPac>(resppac, HttpStatus.BAD_REQUEST);
+							}
 							pacRep.save(pacpac);
 							pacRep.grantDBPaciente(usuario.getEmausu());
 							RespPac resppac = new RespPac();

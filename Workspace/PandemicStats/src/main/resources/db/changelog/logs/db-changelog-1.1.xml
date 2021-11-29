@@ -153,7 +153,7 @@
 			execute procedure controla_sitpac();@
 			
 			
-			<!--Funcao trigger-controla-unicidade-comorbidade--> 
+			<!--Funcao trigger-controla-unicidade-comorbidade-->
 			create or replace function controla_comorbidade()
 			returns trigger
 			as
@@ -161,9 +161,9 @@
 			declare 
 				codcom numeric := 0;
 			begin
-				select pc.codcom_codcom into codcom from paciente_comorbidade pc
-				where pc.codpac_codpac = new.codpac_codpac;
-			    if (new.codcom_codcom = codcom) then
+				select count(pc.codcom_codcom) into codcom from paciente_comorbidade pc
+				where pc.codpac_codpac = new.codpac_codpac and pc.codcom_codcom = new.codcom_codcom;
+			    if (codcom > 0) then
 			        raise exception 'Já cadastrado';
 			    end if;
 			    return new;
@@ -177,6 +177,32 @@
 			on paciente_comorbidade
 			for each row
 			execute procedure controla_comorbidade();@
+			
+			
+			<!--Funcao trigger-controla-paciente-empresa-->
+			create or replace function controla_paciente_empresa()
+			returns trigger
+			as
+			$body$
+			declare 
+				cod numeric;
+			begin
+				select u.cnpjemp_cnpjemp into cod from usuario u
+				where u.cpfusu = new.cpfusu_cpfusu;
+			    if (cod is null) then
+			        raise exception 'Usuário não vinculado a empresa';
+			    end if;
+			    return new;
+			end
+			$body$
+			language plpgsql;@
+			
+			<!--Trigger-controla-paciente-empresa-->
+			create trigger paciente_empresa_before_tg
+			before insert or update
+			on paciente
+			for each row
+			execute procedure controla_paciente_empresa();@
 			
 			<!--View conta-medicos -->
 			create view vw_conta_medicos as

@@ -38,7 +38,7 @@ public class Paciente implements Serializable{
 	
 	@OneToOne
 	@OnDelete(action = OnDeleteAction.CASCADE)
-	@JoinColumn(columnDefinition = "NUMERIC(11, 0)", nullable = false)
+	@JoinColumn(columnDefinition = "NUMERIC(11, 0)", nullable = false, unique = true)
 	private Usuario cpfusu;
 	
 	@Column(columnDefinition = "NUMERIC(5, 2)", nullable = false)

@@ -48,6 +48,11 @@ public class RespPac {
 			this.codstatus = codstatus;
 			this.erro = "Usuário não cadastrado";
 		}
+		else if (codstatus == 507)
+		{
+			this.codstatus = codstatus;
+			this.erro = "Usuário não vinculado a empresa";
+		}
 		else
 		{
 			this.codstatus = 200;
