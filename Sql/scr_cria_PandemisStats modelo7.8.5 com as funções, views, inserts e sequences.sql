@@ -28,7 +28,7 @@ create table Empresa (
 	  nomfanemp varchar(100), 
 	  telemp1   varchar(20) not null, 
 	  telemp2   varchar(20), 
-	  emaemp    varchar(30) unique, 
+	  emaemp    varchar(30) not null unique, 
 	  ramemp    varchar(60) not null, 
 	  cpfusu_cpfusu    numeric(11, 0) not null, 
 	  valemp    date default CURRENT_DATE not null, 
@@ -731,12 +731,12 @@ order by p.codpac desc;
 
 
 create view vw_select2 as
-select u.nomusu, c.nomcid from paciente p 
+select distinct u.nomusu, c.nomcid from paciente p 
 inner join usuario u on u.cpfusu = p.cpfusu_cpfusu 
 inner join cidade c on c.codcid = u.codcid_codcid 
 inner join teste_covid tc on tc.codpac_codpac = p.codpac 
 inner join monitoramento_paciente mp on mp.codpac_codpac = p.codpac 
-where (tc.covpactes = 'N') and (mp.codsin_codsin notnull) and (u.sexusu = 'M') and (c.nomcid in('Maravilha', 'Descanso', 'Pinhalzinho', 'Chapecó', 'Itapiranga'))
+where ((tc.covpactes = 'N') and (mp.codsin_codsin notnull) and (mp.intsin != 'S') and (u.sexusu = 'M') and (c.nomcid in('Maravilha', 'Descanso', 'Pinhalzinho', 'Chapecó', 'Itapiranga')))
 order by c.nomcid desc, u.nomusu;
 
 
