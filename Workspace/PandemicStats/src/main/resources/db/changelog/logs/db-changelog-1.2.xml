@@ -326,12 +326,18 @@
 							  (13, 'Gestação');
 			
 					<!--Usuario-->
+					insert into usuario(cpfusu, cep, emausu, nomusu, num, senusu, rua, telusu, codcid_codcid, datnasusu, sexusu) values
+					(0, 0, 'default', 'default', 'default', 'bvr839rbv3', 'default', 'default', 11, '2000-01-01', 'M');
+					
 					insert into usuario(cpfusu, cep, emausu, nomusu, num, senusu, rua, telusu, codcid_codcid, datnasusu, sexusu) 
 					select id, (id+10), 'usuario.'||id||'@gmail.com', 'Usuario '||id, 'Num '||id, 'Senha'||id, 'Rua'||id, cast((id+1000) as varchar), id, cast('2020-05-20' as date)+id,  
 					case when mod(id, 2)=0 then 'M' else 'F' end
 					from generate_series(1, 11) as t(id);
 					
 					<!--Empresa-->
+					insert into empresa(cnpjemp, cep, emaemp, nomemp, num, ramemp, rua, telemp1, codcid_codcid, cpfusu_cpfusu) values
+					(0, 0, 'default', 'Empresa deletada', 'default', 'default', 'default', '0', 11, 0);
+					
 					insert into empresa(cnpjemp, cep, emaemp, nomemp, num, ramemp, rua, telemp1, codcid_codcid, cpfusu_cpfusu) 
 					select id, (id+10), 'empresa.'||id||'@gmail.com', 'Empresa '||id, 'Num '||id, 'Ramo'||id, 'Rua'||id, cast((id+1000) as varchar), id, id 
 					from generate_series(1, 11) as t(id);

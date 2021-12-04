@@ -219,7 +219,7 @@ public class GreetingsController {
 			}
 			Empresa empresa = empRep.findByCpfusu(cpfusu);
 			if (empresa != null) {
-				usuRep.setCnpjempNull(empresa.getCnpjemp());
+				usuRep.setCnpjemp0(empresa.getCnpjemp());
 			}
 			usuRep.dropUser(usuario.getEmausu());
 			usuRep.deleteByCPF(cpfusu);
@@ -418,7 +418,7 @@ public class GreetingsController {
 			{
 				return new ResponseEntity<String>("Empresa não cadastrada", HttpStatus.BAD_REQUEST);
 			}
-			usuRep.setCnpjempNull(cnpjemp);
+			usuRep.setCnpjemp0(cnpjemp);
 			empRep.deleteById(cnpjemp);
 			emaSend.Enviar(empresa.getEmaemp(), "Remoção de casdastro empresarial feita com sucesso \r\n Se não foi você por favor entre em contato com nossos Administradores pelo email pandemicstats.contato@gmail.com \r\n Está é uma mensagem automática favor não responda!", "Remoção de casdastro empresarial PandemicStats"); 
 			Usuario usuario = empresa.getCpfusu();

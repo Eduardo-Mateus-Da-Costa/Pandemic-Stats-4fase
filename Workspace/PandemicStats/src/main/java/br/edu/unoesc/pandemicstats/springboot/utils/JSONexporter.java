@@ -69,7 +69,6 @@ public class JSONexporter {
 			writeFile.close();
 		} catch (IOException e) {
 			e.printStackTrace();
-			System.out.println("Falhou ali");
 		}
 	}
 	

@@ -49,8 +49,8 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
 	 */
 	@Transactional
 	@Modifying(clearAutomatically = true)
-	@Query(value = "update Usuario set cnpjemp = null where cnpjemp.cnpjemp = ?1")
-	void setCnpjempNull(long cnpj);
+	@Query(value = "update Usuario set cnpjemp = 0 where cnpjemp.cnpjemp = ?1")
+	void setCnpjemp0(long cnpj);
 	
 	/**
 	 * @param long cpfusu
