@@ -1,0 +1,2882 @@
+--
+-- PostgreSQL database dump
+--
+
+-- Dumped from database version 13.4
+-- Dumped by pg_dump version 13.4
+
+-- Started on 2021-12-04 20:47:37
+
+SET statement_timeout = 0;
+SET lock_timeout = 0;
+SET idle_in_transaction_session_timeout = 0;
+SET client_encoding = 'UTF8';
+SET standard_conforming_strings = on;
+SELECT pg_catalog.set_config('search_path', '', false);
+SET check_function_bodies = false;
+SET xmloption = content;
+SET client_min_messages = warning;
+SET row_security = off;
+
+--
+-- TOC entry 3233 (class 1262 OID 33798)
+-- Name: pandemicstats; Type: DATABASE; Schema: -; Owner: postgres
+--
+
+CREATE DATABASE pandemicstats WITH TEMPLATE = template0 ENCODING = 'UTF8' LOCALE = 'Portuguese_Brazil.1252';
+
+
+ALTER DATABASE pandemicstats OWNER TO postgres;
+
+\connect pandemicstats
+
+SET statement_timeout = 0;
+SET lock_timeout = 0;
+SET idle_in_transaction_session_timeout = 0;
+SET client_encoding = 'UTF8';
+SET standard_conforming_strings = on;
+SELECT pg_catalog.set_config('search_path', '', false);
+SET check_function_bodies = false;
+SET xmloption = content;
+SET client_min_messages = warning;
+SET row_security = off;
+
+--
+-- TOC entry 738 (class 1247 OID 34006)
+-- Name: tp_cid_covid; Type: TYPE; Schema: public; Owner: postgres
+--
+
+CREATE TYPE public.tp_cid_covid AS (
+	nomusu character varying(100),
+	sexusu character(1),
+	nomemp character varying(100)
+);
+
+
+ALTER TYPE public.tp_cid_covid OWNER TO postgres;
+
+--
+-- TOC entry 741 (class 1247 OID 34010)
+-- Name: tp_emp_covid; Type: TYPE; Schema: public; Owner: postgres
+--
+
+CREATE TYPE public.tp_emp_covid AS (
+	nomusu character varying(100),
+	sexusu character(1),
+	nomcid character varying(60)
+);
+
+
+ALTER TYPE public.tp_emp_covid OWNER TO postgres;
+
+--
+-- TOC entry 254 (class 1255 OID 34053)
+-- Name: alter_email(character varying, character varying); Type: PROCEDURE; Schema: public; Owner: postgres
+--
+
+CREATE PROCEDURE public.alter_email(email character varying, newemail character varying)
+    LANGUAGE plpgsql
+    AS $$
+			begin
+				execute format('alter role %I rename to %I', email, newemail);
+			end
+			$$;
+
+
+ALTER PROCEDURE public.alter_email(email character varying, newemail character varying) OWNER TO postgres;
+
+--
+-- TOC entry 253 (class 1255 OID 34052)
+-- Name: alter_password(character varying, character varying); Type: PROCEDURE; Schema: public; Owner: postgres
+--
+
+CREATE PROCEDURE public.alter_password(email character varying, senha character varying)
+    LANGUAGE plpgsql
+    AS $$
+			begin
+				execute format('alter role %I with password ''%s''', email, senha);
+			end
+			$$;
+
+
+ALTER PROCEDURE public.alter_password(email character varying, senha character varying) OWNER TO postgres;
+
+--
+-- TOC entry 237 (class 1255 OID 34007)
+-- Name: cidade_covid(numeric); Type: FUNCTION; Schema: public; Owner: postgres
+--
+
+CREATE FUNCTION public.cidade_covid(codigo numeric) RETURNS SETOF public.tp_cid_covid
+    LANGUAGE plpgsql
+    AS $$
+			begin
+				return query select u.nomusu, u.sexusu, e.nomemp from usuario u 
+						inner join empresa e on u.cnpjemp_cnpjemp = e.cnpjemp
+						inner join paciente p on p.cpfusu_cpfusu = u.cpfusu
+						where (p.sitpac = 'ISOLAMENTO' or p.sitpac = 'INTERNADO') and (u.codcid_codcid = codigo);
+			end
+			$$;
+
+
+ALTER FUNCTION public.cidade_covid(codigo numeric) OWNER TO postgres;
+
+--
+-- TOC entry 244 (class 1255 OID 34020)
+-- Name: controla_comorbidade(); Type: FUNCTION; Schema: public; Owner: postgres
+--
+
+CREATE FUNCTION public.controla_comorbidade() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $$
+			declare 
+				codcom numeric := 0;
+			begin
+				select count(pc.codcom_codcom) into codcom from paciente_comorbidade pc
+				where pc.codpac_codpac = new.codpac_codpac and pc.codcom_codcom = new.codcom_codcom;
+			    if (codcom > 0) then
+			        raise exception 'Já cadastrado';
+			    end if;
+			    return new;
+			end
+			$$;
+
+
+ALTER FUNCTION public.controla_comorbidade() OWNER TO postgres;
+
+--
+-- TOC entry 242 (class 1255 OID 34016)
+-- Name: controla_datvac(); Type: FUNCTION; Schema: public; Owner: postgres
+--
+
+CREATE FUNCTION public.controla_datvac() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $$
+			begin
+				if (new.datvac > (current_date)) then
+					raise exception 'Data inválida';
+				end if;
+				return new;		
+			end
+			$$;
+
+
+ALTER FUNCTION public.controla_datvac() OWNER TO postgres;
+
+--
+-- TOC entry 241 (class 1255 OID 34014)
+-- Name: controla_dosvac(); Type: FUNCTION; Schema: public; Owner: postgres
+--
+
+CREATE FUNCTION public.controla_dosvac() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $$
+			begin
+				if (new.dosvac > 2) or (new.dosvac < 1) then
+					raise exception 'Dose inválida';
+				end if;
+				return new;		
+			end
+			$$;
+
+
+ALTER FUNCTION public.controla_dosvac() OWNER TO postgres;
+
+--
+-- TOC entry 245 (class 1255 OID 34022)
+-- Name: controla_paciente_empresa(); Type: FUNCTION; Schema: public; Owner: postgres
+--
+
+CREATE FUNCTION public.controla_paciente_empresa() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $$
+			declare 
+				cod numeric;
+			begin
+				select u.cnpjemp_cnpjemp into cod from usuario u
+				where u.cpfusu = new.cpfusu_cpfusu;
+			    if (cod is null) then
+			        raise exception 'Usuário não vinculado a empresa';
+			    end if;
+			    return new;
+			end
+			$$;
+
+
+ALTER FUNCTION public.controla_paciente_empresa() OWNER TO postgres;
+
+--
+-- TOC entry 243 (class 1255 OID 34018)
+-- Name: controla_sitpac(); Type: FUNCTION; Schema: public; Owner: postgres
+--
+
+CREATE FUNCTION public.controla_sitpac() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $$
+			begin
+				if (new.covpactes = 'P') then
+					update paciente set sitpac = 'ISOLAMENTO' where paciente.codpac = new.codpac_codpac;
+				end if;
+				return new;		
+			end
+			$$;
+
+
+ALTER FUNCTION public.controla_sitpac() OWNER TO postgres;
+
+--
+-- TOC entry 246 (class 1255 OID 34040)
+-- Name: create_user(character varying, character varying); Type: PROCEDURE; Schema: public; Owner: postgres
+--
+
+CREATE PROCEDURE public.create_user(email character varying, senha character varying)
+    LANGUAGE plpgsql
+    AS $$
+			begin
+				execute format('create user %I with password ''%s''', email, senha);
+			end
+			$$;
+
+
+ALTER PROCEDURE public.create_user(email character varying, senha character varying) OWNER TO postgres;
+
+--
+-- TOC entry 252 (class 1255 OID 34051)
+-- Name: drop_user(character varying); Type: PROCEDURE; Schema: public; Owner: postgres
+--
+
+CREATE PROCEDURE public.drop_user(email character varying)
+    LANGUAGE plpgsql
+    AS $$
+			begin
+				execute format('drop role %I', email);
+			end
+			$$;
+
+
+ALTER PROCEDURE public.drop_user(email character varying) OWNER TO postgres;
+
+--
+-- TOC entry 238 (class 1255 OID 34011)
+-- Name: empresa_covid(numeric); Type: FUNCTION; Schema: public; Owner: postgres
+--
+
+CREATE FUNCTION public.empresa_covid(cnpj numeric) RETURNS SETOF public.tp_emp_covid
+    LANGUAGE plpgsql
+    AS $$
+			begin
+				return query select u.nomusu, u.sexusu, c.nomcid from usuario u 
+						inner join empresa e on u.cnpjemp_cnpjemp = e.cnpjemp
+						inner join cidade c on u.codcid_codcid = c.codcid
+						inner join paciente p on p.cpfusu_cpfusu = u.cpfusu
+						where (p.sitpac = 'ISOLAMENTO' or p.sitpac = 'INTERNADO') and (e.cnpjemp = cnpj);
+			end
+			$$;
+
+
+ALTER FUNCTION public.empresa_covid(cnpj numeric) OWNER TO postgres;
+
+--
+-- TOC entry 250 (class 1255 OID 34049)
+-- Name: grant_administrador(character varying); Type: PROCEDURE; Schema: public; Owner: postgres
+--
+
+CREATE PROCEDURE public.grant_administrador(email character varying)
+    LANGUAGE plpgsql
+    AS $$
+			begin
+				execute format('grant g_administrador to %I', email);
+			end
+			$$;
+
+
+ALTER PROCEDURE public.grant_administrador(email character varying) OWNER TO postgres;
+
+--
+-- TOC entry 247 (class 1255 OID 34046)
+-- Name: grant_empresa(character varying); Type: PROCEDURE; Schema: public; Owner: postgres
+--
+
+CREATE PROCEDURE public.grant_empresa(email character varying)
+    LANGUAGE plpgsql
+    AS $$
+			begin
+				execute format('grant g_empresa to %I', email);
+			end
+			$$;
+
+
+ALTER PROCEDURE public.grant_empresa(email character varying) OWNER TO postgres;
+
+--
+-- TOC entry 249 (class 1255 OID 34048)
+-- Name: grant_medico(character varying); Type: PROCEDURE; Schema: public; Owner: postgres
+--
+
+CREATE PROCEDURE public.grant_medico(email character varying)
+    LANGUAGE plpgsql
+    AS $$
+			begin
+				execute format('grant g_medico to %I', email);
+			end
+			$$;
+
+
+ALTER PROCEDURE public.grant_medico(email character varying) OWNER TO postgres;
+
+--
+-- TOC entry 248 (class 1255 OID 34047)
+-- Name: grant_paciente(character varying); Type: PROCEDURE; Schema: public; Owner: postgres
+--
+
+CREATE PROCEDURE public.grant_paciente(email character varying)
+    LANGUAGE plpgsql
+    AS $$
+			begin
+				execute format('grant g_paciente to %I', email);
+			end
+			$$;
+
+
+ALTER PROCEDURE public.grant_paciente(email character varying) OWNER TO postgres;
+
+--
+-- TOC entry 251 (class 1255 OID 34050)
+-- Name: grant_usuario(character varying); Type: PROCEDURE; Schema: public; Owner: postgres
+--
+
+CREATE PROCEDURE public.grant_usuario(email character varying)
+    LANGUAGE plpgsql
+    AS $$
+			begin
+				execute format('grant g_usuario to %I', email);
+			end
+			$$;
+
+
+ALTER PROCEDURE public.grant_usuario(email character varying) OWNER TO postgres;
+
+--
+-- TOC entry 239 (class 1255 OID 34012)
+-- Name: p_dose_cidade(numeric); Type: FUNCTION; Schema: public; Owner: postgres
+--
+
+CREATE FUNCTION public.p_dose_cidade(codigo numeric) RETURNS numeric
+    LANGUAGE plpgsql
+    AS $$
+			declare
+				conta NUMERIC := 0;
+			begin
+				select count(*) into conta from vacina v
+				inner join paciente p on p.codpac = v.codpac_codpac
+				inner join usuario u on u.cpfusu = p.cpfusu_cpfusu
+				where ((u.codcid_codcid = codigo) and (v.dosvac = '1'));
+			return conta; 
+			end
+			$$;
+
+
+ALTER FUNCTION public.p_dose_cidade(codigo numeric) OWNER TO postgres;
+
+--
+-- TOC entry 255 (class 1255 OID 34054)
+-- Name: revoke_group(character varying, character varying); Type: PROCEDURE; Schema: public; Owner: postgres
+--
+
+CREATE PROCEDURE public.revoke_group(email character varying, grupo character varying)
+    LANGUAGE plpgsql
+    AS $$
+			begin
+				execute format('revoke %I FROM %I', grupo, email);
+			end
+			$$;
+
+
+ALTER PROCEDURE public.revoke_group(email character varying, grupo character varying) OWNER TO postgres;
+
+--
+-- TOC entry 240 (class 1255 OID 34013)
+-- Name: s_dose_cidade(numeric); Type: FUNCTION; Schema: public; Owner: postgres
+--
+
+CREATE FUNCTION public.s_dose_cidade(codigo numeric) RETURNS numeric
+    LANGUAGE plpgsql
+    AS $$
+			declare
+				conta NUMERIC := 0;
+			begin
+				select count(*) into conta from vacina v
+				inner join paciente p on p.codpac = v.codpac_codpac
+				inner join usuario u on u.cpfusu = p.cpfusu_cpfusu
+				where ((u.codcid_codcid = codigo) and (v.dosvac = '2'));
+			return conta; 
+			end
+			$$;
+
+
+ALTER FUNCTION public.s_dose_cidade(codigo numeric) OWNER TO postgres;
+
+SET default_tablespace = '';
+
+SET default_table_access_method = heap;
+
+--
+-- TOC entry 200 (class 1259 OID 33799)
+-- Name: cidade; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.cidade (
+    codcid numeric(10,0) NOT NULL,
+    nomcid character varying(60),
+    codest_codest numeric(5,0)
+);
+
+
+ALTER TABLE public.cidade OWNER TO postgres;
+
+--
+-- TOC entry 3234 (class 0 OID 0)
+-- Dependencies: 200
+-- Name: TABLE cidade; Type: COMMENT; Schema: public; Owner: postgres
+--
+
+COMMENT ON TABLE public.cidade IS 'Tabela de cidades';
+
+
+--
+-- TOC entry 3235 (class 0 OID 0)
+-- Dependencies: 200
+-- Name: COLUMN cidade.codcid; Type: COMMENT; Schema: public; Owner: postgres
+--
+
+COMMENT ON COLUMN public.cidade.codcid IS 'Código da cidade';
+
+
+--
+-- TOC entry 3236 (class 0 OID 0)
+-- Dependencies: 200
+-- Name: COLUMN cidade.nomcid; Type: COMMENT; Schema: public; Owner: postgres
+--
+
+COMMENT ON COLUMN public.cidade.nomcid IS 'Nome da cidade.';
+
+
+--
+-- TOC entry 201 (class 1259 OID 33804)
+-- Name: comorbidade; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.comorbidade (
+    codcom numeric(10,0) NOT NULL,
+    com character varying(300) NOT NULL
+);
+
+
+ALTER TABLE public.comorbidade OWNER TO postgres;
+
+--
+-- TOC entry 3238 (class 0 OID 0)
+-- Dependencies: 201
+-- Name: TABLE comorbidade; Type: COMMENT; Schema: public; Owner: postgres
+--
+
+COMMENT ON TABLE public.comorbidade IS 'Tabela de comorbidades';
+
+
+--
+-- TOC entry 3239 (class 0 OID 0)
+-- Dependencies: 201
+-- Name: COLUMN comorbidade.codcom; Type: COMMENT; Schema: public; Owner: postgres
+--
+
+COMMENT ON COLUMN public.comorbidade.codcom IS 'Código da comorbidade';
+
+
+--
+-- TOC entry 3240 (class 0 OID 0)
+-- Dependencies: 201
+-- Name: COLUMN comorbidade.com; Type: COMMENT; Schema: public; Owner: postgres
+--
+
+COMMENT ON COLUMN public.comorbidade.com IS 'Comorbidades e sua descrição se necessário.';
+
+
+--
+-- TOC entry 226 (class 1259 OID 33998)
+-- Name: databasechangelog; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.databasechangelog (
+    id character varying(255) NOT NULL,
+    author character varying(255) NOT NULL,
+    filename character varying(255) NOT NULL,
+    dateexecuted timestamp without time zone NOT NULL,
+    orderexecuted integer NOT NULL,
+    exectype character varying(10) NOT NULL,
+    md5sum character varying(35),
+    description character varying(255),
+    comments character varying(255),
+    tag character varying(255),
+    liquibase character varying(20),
+    contexts character varying(255),
+    labels character varying(255),
+    deployment_id character varying(10)
+);
+
+
+ALTER TABLE public.databasechangelog OWNER TO postgres;
+
+--
+-- TOC entry 225 (class 1259 OID 33993)
+-- Name: databasechangeloglock; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.databasechangeloglock (
+    id integer NOT NULL,
+    locked boolean NOT NULL,
+    lockgranted timestamp without time zone,
+    lockedby character varying(255)
+);
+
+
+ALTER TABLE public.databasechangeloglock OWNER TO postgres;
+
+--
+-- TOC entry 202 (class 1259 OID 33809)
+-- Name: empresa; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.empresa (
+    cnpjemp numeric(14,0) NOT NULL,
+    cep numeric(8,0) NOT NULL,
+    emaemp character varying(30) NOT NULL,
+    nomemp character varying(100) NOT NULL,
+    nomfanemp character varying(100),
+    num character varying(10) NOT NULL,
+    ramemp character varying(60) NOT NULL,
+    rua character varying(60) NOT NULL,
+    telemp1 character varying(20) NOT NULL,
+    telemp2 character varying(20),
+    valemp date DEFAULT CURRENT_DATE NOT NULL,
+    codcid_codcid numeric(10,0) NOT NULL,
+    cpfusu_cpfusu numeric(11,0) NOT NULL
+);
+
+
+ALTER TABLE public.empresa OWNER TO postgres;
+
+--
+-- TOC entry 3244 (class 0 OID 0)
+-- Dependencies: 202
+-- Name: TABLE empresa; Type: COMMENT; Schema: public; Owner: postgres
+--
+
+COMMENT ON TABLE public.empresa IS 'Tabela de empresas';
+
+
+--
+-- TOC entry 3245 (class 0 OID 0)
+-- Dependencies: 202
+-- Name: COLUMN empresa.cnpjemp; Type: COMMENT; Schema: public; Owner: postgres
+--
+
+COMMENT ON COLUMN public.empresa.cnpjemp IS 'CNPJ da Empresa';
+
+
+--
+-- TOC entry 3246 (class 0 OID 0)
+-- Dependencies: 202
+-- Name: COLUMN empresa.cep; Type: COMMENT; Schema: public; Owner: postgres
+--
+
+COMMENT ON COLUMN public.empresa.cep IS 'Número do CEP.';
+
+
+--
+-- TOC entry 3247 (class 0 OID 0)
+-- Dependencies: 202
+-- Name: COLUMN empresa.emaemp; Type: COMMENT; Schema: public; Owner: postgres
+--
+
+COMMENT ON COLUMN public.empresa.emaemp IS 'Email da empresa';
+
+
+--
+-- TOC entry 3248 (class 0 OID 0)
+-- Dependencies: 202
+-- Name: COLUMN empresa.nomemp; Type: COMMENT; Schema: public; Owner: postgres
+--
+
+COMMENT ON COLUMN public.empresa.nomemp IS 'Nome da empresa';
+
+
+--
+-- TOC entry 3249 (class 0 OID 0)
+-- Dependencies: 202
+-- Name: COLUMN empresa.nomfanemp; Type: COMMENT; Schema: public; Owner: postgres
+--
+
+COMMENT ON COLUMN public.empresa.nomfanemp IS 'Nome fantasia da empresa';
+
+
+--
+-- TOC entry 3250 (class 0 OID 0)
+-- Dependencies: 202
+-- Name: COLUMN empresa.num; Type: COMMENT; Schema: public; Owner: postgres
+--
+
+COMMENT ON COLUMN public.empresa.num IS 'Número da casa/prédio';
+
+
+--
+-- TOC entry 3251 (class 0 OID 0)
+-- Dependencies: 202
+-- Name: COLUMN empresa.ramemp; Type: COMMENT; Schema: public; Owner: postgres
+--
+
+COMMENT ON COLUMN public.empresa.ramemp IS 'Ramo da empresa';
+
+
+--
+-- TOC entry 3252 (class 0 OID 0)
+-- Dependencies: 202
+-- Name: COLUMN empresa.rua; Type: COMMENT; Schema: public; Owner: postgres
+--
+
+COMMENT ON COLUMN public.empresa.rua IS 'Nome da rua.';
+
+
+--
+-- TOC entry 3253 (class 0 OID 0)
+-- Dependencies: 202
+-- Name: COLUMN empresa.telemp1; Type: COMMENT; Schema: public; Owner: postgres
+--
+
+COMMENT ON COLUMN public.empresa.telemp1 IS 'Telefone 1 da empresa';
+
+
+--
+-- TOC entry 3254 (class 0 OID 0)
+-- Dependencies: 202
+-- Name: COLUMN empresa.telemp2; Type: COMMENT; Schema: public; Owner: postgres
+--
+
+COMMENT ON COLUMN public.empresa.telemp2 IS 'Telefone 2 da empresa';
+
+
+--
+-- TOC entry 3255 (class 0 OID 0)
+-- Dependencies: 202
+-- Name: COLUMN empresa.valemp; Type: COMMENT; Schema: public; Owner: postgres
+--
+
+COMMENT ON COLUMN public.empresa.valemp IS 'Data de inserção da empresa no sistema';
+
+
+--
+-- TOC entry 203 (class 1259 OID 33815)
+-- Name: estado; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.estado (
+    codest numeric(5,0) NOT NULL,
+    nomest character varying(60) NOT NULL,
+    codpai_codpai numeric(3,0)
+);
+
+
+ALTER TABLE public.estado OWNER TO postgres;
+
+--
+-- TOC entry 3257 (class 0 OID 0)
+-- Dependencies: 203
+-- Name: TABLE estado; Type: COMMENT; Schema: public; Owner: postgres
+--
+
+COMMENT ON TABLE public.estado IS 'Tabela de estados';
+
+
+--
+-- TOC entry 3258 (class 0 OID 0)
+-- Dependencies: 203
+-- Name: COLUMN estado.codest; Type: COMMENT; Schema: public; Owner: postgres
+--
+
+COMMENT ON COLUMN public.estado.codest IS 'Código do estado';
+
+
+--
+-- TOC entry 3259 (class 0 OID 0)
+-- Dependencies: 203
+-- Name: COLUMN estado.nomest; Type: COMMENT; Schema: public; Owner: postgres
+--
+
+COMMENT ON COLUMN public.estado.nomest IS 'Nome do estado';
+
+
+--
+-- TOC entry 204 (class 1259 OID 33820)
+-- Name: medico; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.medico (
+    crmmed character varying(30) NOT NULL,
+    cpfusu_cpfusu numeric(11,0) NOT NULL
+);
+
+
+ALTER TABLE public.medico OWNER TO postgres;
+
+--
+-- TOC entry 3261 (class 0 OID 0)
+-- Dependencies: 204
+-- Name: TABLE medico; Type: COMMENT; Schema: public; Owner: postgres
+--
+
+COMMENT ON TABLE public.medico IS 'Tabela de medicos';
+
+
+--
+-- TOC entry 3262 (class 0 OID 0)
+-- Dependencies: 204
+-- Name: COLUMN medico.crmmed; Type: COMMENT; Schema: public; Owner: postgres
+--
+
+COMMENT ON COLUMN public.medico.crmmed IS 'CRM do médico';
+
+
+--
+-- TOC entry 205 (class 1259 OID 33825)
+-- Name: monitoramento_paciente; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.monitoramento_paciente (
+    codmon numeric(10,0) NOT NULL,
+    datmon date DEFAULT CURRENT_DATE NOT NULL,
+    intsin character(1) NOT NULL,
+    codpac_codpac numeric(10,0),
+    codsin_codsin numeric(10,0),
+    CONSTRAINT monitoramento_paciente_intsin_check CHECK ((intsin = ANY (ARRAY['P'::bpchar, 'M'::bpchar, 'C'::bpchar, 'S'::bpchar])))
+);
+
+
+ALTER TABLE public.monitoramento_paciente OWNER TO postgres;
+
+--
+-- TOC entry 3264 (class 0 OID 0)
+-- Dependencies: 205
+-- Name: TABLE monitoramento_paciente; Type: COMMENT; Schema: public; Owner: postgres
+--
+
+COMMENT ON TABLE public.monitoramento_paciente IS 'Tabela de vinculação monitoramento pacientes';
+
+
+--
+-- TOC entry 3265 (class 0 OID 0)
+-- Dependencies: 205
+-- Name: COLUMN monitoramento_paciente.codmon; Type: COMMENT; Schema: public; Owner: postgres
+--
+
+COMMENT ON COLUMN public.monitoramento_paciente.codmon IS 'Código do monitoramento';
+
+
+--
+-- TOC entry 3266 (class 0 OID 0)
+-- Dependencies: 205
+-- Name: COLUMN monitoramento_paciente.datmon; Type: COMMENT; Schema: public; Owner: postgres
+--
+
+COMMENT ON COLUMN public.monitoramento_paciente.datmon IS 'Data do monitoramento';
+
+
+--
+-- TOC entry 3267 (class 0 OID 0)
+-- Dependencies: 205
+-- Name: COLUMN monitoramento_paciente.intsin; Type: COMMENT; Schema: public; Owner: postgres
+--
+
+COMMENT ON COLUMN public.monitoramento_paciente.intsin IS 'Intensidade dos sintomas:
+			S - Sem sintomas,
+			P - Pouco,
+			M- Moderado,
+			C - Constante.';
+
+
+--
+-- TOC entry 206 (class 1259 OID 33832)
+-- Name: paciente; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.paciente (
+    codpac numeric(10,0) NOT NULL,
+    grurispac character(1) NOT NULL,
+    pespac numeric(5,2) NOT NULL,
+    sitpac character varying(20) NOT NULL,
+    cpfusu_cpfusu numeric(11,0) NOT NULL,
+    CONSTRAINT paciente_grurispac_check CHECK ((grurispac = ANY (ARRAY['S'::bpchar, 'N'::bpchar]))),
+    CONSTRAINT paciente_sitpac_check CHECK (((sitpac)::text = ANY ((ARRAY['INTERNADO'::character varying, 'ISOLAMENTO'::character varying, 'BEM'::character varying])::text[])))
+);
+
+
+ALTER TABLE public.paciente OWNER TO postgres;
+
+--
+-- TOC entry 3269 (class 0 OID 0)
+-- Dependencies: 206
+-- Name: TABLE paciente; Type: COMMENT; Schema: public; Owner: postgres
+--
+
+COMMENT ON TABLE public.paciente IS 'Tabela de pacientes';
+
+
+--
+-- TOC entry 3270 (class 0 OID 0)
+-- Dependencies: 206
+-- Name: COLUMN paciente.grurispac; Type: COMMENT; Schema: public; Owner: postgres
+--
+
+COMMENT ON COLUMN public.paciente.grurispac IS 'Paciente é do grupo de risco:
+			S- Sim,
+			N- Não.';
+
+
+--
+-- TOC entry 3271 (class 0 OID 0)
+-- Dependencies: 206
+-- Name: COLUMN paciente.pespac; Type: COMMENT; Schema: public; Owner: postgres
+--
+
+COMMENT ON COLUMN public.paciente.pespac IS 'Peso do paciente.';
+
+
+--
+-- TOC entry 3272 (class 0 OID 0)
+-- Dependencies: 206
+-- Name: COLUMN paciente.sitpac; Type: COMMENT; Schema: public; Owner: postgres
+--
+
+COMMENT ON COLUMN public.paciente.sitpac IS 'Situação do paciente:
+			Internado,
+			Isolamento,
+			Bem.';
+
+
+--
+-- TOC entry 207 (class 1259 OID 33839)
+-- Name: paciente_comorbidade; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.paciente_comorbidade (
+    codpaccom numeric(10,0) NOT NULL,
+    codcom_codcom numeric(10,0) NOT NULL,
+    codpac_codpac numeric(10,0)
+);
+
+
+ALTER TABLE public.paciente_comorbidade OWNER TO postgres;
+
+--
+-- TOC entry 3274 (class 0 OID 0)
+-- Dependencies: 207
+-- Name: TABLE paciente_comorbidade; Type: COMMENT; Schema: public; Owner: postgres
+--
+
+COMMENT ON TABLE public.paciente_comorbidade IS 'Tabela de vinculação paciente comorbidades';
+
+
+--
+-- TOC entry 3275 (class 0 OID 0)
+-- Dependencies: 207
+-- Name: COLUMN paciente_comorbidade.codpaccom; Type: COMMENT; Schema: public; Owner: postgres
+--
+
+COMMENT ON COLUMN public.paciente_comorbidade.codpaccom IS 'Chave primaria da tabela, existe devido problemas de compatibilidade com o Hibernate';
+
+
+--
+-- TOC entry 208 (class 1259 OID 33844)
+-- Name: pais; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.pais (
+    codpai numeric(3,0) NOT NULL,
+    nompai character varying(60) NOT NULL
+);
+
+
+ALTER TABLE public.pais OWNER TO postgres;
+
+--
+-- TOC entry 3277 (class 0 OID 0)
+-- Dependencies: 208
+-- Name: TABLE pais; Type: COMMENT; Schema: public; Owner: postgres
+--
+
+COMMENT ON TABLE public.pais IS 'Tabela de paises';
+
+
+--
+-- TOC entry 3278 (class 0 OID 0)
+-- Dependencies: 208
+-- Name: COLUMN pais.codpai; Type: COMMENT; Schema: public; Owner: postgres
+--
+
+COMMENT ON COLUMN public.pais.codpai IS 'Chave primária código do país.';
+
+
+--
+-- TOC entry 3279 (class 0 OID 0)
+-- Dependencies: 208
+-- Name: COLUMN pais.nompai; Type: COMMENT; Schema: public; Owner: postgres
+--
+
+COMMENT ON COLUMN public.pais.nompai IS 'Nome do país.';
+
+
+--
+-- TOC entry 214 (class 1259 OID 33891)
+-- Name: seq_cidade; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.seq_cidade
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.seq_cidade OWNER TO postgres;
+
+--
+-- TOC entry 215 (class 1259 OID 33893)
+-- Name: seq_comorbidade; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.seq_comorbidade
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.seq_comorbidade OWNER TO postgres;
+
+--
+-- TOC entry 216 (class 1259 OID 33895)
+-- Name: seq_estado; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.seq_estado
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.seq_estado OWNER TO postgres;
+
+--
+-- TOC entry 217 (class 1259 OID 33897)
+-- Name: seq_monitoramento_paciente; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.seq_monitoramento_paciente
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.seq_monitoramento_paciente OWNER TO postgres;
+
+--
+-- TOC entry 218 (class 1259 OID 33899)
+-- Name: seq_paciente; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.seq_paciente
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.seq_paciente OWNER TO postgres;
+
+--
+-- TOC entry 219 (class 1259 OID 33901)
+-- Name: seq_paciente_comorbidade; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.seq_paciente_comorbidade
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.seq_paciente_comorbidade OWNER TO postgres;
+
+--
+-- TOC entry 220 (class 1259 OID 33903)
+-- Name: seq_pais; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.seq_pais
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.seq_pais OWNER TO postgres;
+
+--
+-- TOC entry 221 (class 1259 OID 33905)
+-- Name: seq_sintoma; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.seq_sintoma
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.seq_sintoma OWNER TO postgres;
+
+--
+-- TOC entry 222 (class 1259 OID 33907)
+-- Name: seq_solicitacao; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.seq_solicitacao
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.seq_solicitacao OWNER TO postgres;
+
+--
+-- TOC entry 223 (class 1259 OID 33909)
+-- Name: seq_teste_covid; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.seq_teste_covid
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.seq_teste_covid OWNER TO postgres;
+
+--
+-- TOC entry 224 (class 1259 OID 33911)
+-- Name: seq_vacina; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.seq_vacina
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.seq_vacina OWNER TO postgres;
+
+--
+-- TOC entry 209 (class 1259 OID 33849)
+-- Name: sintoma; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.sintoma (
+    codsin numeric(10,0) NOT NULL,
+    nomsin character varying(60) NOT NULL
+);
+
+
+ALTER TABLE public.sintoma OWNER TO postgres;
+
+--
+-- TOC entry 3281 (class 0 OID 0)
+-- Dependencies: 209
+-- Name: TABLE sintoma; Type: COMMENT; Schema: public; Owner: postgres
+--
+
+COMMENT ON TABLE public.sintoma IS 'Tabela de sintomas';
+
+
+--
+-- TOC entry 3282 (class 0 OID 0)
+-- Dependencies: 209
+-- Name: COLUMN sintoma.codsin; Type: COMMENT; Schema: public; Owner: postgres
+--
+
+COMMENT ON COLUMN public.sintoma.codsin IS 'Código do sintoma.';
+
+
+--
+-- TOC entry 3283 (class 0 OID 0)
+-- Dependencies: 209
+-- Name: COLUMN sintoma.nomsin; Type: COMMENT; Schema: public; Owner: postgres
+--
+
+COMMENT ON COLUMN public.sintoma.nomsin IS 'Nome do sintoma.';
+
+
+--
+-- TOC entry 210 (class 1259 OID 33854)
+-- Name: solicitacao; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.solicitacao (
+    codsol numeric(10,0) NOT NULL,
+    anasol boolean DEFAULT false NOT NULL,
+    datsol date DEFAULT CURRENT_DATE NOT NULL,
+    dessol character varying(300) NOT NULL,
+    cpfusu_cpfusu numeric(11,0)
+);
+
+
+ALTER TABLE public.solicitacao OWNER TO postgres;
+
+--
+-- TOC entry 3285 (class 0 OID 0)
+-- Dependencies: 210
+-- Name: TABLE solicitacao; Type: COMMENT; Schema: public; Owner: postgres
+--
+
+COMMENT ON TABLE public.solicitacao IS 'Tabela de solicitações';
+
+
+--
+-- TOC entry 3286 (class 0 OID 0)
+-- Dependencies: 210
+-- Name: COLUMN solicitacao.anasol; Type: COMMENT; Schema: public; Owner: postgres
+--
+
+COMMENT ON COLUMN public.solicitacao.anasol IS 'Valor booleano que indica se a solicitação foi analisada pelo Administrador ou não:';
+
+
+--
+-- TOC entry 3287 (class 0 OID 0)
+-- Dependencies: 210
+-- Name: COLUMN solicitacao.datsol; Type: COMMENT; Schema: public; Owner: postgres
+--
+
+COMMENT ON COLUMN public.solicitacao.datsol IS 'Data da solicitação';
+
+
+--
+-- TOC entry 3288 (class 0 OID 0)
+-- Dependencies: 210
+-- Name: COLUMN solicitacao.dessol; Type: COMMENT; Schema: public; Owner: postgres
+--
+
+COMMENT ON COLUMN public.solicitacao.dessol IS 'Solicitação em si';
+
+
+--
+-- TOC entry 211 (class 1259 OID 33861)
+-- Name: teste_covid; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.teste_covid (
+    codtes numeric(10,0) NOT NULL,
+    covpactes character(1) NOT NULL,
+    dattes date DEFAULT CURRENT_DATE NOT NULL,
+    codpac_codpac numeric(10,0),
+    CONSTRAINT teste_covid_covpactes_check CHECK ((covpactes = ANY (ARRAY['P'::bpchar, 'N'::bpchar])))
+);
+
+
+ALTER TABLE public.teste_covid OWNER TO postgres;
+
+--
+-- TOC entry 3290 (class 0 OID 0)
+-- Dependencies: 211
+-- Name: TABLE teste_covid; Type: COMMENT; Schema: public; Owner: postgres
+--
+
+COMMENT ON TABLE public.teste_covid IS 'Tabela de testes de covid';
+
+
+--
+-- TOC entry 3291 (class 0 OID 0)
+-- Dependencies: 211
+-- Name: COLUMN teste_covid.codtes; Type: COMMENT; Schema: public; Owner: postgres
+--
+
+COMMENT ON COLUMN public.teste_covid.codtes IS 'Código do teste de covid.';
+
+
+--
+-- TOC entry 3292 (class 0 OID 0)
+-- Dependencies: 211
+-- Name: COLUMN teste_covid.covpactes; Type: COMMENT; Schema: public; Owner: postgres
+--
+
+COMMENT ON COLUMN public.teste_covid.covpactes IS 'Resultado do teste para covid do paciente:
+			P-positivo
+			N-negativo';
+
+
+--
+-- TOC entry 3293 (class 0 OID 0)
+-- Dependencies: 211
+-- Name: COLUMN teste_covid.dattes; Type: COMMENT; Schema: public; Owner: postgres
+--
+
+COMMENT ON COLUMN public.teste_covid.dattes IS 'Data do teste.';
+
+
+--
+-- TOC entry 212 (class 1259 OID 33868)
+-- Name: usuario; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.usuario (
+    cpfusu numeric(11,0) NOT NULL,
+    cep numeric(8,0) NOT NULL,
+    datnasusu date NOT NULL,
+    emausu character varying(30) NOT NULL,
+    nomusu character varying(100) NOT NULL,
+    num character varying(10) NOT NULL,
+    rua character varying(60) NOT NULL,
+    senusu character varying(20) NOT NULL,
+    sexusu character(1) NOT NULL,
+    telusu character varying(20) NOT NULL,
+    valusu date DEFAULT CURRENT_DATE NOT NULL,
+    cnpjemp_cnpjemp numeric(14,0),
+    codcid_codcid numeric(10,0) NOT NULL,
+    CONSTRAINT usuario_sexusu_check CHECK ((sexusu = ANY (ARRAY['M'::bpchar, 'F'::bpchar])))
+);
+
+
+ALTER TABLE public.usuario OWNER TO postgres;
+
+--
+-- TOC entry 3295 (class 0 OID 0)
+-- Dependencies: 212
+-- Name: TABLE usuario; Type: COMMENT; Schema: public; Owner: postgres
+--
+
+COMMENT ON TABLE public.usuario IS 'Tabela de usuarios';
+
+
+--
+-- TOC entry 3296 (class 0 OID 0)
+-- Dependencies: 212
+-- Name: COLUMN usuario.cpfusu; Type: COMMENT; Schema: public; Owner: postgres
+--
+
+COMMENT ON COLUMN public.usuario.cpfusu IS 'CPF do usuario.';
+
+
+--
+-- TOC entry 3297 (class 0 OID 0)
+-- Dependencies: 212
+-- Name: COLUMN usuario.cep; Type: COMMENT; Schema: public; Owner: postgres
+--
+
+COMMENT ON COLUMN public.usuario.cep IS 'Número do CEP.';
+
+
+--
+-- TOC entry 3298 (class 0 OID 0)
+-- Dependencies: 212
+-- Name: COLUMN usuario.datnasusu; Type: COMMENT; Schema: public; Owner: postgres
+--
+
+COMMENT ON COLUMN public.usuario.datnasusu IS 'Data de nascimento do usuario.';
+
+
+--
+-- TOC entry 3299 (class 0 OID 0)
+-- Dependencies: 212
+-- Name: COLUMN usuario.emausu; Type: COMMENT; Schema: public; Owner: postgres
+--
+
+COMMENT ON COLUMN public.usuario.emausu IS 'Email do usuario';
+
+
+--
+-- TOC entry 3300 (class 0 OID 0)
+-- Dependencies: 212
+-- Name: COLUMN usuario.nomusu; Type: COMMENT; Schema: public; Owner: postgres
+--
+
+COMMENT ON COLUMN public.usuario.nomusu IS 'Nome do usuário';
+
+
+--
+-- TOC entry 3301 (class 0 OID 0)
+-- Dependencies: 212
+-- Name: COLUMN usuario.num; Type: COMMENT; Schema: public; Owner: postgres
+--
+
+COMMENT ON COLUMN public.usuario.num IS 'Número da casa/prédio';
+
+
+--
+-- TOC entry 3302 (class 0 OID 0)
+-- Dependencies: 212
+-- Name: COLUMN usuario.rua; Type: COMMENT; Schema: public; Owner: postgres
+--
+
+COMMENT ON COLUMN public.usuario.rua IS 'Nome da rua.';
+
+
+--
+-- TOC entry 3303 (class 0 OID 0)
+-- Dependencies: 212
+-- Name: COLUMN usuario.senusu; Type: COMMENT; Schema: public; Owner: postgres
+--
+
+COMMENT ON COLUMN public.usuario.senusu IS 'Senha do usuário';
+
+
+--
+-- TOC entry 3304 (class 0 OID 0)
+-- Dependencies: 212
+-- Name: COLUMN usuario.sexusu; Type: COMMENT; Schema: public; Owner: postgres
+--
+
+COMMENT ON COLUMN public.usuario.sexusu IS 'Sexo do usuario:
+			M- Masculino
+			F- Feminino';
+
+
+--
+-- TOC entry 3305 (class 0 OID 0)
+-- Dependencies: 212
+-- Name: COLUMN usuario.telusu; Type: COMMENT; Schema: public; Owner: postgres
+--
+
+COMMENT ON COLUMN public.usuario.telusu IS 'Telefone do usuario.';
+
+
+--
+-- TOC entry 3306 (class 0 OID 0)
+-- Dependencies: 212
+-- Name: COLUMN usuario.valusu; Type: COMMENT; Schema: public; Owner: postgres
+--
+
+COMMENT ON COLUMN public.usuario.valusu IS 'Data de cadastro do usuário no sistema';
+
+
+--
+-- TOC entry 213 (class 1259 OID 33875)
+-- Name: vacina; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.vacina (
+    codvac numeric(10,0) NOT NULL,
+    datvac date DEFAULT CURRENT_DATE NOT NULL,
+    dosvac integer NOT NULL,
+    fabvac character varying(30),
+    codpac_codpac numeric(10,0),
+    crmmed_crmmed character varying(30)
+);
+
+
+ALTER TABLE public.vacina OWNER TO postgres;
+
+--
+-- TOC entry 3308 (class 0 OID 0)
+-- Dependencies: 213
+-- Name: TABLE vacina; Type: COMMENT; Schema: public; Owner: postgres
+--
+
+COMMENT ON TABLE public.vacina IS 'Tabela de vacinas';
+
+
+--
+-- TOC entry 3309 (class 0 OID 0)
+-- Dependencies: 213
+-- Name: COLUMN vacina.codvac; Type: COMMENT; Schema: public; Owner: postgres
+--
+
+COMMENT ON COLUMN public.vacina.codvac IS 'Chave primária da tabela vacina';
+
+
+--
+-- TOC entry 3310 (class 0 OID 0)
+-- Dependencies: 213
+-- Name: COLUMN vacina.datvac; Type: COMMENT; Schema: public; Owner: postgres
+--
+
+COMMENT ON COLUMN public.vacina.datvac IS 'Data da vacinação';
+
+
+--
+-- TOC entry 3311 (class 0 OID 0)
+-- Dependencies: 213
+-- Name: COLUMN vacina.dosvac; Type: COMMENT; Schema: public; Owner: postgres
+--
+
+COMMENT ON COLUMN public.vacina.dosvac IS 'Dose da vacina';
+
+
+--
+-- TOC entry 3312 (class 0 OID 0)
+-- Dependencies: 213
+-- Name: COLUMN vacina.fabvac; Type: COMMENT; Schema: public; Owner: postgres
+--
+
+COMMENT ON COLUMN public.vacina.fabvac IS 'Fabricante da vacina';
+
+
+--
+-- TOC entry 230 (class 1259 OID 34028)
+-- Name: vw_conta_empresas; Type: VIEW; Schema: public; Owner: postgres
+--
+
+CREATE VIEW public.vw_conta_empresas AS
+ SELECT count(*) AS count
+   FROM public.empresa;
+
+
+ALTER TABLE public.vw_conta_empresas OWNER TO postgres;
+
+--
+-- TOC entry 229 (class 1259 OID 34024)
+-- Name: vw_conta_medicos; Type: VIEW; Schema: public; Owner: postgres
+--
+
+CREATE VIEW public.vw_conta_medicos AS
+ SELECT count(*) AS count
+   FROM public.medico;
+
+
+ALTER TABLE public.vw_conta_medicos OWNER TO postgres;
+
+--
+-- TOC entry 231 (class 1259 OID 34032)
+-- Name: vw_conta_pacientes; Type: VIEW; Schema: public; Owner: postgres
+--
+
+CREATE VIEW public.vw_conta_pacientes AS
+ SELECT count(*) AS count
+   FROM public.paciente;
+
+
+ALTER TABLE public.vw_conta_pacientes OWNER TO postgres;
+
+--
+-- TOC entry 232 (class 1259 OID 34036)
+-- Name: vw_conta_usuarios; Type: VIEW; Schema: public; Owner: postgres
+--
+
+CREATE VIEW public.vw_conta_usuarios AS
+ SELECT count(*) AS count
+   FROM public.usuario;
+
+
+ALTER TABLE public.vw_conta_usuarios OWNER TO postgres;
+
+--
+-- TOC entry 233 (class 1259 OID 34055)
+-- Name: vw_select1; Type: VIEW; Schema: public; Owner: postgres
+--
+
+CREATE VIEW public.vw_select1 AS
+ SELECT p.codpac,
+    u.nomusu
+   FROM (((public.paciente p
+     JOIN public.usuario u ON ((u.cpfusu = p.cpfusu_cpfusu)))
+     JOIN public.monitoramento_paciente mp ON ((mp.codpac_codpac = p.codpac)))
+     JOIN public.sintoma s ON ((mp.codsin_codsin = s.codsin)))
+  WHERE (((s.nomsin)::text ~~* '%tosse%'::text) AND ((date_part('year'::text, CURRENT_TIMESTAMP) - date_part('year'::text, u.datnasusu)) >= (40)::double precision) AND ((date_part('year'::text, CURRENT_TIMESTAMP) - date_part('year'::text, u.datnasusu)) <= (50)::double precision))
+  ORDER BY p.codpac DESC;
+
+
+ALTER TABLE public.vw_select1 OWNER TO postgres;
+
+--
+-- TOC entry 234 (class 1259 OID 34060)
+-- Name: vw_select2; Type: VIEW; Schema: public; Owner: postgres
+--
+
+CREATE VIEW public.vw_select2 AS
+ SELECT DISTINCT u.nomusu,
+    c.nomcid
+   FROM ((((public.paciente p
+     JOIN public.usuario u ON ((u.cpfusu = p.cpfusu_cpfusu)))
+     JOIN public.cidade c ON ((c.codcid = u.codcid_codcid)))
+     JOIN public.teste_covid tc ON ((tc.codpac_codpac = p.codpac)))
+     JOIN public.monitoramento_paciente mp ON ((mp.codpac_codpac = p.codpac)))
+  WHERE ((tc.covpactes = 'N'::bpchar) AND (mp.codsin_codsin IS NOT NULL) AND (mp.intsin <> 'S'::bpchar) AND (u.sexusu = 'M'::bpchar) AND ((c.nomcid)::text = ANY ((ARRAY['Maravilha'::character varying, 'Descanso'::character varying, 'Pinhalzinho'::character varying, 'Chapecó'::character varying, 'Itapiranga'::character varying])::text[])))
+  ORDER BY c.nomcid DESC, u.nomusu;
+
+
+ALTER TABLE public.vw_select2 OWNER TO postgres;
+
+--
+-- TOC entry 235 (class 1259 OID 34065)
+-- Name: vw_select3; Type: VIEW; Schema: public; Owner: postgres
+--
+
+CREATE VIEW public.vw_select3 AS
+SELECT
+    NULL::numeric(10,0) AS codcid,
+    NULL::character varying(60) AS nomcid,
+    NULL::bigint AS conta;
+
+
+ALTER TABLE public.vw_select3 OWNER TO postgres;
+
+--
+-- TOC entry 236 (class 1259 OID 34070)
+-- Name: vw_select4; Type: VIEW; Schema: public; Owner: postgres
+--
+
+CREATE VIEW public.vw_select4 AS
+ SELECT to_char(age((u.datnasusu)::timestamp with time zone), 'YY'::text) AS idade,
+    count(*) AS casos
+   FROM ((public.paciente p
+     JOIN public.teste_covid tc ON ((tc.codpac_codpac = p.codpac)))
+     JOIN public.usuario u ON ((u.cpfusu = p.cpfusu_cpfusu)))
+  WHERE ((tc.covpactes = 'P'::bpchar) AND (((date_part('day'::text, tc.dattes))::integer % 2) = 0))
+  GROUP BY (to_char(age((u.datnasusu)::timestamp with time zone), 'YY'::text))
+  ORDER BY (count(*)) DESC;
+
+
+ALTER TABLE public.vw_select4 OWNER TO postgres;
+
+--
+-- TOC entry 3201 (class 0 OID 33799)
+-- Dependencies: 200
+-- Data for Name: cidade; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.cidade (codcid, nomcid, codest_codest) FROM stdin;
+1	São José do Cedro	24
+2	São Miguel do Oeste	24
+3	Guaraciaba	24
+4	Maravilha	24
+5	Descanso	24
+6	Dionísio Cerqueira	24
+7	Florianópolis	24
+8	Chapecó	24
+9	Lages	24
+10	Balneário Camboriú	24
+11	Outro	24
+\.
+
+
+--
+-- TOC entry 3202 (class 0 OID 33804)
+-- Dependencies: 201
+-- Data for Name: comorbidade; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.comorbidade (codcom, com) FROM stdin;
+1	Idade igual ou superior a 60 anos
+2	Tabagismo
+3	Obesidade
+4	Miocardiopatias de diferentes etiologias (insuficiência cardíaca, miocardiopatia isquêmica etc.)
+5	Hipertensão arterial
+6	Pneumopatias graves ou descompensados (asma moderada/grave, DPOC)
+7	Imunodepressão e imunossupressão
+8	Doenças renais crônicas em estágio avançado (graus 3, 4 e 5)
+9	Diabetes melito, conforme juízo clínico
+10	Doenças cromossômicas com estado de fragilidade imunológica
+11	Neoplasia maligna (exceto câncer não melanótico de pele)
+12	Algumas doenças hematológicas (incluindo anemia falciforme e talassemia)
+13	Gestação
+\.
+
+
+--
+-- TOC entry 3227 (class 0 OID 33998)
+-- Dependencies: 226
+-- Data for Name: databasechangelog; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.databasechangelog (id, author, filename, dateexecuted, orderexecuted, exectype, md5sum, description, comments, tag, liquibase, contexts, labels, deployment_id) FROM stdin;
+adiciona os comentários em todas as tabelas	Eduardo Mateus da Costa	db/changelog/logs/db-changelog-1.0.xml	2021-11-29 20:14:12.085965	1	EXECUTED	8:f4b5425ee6f1c0e4fc16b7da4b2477e2	sql		\N	4.5.0	\N	\N	8227652026
+tag-1.0	Eduardo Mateus da Costa	db/changelog/logs/db-changelog-1.0.xml	2021-11-29 20:14:12.089736	2	EXECUTED	8:3c7be0136474b1608ff678d78f1a3738	tagDatabase		1.0	4.5.0	\N	\N	8227652026
+adiciona as functions, trigger, views e grupos	Eduardo Mateus da Costa	db/changelog/logs/db-changelog-1.1.xml	2021-11-29 20:14:12.144452	3	EXECUTED	8:7d01afaa26251107098176406d0a9d1d	sql		\N	4.5.0	\N	\N	8227652026
+tag-1.1	Eduardo Mateus da Costa	db/changelog/logs/db-changelog-1.1.xml	2021-11-29 20:14:12.146297	4	EXECUTED	8:1dc9bb64b8fe1be5bf4a6ed2f1bb88ef	tagDatabase		1.1	4.5.0	\N	\N	8227652026
+inserts padrões	Eduardo Mateus da Costa	db/changelog/logs/db-changelog-1.2.xml	2021-11-29 20:14:12.184253	5	EXECUTED	8:7c56399c62c02a69ae3be804f93b83ee	sql		\N	4.5.0	\N	\N	8227652026
+tag-1.2	Eduardo Mateus da Costa	db/changelog/logs/db-changelog-1.2.xml	2021-11-29 20:14:12.185558	6	EXECUTED	8:e42a63992c149e432e6a71fc43f11d27	tagDatabase		1.2	4.5.0	\N	\N	8227652026
+\.
+
+
+--
+-- TOC entry 3226 (class 0 OID 33993)
+-- Dependencies: 225
+-- Data for Name: databasechangeloglock; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.databasechangeloglock (id, locked, lockgranted, lockedby) FROM stdin;
+1	f	\N	\N
+\.
+
+
+--
+-- TOC entry 3203 (class 0 OID 33809)
+-- Dependencies: 202
+-- Data for Name: empresa; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.empresa (cnpjemp, cep, emaemp, nomemp, nomfanemp, num, ramemp, rua, telemp1, telemp2, valemp, codcid_codcid, cpfusu_cpfusu) FROM stdin;
+1	11	empresa.1@gmail.com	Empresa 1	\N	Num 1	Ramo1	Rua1	1001	\N	2021-11-29	1	1
+2	12	empresa.2@gmail.com	Empresa 2	\N	Num 2	Ramo2	Rua2	1002	\N	2021-11-29	2	2
+3	13	empresa.3@gmail.com	Empresa 3	\N	Num 3	Ramo3	Rua3	1003	\N	2021-11-29	3	3
+4	14	empresa.4@gmail.com	Empresa 4	\N	Num 4	Ramo4	Rua4	1004	\N	2021-11-29	4	4
+5	15	empresa.5@gmail.com	Empresa 5	\N	Num 5	Ramo5	Rua5	1005	\N	2021-11-29	5	5
+6	16	empresa.6@gmail.com	Empresa 6	\N	Num 6	Ramo6	Rua6	1006	\N	2021-11-29	6	6
+7	17	empresa.7@gmail.com	Empresa 7	\N	Num 7	Ramo7	Rua7	1007	\N	2021-11-29	7	7
+8	18	empresa.8@gmail.com	Empresa 8	\N	Num 8	Ramo8	Rua8	1008	\N	2021-11-29	8	8
+9	19	empresa.9@gmail.com	Empresa 9	\N	Num 9	Ramo9	Rua9	1009	\N	2021-11-29	9	9
+10	20	empresa.10@gmail.com	Empresa 10	\N	Num 10	Ramo10	Rua10	1010	\N	2021-11-29	10	10
+11	21	empresa.11@gmail.com	Empresa 11	\N	Num 11	Ramo11	Rua11	1011	\N	2021-11-29	11	11
+12	22	empresa.12@gmail.com	Empresa 12	\N	Num 12	Ramo12	Rua12	1012	\N	2021-11-29	1	1
+13	23	empresa.13@gmail.com	Empresa 13	\N	Num 13	Ramo13	Rua13	1013	\N	2021-11-29	2	2
+14	24	empresa.14@gmail.com	Empresa 14	\N	Num 14	Ramo14	Rua14	1014	\N	2021-11-29	3	3
+15	25	empresa.15@gmail.com	Empresa 15	\N	Num 15	Ramo15	Rua15	1015	\N	2021-11-29	4	4
+16	26	empresa.16@gmail.com	Empresa 16	\N	Num 16	Ramo16	Rua16	1016	\N	2021-11-29	5	5
+17	27	empresa.17@gmail.com	Empresa 17	\N	Num 17	Ramo17	Rua17	1017	\N	2021-11-29	6	6
+18	28	empresa.18@gmail.com	Empresa 18	\N	Num 18	Ramo18	Rua18	1018	\N	2021-11-29	7	7
+19	29	empresa.19@gmail.com	Empresa 19	\N	Num 19	Ramo19	Rua19	1019	\N	2021-11-29	8	8
+20	30	empresa.20@gmail.com	Empresa 20	\N	Num 20	Ramo20	Rua20	1020	\N	2021-11-29	9	9
+21	31	empresa.21@gmail.com	Empresa 21	\N	Num 21	Ramo21	Rua21	1021	\N	2021-11-29	10	10
+22	32	empresa.22@gmail.com	Empresa 22	\N	Num 22	Ramo22	Rua22	1022	\N	2021-11-29	11	11
+0	0	default	Empresa deletada	\N	default	default	default	0	\N	2021-12-04	11	0
+\.
+
+
+--
+-- TOC entry 3204 (class 0 OID 33815)
+-- Dependencies: 203
+-- Data for Name: estado; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.estado (codest, nomest, codpai_codpai) FROM stdin;
+1	Acre	33
+2	Alagoas	33
+3	Amazonas	33
+4	Amapá	33
+5	Bahia	33
+6	Ceará	33
+7	Distrito Federal	33
+8	Espírito Santo	33
+9	Goiás	33
+10	Maranhão	33
+11	Minas Gerais	33
+12	Mato Grosso do Sul	33
+13	Mato Grosso	33
+14	Pará	33
+15	Paraíba	33
+16	Pernambuco	33
+17	Piauí	33
+18	Paraná	33
+19	Rio de Janeiro	33
+20	Rio Grande do Norte	33
+21	Rondônia	33
+22	Roraima	33
+23	Rio Grande do Sul	33
+24	Santa Catarina	33
+25	Sergipe	33
+26	São Paulo	33
+27	Tocantins	33
+28	Outro	33
+\.
+
+
+--
+-- TOC entry 3205 (class 0 OID 33820)
+-- Dependencies: 204
+-- Data for Name: medico; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.medico (crmmed, cpfusu_cpfusu) FROM stdin;
+1	1
+2	2
+3	3
+4	4
+5	5
+6	6
+7	7
+8	8
+9	9
+10	10
+11	11
+12	12
+13	13
+14	14
+15	15
+16	16
+17	17
+18	18
+19	19
+20	20
+21	21
+22	22
+\.
+
+
+--
+-- TOC entry 3206 (class 0 OID 33825)
+-- Dependencies: 205
+-- Data for Name: monitoramento_paciente; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.monitoramento_paciente (codmon, datmon, intsin, codpac_codpac, codsin_codsin) FROM stdin;
+1	2021-11-29	M	1	1
+2	2021-11-29	P	2	2
+3	2021-11-29	M	3	3
+4	2021-11-29	P	4	4
+6	2021-11-29	P	6	6
+7	2021-11-29	M	7	7
+8	2021-11-29	P	8	8
+9	2021-11-29	M	9	9
+10	2021-11-29	P	10	10
+11	2021-11-29	M	11	11
+12	2021-11-29	C	1	1
+13	2021-11-29	S	2	2
+14	2021-11-29	C	3	3
+15	2021-11-29	S	4	4
+16	2021-11-29	C	5	5
+17	2021-11-29	S	6	6
+18	2021-11-29	C	7	7
+19	2021-11-29	S	8	8
+20	2021-11-29	C	9	9
+21	2021-11-29	S	10	10
+22	2021-11-29	C	11	11
+5	2021-11-29	M	5	5
+\.
+
+
+--
+-- TOC entry 3207 (class 0 OID 33832)
+-- Dependencies: 206
+-- Data for Name: paciente; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.paciente (codpac, grurispac, pespac, sitpac, cpfusu_cpfusu) FROM stdin;
+1	S	42.50	BEM	12
+3	S	44.50	BEM	14
+5	S	46.50	BEM	16
+7	S	48.50	BEM	18
+9	S	50.50	BEM	20
+11	S	52.50	BEM	22
+2	N	43.50	ISOLAMENTO	13
+4	N	45.50	ISOLAMENTO	15
+6	N	47.50	ISOLAMENTO	17
+8	N	49.50	ISOLAMENTO	19
+10	N	51.50	ISOLAMENTO	21
+\.
+
+
+--
+-- TOC entry 3208 (class 0 OID 33839)
+-- Dependencies: 207
+-- Data for Name: paciente_comorbidade; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.paciente_comorbidade (codpaccom, codcom_codcom, codpac_codpac) FROM stdin;
+1	1	1
+2	2	2
+3	3	3
+4	4	4
+5	5	5
+6	6	6
+7	7	7
+8	8	8
+9	9	9
+10	10	10
+11	11	11
+\.
+
+
+--
+-- TOC entry 3209 (class 0 OID 33844)
+-- Dependencies: 208
+-- Data for Name: pais; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.pais (codpai, nompai) FROM stdin;
+1	Afeganistão
+2	África do Sul
+3	Åland, Ilhas
+4	Albânia
+5	Alemanha
+6	Andorra
+7	Angola
+8	Anguilla
+9	Antártida
+10	Antigua e Barbuda
+11	Antilhas Holandesas
+12	Arábia Saudita
+13	Argélia
+14	Argentina
+15	Arménia
+16	Aruba
+17	Austrália
+18	Áustria
+19	Azerbaijão
+20	Bahamas
+21	Bahrain
+22	Bangladesh
+23	Barbados
+24	Bélgica
+25	Belize
+26	Benin
+27	Bermuda
+28	Bielo-Rússia
+29	Bolívia
+30	Bósnia-Herzegovina
+31	Botswana
+32	Bouvet, Ilha
+33	Brasil
+34	Brunei
+35	Bulgária
+36	Burkina Faso
+37	Burundi
+38	Butão
+39	Cabo Verde
+40	Cambodja
+41	Camarões
+42	Canadá
+43	Cayman, Ilhas
+44	Cazaquistão
+45	Centro-africana, República
+46	Chade
+47	Checa, República
+48	Chile
+49	China
+50	Chipre
+51	Christmas, Ilha
+52	Cocos, Ilhas
+53	Colômbia
+54	Comores
+55	Congo, República do
+56	Congo, República Democrática do antigo Zaire
+57	Cook, Ilhas
+58	Coreia do Sul
+59	Coreia, República Democrática da Coreia do Norte
+60	Costa do Marfim
+61	Costa Rica
+62	Croácia
+63	Cuba
+64	Dinamarca
+65	Djibouti
+66	Dominica
+67	Dominicana, República
+68	Egipto
+69	El Salvador
+70	Emiratos Árabes Unidos
+71	Equador
+72	Eritreia
+73	Eslováquia
+74	Eslovénia
+75	Espanha
+76	Estados Unidos da América
+77	Estónia
+78	Etiópia
+79	Faroe, Ilhas
+80	Fiji
+81	Filipinas
+82	Finlândia
+83	França
+84	Gabão
+85	Gâmbia
+86	Gana
+87	Geórgia
+88	Geórgia do Sul e Sandwich do Sul, Ilhas
+89	Gibraltar
+90	Grécia
+91	Grenada
+92	Groenlândia
+93	Guadeloupe
+94	Guam
+95	Guatemala
+96	Guernsey
+97	Guiana
+98	Guiana Francesa
+99	Guiné-Bissau
+100	Guiné-Conacri
+101	Guiné Equatorial
+102	Haiti
+103	Heard e Ilhas McDonald, Ilha
+104	Honduras
+105	Hong Kong
+106	Hungria
+107	Iémen
+108	Índia
+109	Indonésia
+110	Iraque
+111	Irão
+112	Irlanda
+113	Islândia
+114	Israel
+115	Itália
+116	Jamaica
+117	Japão
+118	Jersey
+119	Jordânia
+120	Kiribati
+121	Kuwait
+122	Laos
+123	Lesoto
+124	Letónia
+125	Líbano
+126	Libéria
+127	Líbia
+128	Liechtenstein
+129	Lituânia
+130	Luxemburgo
+131	Macau
+132	Macedónia
+133	Madagáscar
+134	Malásia
+135	Malawi
+136	Maldivas
+137	Mali
+138	Malta
+139	Malvinas, Ilhas Falkland
+140	Man, Ilha de
+141	Marianas Setentrionais
+142	Marrocos
+143	Marshall, Ilhas
+144	Martinica
+145	Maurícia
+146	Mauritânia
+147	Mayotte
+148	Menores Distantes dos Estados Unidos, Ilhas
+149	México
+150	Myanmar, antiga Birmânia
+151	Micronésia, Estados Federados da
+152	Moçambique
+153	Moldávia
+154	Mónaco
+155	Mongólia
+156	Montenegro
+157	Montserrat
+158	Namíbia
+159	Nauru
+160	Nepal
+161	Nicarágua
+162	Níger
+163	Nigéria
+164	Niue
+165	Norfolk, Ilha
+166	Noruega
+167	Nova Caledónia
+168	Nova Zelândia, Aotearoa
+169	Oman
+170	Países Baixos, Holanda
+171	Palau
+172	Palestina
+173	Panamá
+174	Papua-Nova Guiné
+175	Paquistão
+176	Paraguai
+177	Peru
+178	Pitcairn
+179	Polinésia Francesa
+180	Polônia
+181	Porto Rico
+182	Portugal
+183	Qatar
+184	Quénia
+185	Quirguistão
+186	Reino Unido da Grã-Bretanha e Irlanda do Norte
+187	Reunião, Ilha
+188	Roménia
+189	Ruanda
+190	Rússia
+191	Saara Ocidental
+192	Samoa Americana
+193	Samoa, Samoa Ocidental
+194	Saint Pierre et Miquelon
+195	Salomão, Ilhas
+196	São Cristóvão e Névis, Saint Kitts e Nevis
+197	San Marino
+198	São Tomé e Príncipe
+199	São Vicente e Granadinas
+200	Santa Helena
+201	Santa Lúcia
+202	Senegal
+203	Serra Leoa
+204	Sérvia
+205	Seychelles
+206	Singapura
+207	Síria
+208	Somália
+209	Sri Lanka
+210	Suazilândia
+211	Sudão
+212	Suécia
+213	Suíça
+214	Suriname
+215	Svalbard e Jan Mayen
+216	Tailândia
+217	Taiwan
+218	Tajiquistão
+219	Tanzânia
+220	Terras Austrais e Antárticas Francesas, TAAF
+221	Território Britânico do Oceano Índico
+223	Timor-Leste
+224	Togo
+225	Toquelau
+226	Tonga
+227	Trindade e Tobago
+228	Tunísia
+229	Turks e Caicos
+230	Turquemenistão
+231	Turquia
+232	Tuvalu
+233	Ucrânia
+234	Uganda
+235	Uruguai
+236	Usbequistão
+237	Vanuatu
+238	Vaticano
+239	Venezuela
+240	Vietname
+241	Virgens Americanas, Ilhas
+242	Virgens Britânicas, Ilhas
+243	Wallis e Futuna
+244	Zâmbia
+245	Zimbabue
+246	Outro
+\.
+
+
+--
+-- TOC entry 3210 (class 0 OID 33849)
+-- Dependencies: 209
+-- Data for Name: sintoma; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.sintoma (codsin, nomsin) FROM stdin;
+1	Febre
+2	Espirros e secreção nasal
+3	Tosse seca
+4	Dor no corpo
+5	Dor de cabeça
+6	Dor ou irritação na garganta
+7	Dificuldade respiratória
+8	Diarreia
+9	Perda de paladar e/ou olfato
+10	Outros sintomas
+11	Oximetria ou Saturação de oxigênio por oxímetro
+\.
+
+
+--
+-- TOC entry 3211 (class 0 OID 33854)
+-- Dependencies: 210
+-- Data for Name: solicitacao; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.solicitacao (codsol, anasol, datsol, dessol, cpfusu_cpfusu) FROM stdin;
+1	f	2021-11-29	Descição1	1
+2	f	2021-11-29	Descição2	2
+3	f	2021-11-29	Descição3	3
+4	f	2021-11-29	Descição4	4
+5	f	2021-11-29	Descição5	5
+6	f	2021-11-29	Descição6	6
+7	f	2021-11-29	Descição7	7
+8	f	2021-11-29	Descição8	8
+9	f	2021-11-29	Descição9	9
+10	f	2021-11-29	Descição10	10
+11	f	2021-11-29	Descição11	11
+12	f	2021-11-29	Descição12	12
+13	f	2021-11-29	Descição13	13
+14	f	2021-11-29	Descição14	14
+15	f	2021-11-29	Descição15	15
+16	f	2021-11-29	Descição16	16
+17	f	2021-11-29	Descição17	17
+18	f	2021-11-29	Descição18	18
+19	f	2021-11-29	Descição19	19
+20	f	2021-11-29	Descição20	20
+21	f	2021-11-29	Descição21	21
+22	f	2021-11-29	Descição22	22
+\.
+
+
+--
+-- TOC entry 3212 (class 0 OID 33861)
+-- Dependencies: 211
+-- Data for Name: teste_covid; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.teste_covid (codtes, covpactes, dattes, codpac_codpac) FROM stdin;
+1	N	2021-11-29	1
+2	P	2021-11-29	2
+3	N	2021-11-29	3
+4	P	2021-11-29	4
+5	N	2021-11-29	5
+6	P	2021-11-29	6
+7	N	2021-11-29	7
+8	P	2021-11-29	8
+9	N	2021-11-29	9
+10	P	2021-11-29	10
+11	N	2021-11-29	11
+\.
+
+
+--
+-- TOC entry 3213 (class 0 OID 33868)
+-- Dependencies: 212
+-- Data for Name: usuario; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.usuario (cpfusu, cep, datnasusu, emausu, nomusu, num, rua, senusu, sexusu, telusu, valusu, cnpjemp_cnpjemp, codcid_codcid) FROM stdin;
+1	11	2020-05-21	usuario.1@gmail.com	Usuario 1	Num 1	Rua1	Senha1	F	1001	2021-11-29	\N	1
+2	12	2020-05-22	usuario.2@gmail.com	Usuario 2	Num 2	Rua2	Senha2	M	1002	2021-11-29	\N	2
+3	13	2020-05-23	usuario.3@gmail.com	Usuario 3	Num 3	Rua3	Senha3	F	1003	2021-11-29	\N	3
+4	14	2020-05-24	usuario.4@gmail.com	Usuario 4	Num 4	Rua4	Senha4	M	1004	2021-11-29	\N	4
+5	15	2020-05-25	usuario.5@gmail.com	Usuario 5	Num 5	Rua5	Senha5	F	1005	2021-11-29	\N	5
+6	16	2020-05-26	usuario.6@gmail.com	Usuario 6	Num 6	Rua6	Senha6	M	1006	2021-11-29	\N	6
+7	17	2020-05-27	usuario.7@gmail.com	Usuario 7	Num 7	Rua7	Senha7	F	1007	2021-11-29	\N	7
+8	18	2020-05-28	usuario.8@gmail.com	Usuario 8	Num 8	Rua8	Senha8	M	1008	2021-11-29	\N	8
+9	19	2020-05-29	usuario.9@gmail.com	Usuario 9	Num 9	Rua9	Senha9	F	1009	2021-11-29	\N	9
+10	20	2020-05-30	usuario.10@gmail.com	Usuario 10	Num 10	Rua10	Senha10	M	1010	2021-11-29	\N	10
+11	21	2020-05-31	usuario.11@gmail.com	Usuario 11	Num 11	Rua11	Senha11	F	1011	2021-11-29	\N	11
+12	22	2020-06-01	usuario.12@gmail.com	Usuario 12	Num 12	Rua12	Senha12	M	1012	2021-11-29	12	1
+13	23	2020-06-02	usuario.13@gmail.com	Usuario 13	Num 13	Rua13	Senha13	F	1013	2021-11-29	13	2
+14	24	2020-06-03	usuario.14@gmail.com	Usuario 14	Num 14	Rua14	Senha14	M	1014	2021-11-29	14	3
+15	25	2020-06-04	usuario.15@gmail.com	Usuario 15	Num 15	Rua15	Senha15	F	1015	2021-11-29	15	4
+16	26	2020-06-05	usuario.16@gmail.com	Usuario 16	Num 16	Rua16	Senha16	M	1016	2021-11-29	16	5
+17	27	2020-06-06	usuario.17@gmail.com	Usuario 17	Num 17	Rua17	Senha17	F	1017	2021-11-29	17	6
+18	28	2020-06-07	usuario.18@gmail.com	Usuario 18	Num 18	Rua18	Senha18	M	1018	2021-11-29	18	7
+19	29	2020-06-08	usuario.19@gmail.com	Usuario 19	Num 19	Rua19	Senha19	F	1019	2021-11-29	19	8
+20	30	2020-06-09	usuario.20@gmail.com	Usuario 20	Num 20	Rua20	Senha20	M	1020	2021-11-29	20	9
+21	31	2020-06-10	usuario.21@gmail.com	Usuario 21	Num 21	Rua21	Senha21	F	1021	2021-11-29	21	10
+22	32	2020-06-11	usuario.22@gmail.com	Usuario 22	Num 22	Rua22	Senha22	M	1022	2021-11-29	22	11
+0	0	2000-01-01	default	default	default	default	bvr839rbv3	M	default	2021-12-04	\N	11
+\.
+
+
+--
+-- TOC entry 3214 (class 0 OID 33875)
+-- Dependencies: 213
+-- Data for Name: vacina; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.vacina (codvac, datvac, dosvac, fabvac, codpac_codpac, crmmed_crmmed) FROM stdin;
+1	2021-11-29	2	\N	1	1
+2	2021-11-29	1	\N	2	2
+3	2021-11-29	2	\N	3	3
+4	2021-11-29	1	\N	4	4
+5	2021-11-29	2	\N	5	5
+6	2021-11-29	1	\N	6	6
+7	2021-11-29	2	\N	7	7
+8	2021-11-29	1	\N	8	8
+9	2021-11-29	2	\N	9	9
+10	2021-11-29	1	\N	10	10
+11	2021-11-29	2	\N	11	11
+\.
+
+
+--
+-- TOC entry 3318 (class 0 OID 0)
+-- Dependencies: 214
+-- Name: seq_cidade; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.seq_cidade', 1, false);
+
+
+--
+-- TOC entry 3319 (class 0 OID 0)
+-- Dependencies: 215
+-- Name: seq_comorbidade; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.seq_comorbidade', 1, false);
+
+
+--
+-- TOC entry 3320 (class 0 OID 0)
+-- Dependencies: 216
+-- Name: seq_estado; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.seq_estado', 1, false);
+
+
+--
+-- TOC entry 3321 (class 0 OID 0)
+-- Dependencies: 217
+-- Name: seq_monitoramento_paciente; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.seq_monitoramento_paciente', 22, true);
+
+
+--
+-- TOC entry 3322 (class 0 OID 0)
+-- Dependencies: 218
+-- Name: seq_paciente; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.seq_paciente', 11, true);
+
+
+--
+-- TOC entry 3323 (class 0 OID 0)
+-- Dependencies: 219
+-- Name: seq_paciente_comorbidade; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.seq_paciente_comorbidade', 11, true);
+
+
+--
+-- TOC entry 3324 (class 0 OID 0)
+-- Dependencies: 220
+-- Name: seq_pais; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.seq_pais', 1, false);
+
+
+--
+-- TOC entry 3325 (class 0 OID 0)
+-- Dependencies: 221
+-- Name: seq_sintoma; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.seq_sintoma', 1, false);
+
+
+--
+-- TOC entry 3326 (class 0 OID 0)
+-- Dependencies: 222
+-- Name: seq_solicitacao; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.seq_solicitacao', 22, true);
+
+
+--
+-- TOC entry 3327 (class 0 OID 0)
+-- Dependencies: 223
+-- Name: seq_teste_covid; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.seq_teste_covid', 11, true);
+
+
+--
+-- TOC entry 3328 (class 0 OID 0)
+-- Dependencies: 224
+-- Name: seq_vacina; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.seq_vacina', 11, true);
+
+
+--
+-- TOC entry 3003 (class 2606 OID 33803)
+-- Name: cidade cidade_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.cidade
+    ADD CONSTRAINT cidade_pkey PRIMARY KEY (codcid);
+
+
+--
+-- TOC entry 3005 (class 2606 OID 33808)
+-- Name: comorbidade comorbidade_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.comorbidade
+    ADD CONSTRAINT comorbidade_pkey PRIMARY KEY (codcom);
+
+
+--
+-- TOC entry 3041 (class 2606 OID 33997)
+-- Name: databasechangeloglock databasechangeloglock_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.databasechangeloglock
+    ADD CONSTRAINT databasechangeloglock_pkey PRIMARY KEY (id);
+
+
+--
+-- TOC entry 3007 (class 2606 OID 33814)
+-- Name: empresa empresa_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.empresa
+    ADD CONSTRAINT empresa_pkey PRIMARY KEY (cnpjemp);
+
+
+--
+-- TOC entry 3011 (class 2606 OID 33819)
+-- Name: estado estado_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.estado
+    ADD CONSTRAINT estado_pkey PRIMARY KEY (codest);
+
+
+--
+-- TOC entry 3013 (class 2606 OID 33824)
+-- Name: medico medico_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.medico
+    ADD CONSTRAINT medico_pkey PRIMARY KEY (crmmed);
+
+
+--
+-- TOC entry 3017 (class 2606 OID 33831)
+-- Name: monitoramento_paciente monitoramento_paciente_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.monitoramento_paciente
+    ADD CONSTRAINT monitoramento_paciente_pkey PRIMARY KEY (codmon);
+
+
+--
+-- TOC entry 3023 (class 2606 OID 33843)
+-- Name: paciente_comorbidade paciente_comorbidade_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.paciente_comorbidade
+    ADD CONSTRAINT paciente_comorbidade_pkey PRIMARY KEY (codpaccom);
+
+
+--
+-- TOC entry 3019 (class 2606 OID 33838)
+-- Name: paciente paciente_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.paciente
+    ADD CONSTRAINT paciente_pkey PRIMARY KEY (codpac);
+
+
+--
+-- TOC entry 3025 (class 2606 OID 33848)
+-- Name: pais pais_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.pais
+    ADD CONSTRAINT pais_pkey PRIMARY KEY (codpai);
+
+
+--
+-- TOC entry 3029 (class 2606 OID 33853)
+-- Name: sintoma sintoma_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.sintoma
+    ADD CONSTRAINT sintoma_pkey PRIMARY KEY (codsin);
+
+
+--
+-- TOC entry 3031 (class 2606 OID 33860)
+-- Name: solicitacao solicitacao_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.solicitacao
+    ADD CONSTRAINT solicitacao_pkey PRIMARY KEY (codsol);
+
+
+--
+-- TOC entry 3033 (class 2606 OID 33867)
+-- Name: teste_covid teste_covid_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.teste_covid
+    ADD CONSTRAINT teste_covid_pkey PRIMARY KEY (codtes);
+
+
+--
+-- TOC entry 3027 (class 2606 OID 33888)
+-- Name: pais uk_2j0xr41oys2wa2ylqusdor5a; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.pais
+    ADD CONSTRAINT uk_2j0xr41oys2wa2ylqusdor5a UNIQUE (nompai);
+
+
+--
+-- TOC entry 3015 (class 2606 OID 33884)
+-- Name: medico uk_576mgjbwyqg8s4i4f7eqofsmr; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.medico
+    ADD CONSTRAINT uk_576mgjbwyqg8s4i4f7eqofsmr UNIQUE (cpfusu_cpfusu);
+
+
+--
+-- TOC entry 3021 (class 2606 OID 33886)
+-- Name: paciente uk_lhbqkvmcs8baym7nhneryxh0k; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.paciente
+    ADD CONSTRAINT uk_lhbqkvmcs8baym7nhneryxh0k UNIQUE (cpfusu_cpfusu);
+
+
+--
+-- TOC entry 3035 (class 2606 OID 33890)
+-- Name: usuario uk_qpqme80xu0cw9vdadaunjifr7; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.usuario
+    ADD CONSTRAINT uk_qpqme80xu0cw9vdadaunjifr7 UNIQUE (emausu);
+
+
+--
+-- TOC entry 3009 (class 2606 OID 33882)
+-- Name: empresa uk_r7w5sif4r4c0asameonxn9qkc; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.empresa
+    ADD CONSTRAINT uk_r7w5sif4r4c0asameonxn9qkc UNIQUE (emaemp);
+
+
+--
+-- TOC entry 3037 (class 2606 OID 33874)
+-- Name: usuario usuario_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.usuario
+    ADD CONSTRAINT usuario_pkey PRIMARY KEY (cpfusu);
+
+
+--
+-- TOC entry 3039 (class 2606 OID 33880)
+-- Name: vacina vacina_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.vacina
+    ADD CONSTRAINT vacina_pkey PRIMARY KEY (codvac);
+
+
+--
+-- TOC entry 3199 (class 2618 OID 34068)
+-- Name: vw_select3 _RETURN; Type: RULE; Schema: public; Owner: postgres
+--
+
+CREATE OR REPLACE VIEW public.vw_select3 AS
+ SELECT c.codcid,
+    c.nomcid,
+    count(DISTINCT mp.codpac_codpac) AS conta
+   FROM (((public.cidade c
+     LEFT JOIN public.usuario u ON ((c.codcid = u.codcid_codcid)))
+     LEFT JOIN public.paciente p ON ((p.cpfusu_cpfusu = u.cpfusu)))
+     LEFT JOIN public.monitoramento_paciente mp ON ((mp.codpac_codpac = p.codpac)))
+  GROUP BY c.codcid
+  ORDER BY (count(DISTINCT mp.codpac_codpac));
+
+
+--
+-- TOC entry 3059 (class 2620 OID 34021)
+-- Name: paciente_comorbidade paciente_comorbidade_before_tg; Type: TRIGGER; Schema: public; Owner: postgres
+--
+
+CREATE TRIGGER paciente_comorbidade_before_tg BEFORE INSERT OR UPDATE ON public.paciente_comorbidade FOR EACH ROW EXECUTE FUNCTION public.controla_comorbidade();
+
+
+--
+-- TOC entry 3058 (class 2620 OID 34023)
+-- Name: paciente paciente_empresa_before_tg; Type: TRIGGER; Schema: public; Owner: postgres
+--
+
+CREATE TRIGGER paciente_empresa_before_tg BEFORE INSERT OR UPDATE ON public.paciente FOR EACH ROW EXECUTE FUNCTION public.controla_paciente_empresa();
+
+
+--
+-- TOC entry 3060 (class 2620 OID 34019)
+-- Name: teste_covid testecovid_after_tg; Type: TRIGGER; Schema: public; Owner: postgres
+--
+
+CREATE TRIGGER testecovid_after_tg AFTER INSERT OR UPDATE ON public.teste_covid FOR EACH ROW EXECUTE FUNCTION public.controla_sitpac();
+
+
+--
+-- TOC entry 3061 (class 2620 OID 34017)
+-- Name: vacina vacina_datvac_before_tg; Type: TRIGGER; Schema: public; Owner: postgres
+--
+
+CREATE TRIGGER vacina_datvac_before_tg BEFORE INSERT ON public.vacina FOR EACH ROW EXECUTE FUNCTION public.controla_datvac();
+
+
+--
+-- TOC entry 3062 (class 2620 OID 34015)
+-- Name: vacina vacina_dosvac_before_tg; Type: TRIGGER; Schema: public; Owner: postgres
+--
+
+CREATE TRIGGER vacina_dosvac_before_tg BEFORE INSERT OR UPDATE ON public.vacina FOR EACH ROW EXECUTE FUNCTION public.controla_dosvac();
+
+
+--
+-- TOC entry 3057 (class 2606 OID 33988)
+-- Name: vacina fk1r7q80i7cy757mpakujhv6flg; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.vacina
+    ADD CONSTRAINT fk1r7q80i7cy757mpakujhv6flg FOREIGN KEY (crmmed_crmmed) REFERENCES public.medico(crmmed);
+
+
+--
+-- TOC entry 3043 (class 2606 OID 33918)
+-- Name: empresa fk3cm5l20jyow2j8h4aw6gu5qe7; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.empresa
+    ADD CONSTRAINT fk3cm5l20jyow2j8h4aw6gu5qe7 FOREIGN KEY (codcid_codcid) REFERENCES public.cidade(codcid);
+
+
+--
+-- TOC entry 3055 (class 2606 OID 33978)
+-- Name: usuario fk4wjwqy3t3k92wm18x2iwlal82; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.usuario
+    ADD CONSTRAINT fk4wjwqy3t3k92wm18x2iwlal82 FOREIGN KEY (codcid_codcid) REFERENCES public.cidade(codcid);
+
+
+--
+-- TOC entry 3042 (class 2606 OID 33913)
+-- Name: cidade fk513uuv6dcnn53onkrbfhtiks0; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.cidade
+    ADD CONSTRAINT fk513uuv6dcnn53onkrbfhtiks0 FOREIGN KEY (codest_codest) REFERENCES public.estado(codest);
+
+
+--
+-- TOC entry 3045 (class 2606 OID 33928)
+-- Name: estado fk5yllmg1rb8up7esi9wbqr642l; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.estado
+    ADD CONSTRAINT fk5yllmg1rb8up7esi9wbqr642l FOREIGN KEY (codpai_codpai) REFERENCES public.pais(codpai);
+
+
+--
+-- TOC entry 3046 (class 2606 OID 33933)
+-- Name: medico fkaf109eleig7hkaoge0d2fxmys; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.medico
+    ADD CONSTRAINT fkaf109eleig7hkaoge0d2fxmys FOREIGN KEY (cpfusu_cpfusu) REFERENCES public.usuario(cpfusu);
+
+
+--
+-- TOC entry 3049 (class 2606 OID 33948)
+-- Name: paciente fkatj5riy7sdi4phtuq0yor7p4j; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.paciente
+    ADD CONSTRAINT fkatj5riy7sdi4phtuq0yor7p4j FOREIGN KEY (cpfusu_cpfusu) REFERENCES public.usuario(cpfusu) ON DELETE CASCADE;
+
+
+--
+-- TOC entry 3054 (class 2606 OID 33973)
+-- Name: usuario fkayp7jv2rliyt7ma41gglamcbo; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.usuario
+    ADD CONSTRAINT fkayp7jv2rliyt7ma41gglamcbo FOREIGN KEY (cnpjemp_cnpjemp) REFERENCES public.empresa(cnpjemp);
+
+
+--
+-- TOC entry 3044 (class 2606 OID 33923)
+-- Name: empresa fkb72tjkhqxia8tr6p0svgc5qco; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.empresa
+    ADD CONSTRAINT fkb72tjkhqxia8tr6p0svgc5qco FOREIGN KEY (cpfusu_cpfusu) REFERENCES public.usuario(cpfusu);
+
+
+--
+-- TOC entry 3048 (class 2606 OID 33943)
+-- Name: monitoramento_paciente fkessl3kkc8dxp0yfd4nbnd9c7x; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.monitoramento_paciente
+    ADD CONSTRAINT fkessl3kkc8dxp0yfd4nbnd9c7x FOREIGN KEY (codsin_codsin) REFERENCES public.sintoma(codsin);
+
+
+--
+-- TOC entry 3051 (class 2606 OID 33958)
+-- Name: paciente_comorbidade fkict2s3jgwc8eksomkeh1008hx; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.paciente_comorbidade
+    ADD CONSTRAINT fkict2s3jgwc8eksomkeh1008hx FOREIGN KEY (codpac_codpac) REFERENCES public.paciente(codpac) ON DELETE CASCADE;
+
+
+--
+-- TOC entry 3050 (class 2606 OID 33953)
+-- Name: paciente_comorbidade fkiqysb9lithopqige251f12uu5; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.paciente_comorbidade
+    ADD CONSTRAINT fkiqysb9lithopqige251f12uu5 FOREIGN KEY (codcom_codcom) REFERENCES public.comorbidade(codcom);
+
+
+--
+-- TOC entry 3052 (class 2606 OID 33963)
+-- Name: solicitacao fkjxjv2agv1b4a55whhuv2invmo; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.solicitacao
+    ADD CONSTRAINT fkjxjv2agv1b4a55whhuv2invmo FOREIGN KEY (cpfusu_cpfusu) REFERENCES public.usuario(cpfusu);
+
+
+--
+-- TOC entry 3056 (class 2606 OID 33983)
+-- Name: vacina fkorwqcoxhh3t0vngthw59iml7b; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.vacina
+    ADD CONSTRAINT fkorwqcoxhh3t0vngthw59iml7b FOREIGN KEY (codpac_codpac) REFERENCES public.paciente(codpac);
+
+
+--
+-- TOC entry 3053 (class 2606 OID 33968)
+-- Name: teste_covid fkp0qj60v0fd06yivrhj4nyse5r; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.teste_covid
+    ADD CONSTRAINT fkp0qj60v0fd06yivrhj4nyse5r FOREIGN KEY (codpac_codpac) REFERENCES public.paciente(codpac) ON DELETE CASCADE;
+
+
+--
+-- TOC entry 3047 (class 2606 OID 33938)
+-- Name: monitoramento_paciente fkrtyd6qlo2yurwwv7bc743fmpk; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.monitoramento_paciente
+    ADD CONSTRAINT fkrtyd6qlo2yurwwv7bc743fmpk FOREIGN KEY (codpac_codpac) REFERENCES public.paciente(codpac) ON DELETE CASCADE;
+
+
+--
+-- TOC entry 3237 (class 0 OID 0)
+-- Dependencies: 200
+-- Name: TABLE cidade; Type: ACL; Schema: public; Owner: postgres
+--
+
+GRANT SELECT ON TABLE public.cidade TO g_usuario;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE public.cidade TO g_administrador;
+
+
+--
+-- TOC entry 3241 (class 0 OID 0)
+-- Dependencies: 201
+-- Name: TABLE comorbidade; Type: ACL; Schema: public; Owner: postgres
+--
+
+GRANT SELECT ON TABLE public.comorbidade TO g_usuario;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE public.comorbidade TO g_administrador;
+
+
+--
+-- TOC entry 3242 (class 0 OID 0)
+-- Dependencies: 226
+-- Name: TABLE databasechangelog; Type: ACL; Schema: public; Owner: postgres
+--
+
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE public.databasechangelog TO g_administrador;
+
+
+--
+-- TOC entry 3243 (class 0 OID 0)
+-- Dependencies: 225
+-- Name: TABLE databasechangeloglock; Type: ACL; Schema: public; Owner: postgres
+--
+
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE public.databasechangeloglock TO g_administrador;
+
+
+--
+-- TOC entry 3256 (class 0 OID 0)
+-- Dependencies: 202
+-- Name: TABLE empresa; Type: ACL; Schema: public; Owner: postgres
+--
+
+GRANT INSERT ON TABLE public.empresa TO g_usuario;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE public.empresa TO g_empresa;
+GRANT SELECT ON TABLE public.empresa TO g_medico;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE public.empresa TO g_administrador;
+
+
+--
+-- TOC entry 3260 (class 0 OID 0)
+-- Dependencies: 203
+-- Name: TABLE estado; Type: ACL; Schema: public; Owner: postgres
+--
+
+GRANT SELECT ON TABLE public.estado TO g_usuario;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE public.estado TO g_administrador;
+
+
+--
+-- TOC entry 3263 (class 0 OID 0)
+-- Dependencies: 204
+-- Name: TABLE medico; Type: ACL; Schema: public; Owner: postgres
+--
+
+GRANT INSERT ON TABLE public.medico TO g_usuario;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE public.medico TO g_administrador;
+
+
+--
+-- TOC entry 3268 (class 0 OID 0)
+-- Dependencies: 205
+-- Name: TABLE monitoramento_paciente; Type: ACL; Schema: public; Owner: postgres
+--
+
+GRANT SELECT,INSERT,UPDATE ON TABLE public.monitoramento_paciente TO g_paciente;
+GRANT SELECT,INSERT ON TABLE public.monitoramento_paciente TO g_medico;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE public.monitoramento_paciente TO g_administrador;
+
+
+--
+-- TOC entry 3273 (class 0 OID 0)
+-- Dependencies: 206
+-- Name: TABLE paciente; Type: ACL; Schema: public; Owner: postgres
+--
+
+GRANT INSERT ON TABLE public.paciente TO g_usuario;
+GRANT SELECT ON TABLE public.paciente TO g_empresa;
+GRANT DELETE ON TABLE public.paciente TO g_paciente;
+GRANT SELECT ON TABLE public.paciente TO g_medico;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE public.paciente TO g_administrador;
+
+
+--
+-- TOC entry 3276 (class 0 OID 0)
+-- Dependencies: 207
+-- Name: TABLE paciente_comorbidade; Type: ACL; Schema: public; Owner: postgres
+--
+
+GRANT INSERT ON TABLE public.paciente_comorbidade TO g_usuario;
+GRANT DELETE ON TABLE public.paciente_comorbidade TO g_paciente;
+GRANT SELECT ON TABLE public.paciente_comorbidade TO g_medico;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE public.paciente_comorbidade TO g_administrador;
+
+
+--
+-- TOC entry 3280 (class 0 OID 0)
+-- Dependencies: 208
+-- Name: TABLE pais; Type: ACL; Schema: public; Owner: postgres
+--
+
+GRANT SELECT ON TABLE public.pais TO g_usuario;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE public.pais TO g_administrador;
+
+
+--
+-- TOC entry 3284 (class 0 OID 0)
+-- Dependencies: 209
+-- Name: TABLE sintoma; Type: ACL; Schema: public; Owner: postgres
+--
+
+GRANT SELECT ON TABLE public.sintoma TO g_medico;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE public.sintoma TO g_administrador;
+
+
+--
+-- TOC entry 3289 (class 0 OID 0)
+-- Dependencies: 210
+-- Name: TABLE solicitacao; Type: ACL; Schema: public; Owner: postgres
+--
+
+GRANT INSERT ON TABLE public.solicitacao TO g_usuario;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE public.solicitacao TO g_administrador;
+
+
+--
+-- TOC entry 3294 (class 0 OID 0)
+-- Dependencies: 211
+-- Name: TABLE teste_covid; Type: ACL; Schema: public; Owner: postgres
+--
+
+GRANT SELECT ON TABLE public.teste_covid TO g_empresa;
+GRANT SELECT,INSERT,UPDATE ON TABLE public.teste_covid TO g_paciente;
+GRANT SELECT,INSERT ON TABLE public.teste_covid TO g_medico;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE public.teste_covid TO g_administrador;
+
+
+--
+-- TOC entry 3307 (class 0 OID 0)
+-- Dependencies: 212
+-- Name: TABLE usuario; Type: ACL; Schema: public; Owner: postgres
+--
+
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE public.usuario TO g_usuario;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE public.usuario TO g_administrador;
+
+
+--
+-- TOC entry 3313 (class 0 OID 0)
+-- Dependencies: 213
+-- Name: TABLE vacina; Type: ACL; Schema: public; Owner: postgres
+--
+
+GRANT SELECT ON TABLE public.vacina TO g_empresa;
+GRANT SELECT,INSERT,UPDATE ON TABLE public.vacina TO g_paciente;
+GRANT SELECT,INSERT ON TABLE public.vacina TO g_medico;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE public.vacina TO g_administrador;
+
+
+--
+-- TOC entry 3314 (class 0 OID 0)
+-- Dependencies: 230
+-- Name: TABLE vw_conta_empresas; Type: ACL; Schema: public; Owner: postgres
+--
+
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE public.vw_conta_empresas TO g_administrador;
+
+
+--
+-- TOC entry 3315 (class 0 OID 0)
+-- Dependencies: 229
+-- Name: TABLE vw_conta_medicos; Type: ACL; Schema: public; Owner: postgres
+--
+
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE public.vw_conta_medicos TO g_administrador;
+
+
+--
+-- TOC entry 3316 (class 0 OID 0)
+-- Dependencies: 231
+-- Name: TABLE vw_conta_pacientes; Type: ACL; Schema: public; Owner: postgres
+--
+
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE public.vw_conta_pacientes TO g_administrador;
+
+
+--
+-- TOC entry 3317 (class 0 OID 0)
+-- Dependencies: 232
+-- Name: TABLE vw_conta_usuarios; Type: ACL; Schema: public; Owner: postgres
+--
+
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE public.vw_conta_usuarios TO g_administrador;
+
+
+-- Completed on 2021-12-04 20:47:38
+
+--
+-- PostgreSQL database dump complete
+--
+
