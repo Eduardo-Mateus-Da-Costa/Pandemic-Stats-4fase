@@ -49,6 +49,7 @@ public class JSONexporter {
 	       	 	
 	        } catch (Exception e) {
 	            e.printStackTrace();
+	            throw new RuntimeException("Falhou na url");
 	        }
 	  }
 
@@ -69,6 +70,7 @@ public class JSONexporter {
 			writeFile.close();
 		} catch (IOException e) {
 			e.printStackTrace();
+		    throw new RuntimeException("Falhou na exportação");
 		}
 	}
 	

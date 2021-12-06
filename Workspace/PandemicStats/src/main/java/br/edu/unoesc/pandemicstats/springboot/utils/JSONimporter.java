@@ -39,7 +39,7 @@ public class JSONimporter {
 			return jsonArray;
 			}catch(IOException e)
 			{
-				return "0";
+				throw new RuntimeException("Falhou na importação");
 			}
 		
 	}

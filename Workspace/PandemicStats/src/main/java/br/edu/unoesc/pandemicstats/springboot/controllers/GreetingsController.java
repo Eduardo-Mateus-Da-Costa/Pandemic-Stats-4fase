@@ -243,6 +243,7 @@ public class GreetingsController {
 	@ResponseBody
 	public ResponseEntity<RespUsu> getUsu(@RequestParam long cpfusu) {
 		try {
+			System.out.println(cpfusu);
 			Usuario usuario = usuRep.findByCPF(cpfusu);
 			if (usuario == null)
 			{
@@ -253,11 +254,12 @@ public class GreetingsController {
 			PermisSCH permissoes = getPermis(usuario.getCpfusu());
 			RespUsu respusu = new RespUsu();
 			respusu.RespValUsu(usuario, 0, permissoes);
-			return new ResponseEntity<RespUsu>(respusu, HttpStatus.OK);
+			return new ResponseEntity<RespUsu>(respusu, HttpStatus.BAD_REQUEST);
 		} catch (Exception e) {
+			e.printStackTrace();
 			RespUsu respusu = new RespUsu();
 			respusu.RespValUsu(null, 500, null);
-			return new ResponseEntity<RespUsu>(respusu, HttpStatus.OK);
+			return new ResponseEntity<RespUsu>(respusu, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
 
@@ -273,23 +275,30 @@ public class GreetingsController {
 	@PostMapping(value = "postLogin")
 	@ResponseBody
 	public ResponseEntity<RespUsu> login(@RequestBody ReqLoginSCH reqlogin) {
-		Usuario usuario = new Usuario();
-		usuario = usuRep.findByEmail(reqlogin.getEmail());
-		if (usuario == null) {
-			RespUsu respusu = new RespUsu();
-			respusu.RespValUsu(null, 505, null);
-			return new ResponseEntity<RespUsu>(respusu, HttpStatus.CONFLICT);
-		} else {
-			if (usuario.getSenusu().equals(reqlogin.getSenha())) {
-				PermisSCH permissoes = getPermis(usuario.getCpfusu());
+		try {
+			Usuario usuario = new Usuario();
+			usuario = usuRep.findByEmail(reqlogin.getEmail());
+			if (usuario == null) {
 				RespUsu respusu = new RespUsu();
-				respusu.RespValUsu(usuario, 0, permissoes);
-				return new ResponseEntity<RespUsu>(respusu, HttpStatus.ACCEPTED);
+				respusu.RespValUsu(null, 505, null);
+				return new ResponseEntity<RespUsu>(respusu, HttpStatus.CONFLICT);
 			} else {
-				RespUsu respusu = new RespUsu();
-				respusu.RespValUsu(null, 504, null);
-				return new ResponseEntity<RespUsu>(respusu, HttpStatus.UNAUTHORIZED);
+				if (usuario.getSenusu().equals(reqlogin.getSenha())) {
+					PermisSCH permissoes = getPermis(usuario.getCpfusu());
+					RespUsu respusu = new RespUsu();
+					respusu.RespValUsu(usuario, 0, permissoes);
+					return new ResponseEntity<RespUsu>(respusu, HttpStatus.ACCEPTED);
+				} else {
+					RespUsu respusu = new RespUsu();
+					respusu.RespValUsu(null, 504, null);
+					return new ResponseEntity<RespUsu>(respusu, HttpStatus.UNAUTHORIZED);
+				}
 			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			RespUsu respusu = new RespUsu();
+			respusu.RespValUsu(null, 500, null);
+			return new ResponseEntity<RespUsu>(respusu, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
 
@@ -1258,10 +1267,6 @@ public class GreetingsController {
 			String jsonusuario = new String();
 			JSONimporter importer = new JSONimporter();
 			jsonusuario = importer.importer(filename);
-			if(jsonusuario.equals("0"))
-			{
-				return new ResponseEntity<String>("Falhou", HttpStatus.INTERNAL_SERVER_ERROR);
-			}
 			Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd").create();
 			Usuario usuario = gson.fromJson(jsonusuario, Usuario.class);
 			ResponseEntity<RespUsu> resp = postUsu(usuario);
@@ -1288,10 +1293,6 @@ public class GreetingsController {
 			String jsonempresa = new String();
 			JSONimporter importer = new JSONimporter();
 			jsonempresa = importer.importer(filename);
-			if(jsonempresa.equals("0"))
-			{
-				return new ResponseEntity<String>("Falhou", HttpStatus.INTERNAL_SERVER_ERROR);
-			}
 			Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd").create();
 			Empresa empresa = gson.fromJson(jsonempresa, Empresa.class);
 			ResponseEntity<RespEmp> resp = postEmp(empresa);
