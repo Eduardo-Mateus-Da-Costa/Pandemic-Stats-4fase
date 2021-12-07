@@ -3,9 +3,70 @@
 	xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
-	<changeSet id="adiciona as functions, trigger, views e grupos"
+	<changeSet id="adiciona as functions, trigger, views, grupos e indexes"
 		author="Eduardo Mateus da Costa">
 		<sql stripComments="true" splitStatements="true" endDelimiter="@"> <!--@ finaliza pois nas functions tem ; no meio -->
+			<!--INDEXES-->
+			<!--Usuario-->
+			create index usu_nomusu_ix
+			on usuario(nomusu);@
+			create index usu_rua_ix
+			on usuario(rua);@
+			create index usu_num_ix
+			on usuario(num);@
+			create index usu_emausu_ix
+			on usuario(emausu);@
+			create index usu_senusu_ix
+			on usuario(senusu);@
+			
+			<!--Paciente-->
+			create index pac_sitpac_ix
+			on paciente(sitpac);@
+			
+			<!--Endereços-->
+			create index cid_nomcid_ix
+			on cidade(nomcid);@
+			create index est_nomest_ix
+			on estado(nomest);@
+			
+			<!--Teste de covid-->
+			create index tescov_covpactes_ix
+			on teste_covid(covpactes);@
+			create index tescov_dattes_ix
+			on teste_covid(dattes);@
+			
+			<!--Monitoramento_paciente-->
+			create index monpac_intsin_ix
+			on monitoramento_paciente(intsin);@
+			create index monpac_datmon_ix
+			on monitoramento_paciente(datmon);@
+			
+			<!--Empresas-->
+			create index emp_nomemp_ix
+			on empresa(nomemp);@
+			create index emp_emaemp_ix
+			on empresa(emaemp);@
+			
+			<!--Medico-->
+			create index med_crmmed_ix
+			on medico(crmmed);@
+			
+			<!--Vacina-->
+			create index vac_dosvac_ix
+			on vacina(dosvac);@
+			
+			<!--Comorbidades-->
+			create index compac_codpac_ix
+			on paciente_comorbidade(codpac_codpac);@
+			create index compac_codcom_ix
+			on paciente_comorbidade(codcom_codcom);@
+			
+			<!--Solicitação-->
+			create index sol_dessol_ix
+			on solicitacao(dessol);@
+			create index sol_anasol_ix
+			on solicitacao(anasol);@
+			
 		
 			<!--Tipo de  resposta cidade-covid -->
 			create type tp_cid_covid as 
